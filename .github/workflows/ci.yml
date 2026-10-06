@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  calidad:
+    name: Contrato, estilo, tipos, pruebas y compilación
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Tipos generados al día con contrato/openapi.json
+        run: npm run api:verificar
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - name: Pruebas con cobertura mínima del 80 %
+        run: npm run test:cobertura
+      - name: Compilación de producción
+        run: npm run build
+        env:
+          VITE_API_URL: http://localhost:8080
+
+  e2e:
+    name: Extremo a extremo (celular y computador)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
