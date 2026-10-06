@@ -7,11 +7,20 @@ const esquemaEntorno = z.object({
 
 export type Entorno = z.infer<typeof esquemaEntorno>;
 
-export function leerEntorno(variables: Record<string, unknown>): Entorno {
+export type ResultadoEntorno = { entorno: Entorno; error: null } | { entorno: null; error: string };
+
+/** Valida las variables sin lanzar: si falta algo, la app muestra el error en pantalla (main.tsx). */
+export function revisarEntorno(variables: Record<string, unknown>): ResultadoEntorno {
   const resultado = esquemaEntorno.safeParse(variables);
   if (!resultado.success) {
     const detalle = resultado.error.issues.map((i) => i.message).join("; ");
-    throw new Error(`Configuración incompleta: ${detalle}. Revisa el archivo .env.local (ver .env.example).`);
+    return {
+      entorno: null,
+      error: `Configuración incompleta: ${detalle}. Revisa el archivo .env.local (ver .env.example).`,
+    };
   }
-  return { VITE_API_URL: resultado.data.VITE_API_URL.replace(/\/+$/, "") };
+  return { entorno: { VITE_API_URL: resultado.data.VITE_API_URL.replace(/\/+$/, "") }, error: null };
 }
+
+/** Configuración con la que arrancó la app. */
+export const configuracion = revisarEntorno(import.meta.env);

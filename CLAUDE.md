@@ -12,7 +12,7 @@ Frontend de ITALARM (React + TypeScript + Vite). Consume la API de `italarm-api`
 ## Comandos
 
 ```bash
-npm run dev                # http://localhost:5173 (VITE_API_URL en .env.local)
+npm run dev                # http://localhost:5173 (VITE_API_URL de .env.development; .env.local lo reemplaza)
 npm run lint && npm run format:check && npm run typecheck
 npm test                   # Vitest + Testing Library + MSW
 npm run test:cobertura     # mínimo 80 % de líneas

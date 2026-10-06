@@ -18,6 +18,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - CSP en la compilación de producción.
 - CI en GitHub Actions: contrato sincronizado, lint, formato, tipos, pruebas con cobertura, compilación y Playwright en celular y computador.
 
+#### Corregido
+
+- Sin `.env.local` la app quedaba en blanco. Ahora `npm run dev` usa `http://localhost:8080` por defecto (`.env.development`), y si la configuración es inválida, la app muestra el error en pantalla.
+
 #### Pendiente (pasa a la Fase 6)
 
 - Acceso a los listados de Compras y Cotizaciones en el celular, despliegue a pruebas (P-04), ajustes del contrato (D-01, D-02), logo de ITALARM y CI en verde en GitHub. Detalle en `docs/plan-fase-0.md`, sección 10.

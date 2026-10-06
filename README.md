@@ -11,9 +11,10 @@ Aplicación web de ITALARM: inventario, compras, ventas, instalaciones y cotizac
 
 ```bash
 npm install
-cp .env.example .env.local   # VITE_API_URL=http://localhost:8080
 npm run dev                  # http://localhost:5173
 ```
+
+`npm run dev` usa la API en `http://localhost:8080` (archivo `.env.development`). Para otra dirección, por ejemplo la IP del computador al probar desde el celular, crea `.env.local` a partir de `.env.example`: tiene prioridad. Si la configuración es inválida, la app lo dice en pantalla.
 
 El backend permite por CORS el origen `http://localhost:5173` (`ITALARM_CORS_ORIGENES`).
 

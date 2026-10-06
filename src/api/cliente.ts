@@ -1,7 +1,7 @@
 import createFetchClient, { type Middleware } from "openapi-fetch";
 import createQueryClient from "openapi-react-query";
 
-import { leerEntorno } from "@/lib/entorno";
+import { configuracion } from "@/lib/entorno";
 
 import type { paths } from "./esquema";
 import { ErrorApi, leerProblema, SIN_CONEXION } from "./problema";
@@ -57,7 +57,8 @@ export function crearClienteApi(baseUrl: string) {
   return cliente;
 }
 
-export const api = crearClienteApi(leerEntorno(import.meta.env).VITE_API_URL);
+// Si la configuración es inválida, main.tsx muestra el error y no monta la app: la URL vacía no se usa.
+export const api = crearClienteApi(configuracion.entorno?.VITE_API_URL ?? "");
 
 /** Hooks de TanStack Query tipados por ruta: $api.useQuery("get", "/api/v1/...") (BF-03, BF-04). */
 export const $api = createQueryClient(api);
