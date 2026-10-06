@@ -1,4 +1,5 @@
 import { Pencil, TriangleAlert } from "lucide-react";
+import { useQueries } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
 import { $api } from "@/api/cliente";
@@ -22,6 +23,7 @@ import { NOMBRE_PAR, TEXTOS_TASAS } from "../textos";
 const T = TEXTOS_TASAS;
 const DIAS_POR_DEFECTO = 30;
 const MAXIMO_FILAS = 100;
+const DIAS_CON_CORRECCIONES = 31;
 
 function Procedencia({
   tasa,
@@ -130,14 +132,22 @@ export function Component() {
     return [...porFecha.values()].sort((a, b) => b.fecha.localeCompare(a.fecha));
   }, [trm.data, ves.data]);
 
-  const correcciones = useMemo(
-    () =>
-      filas
-        .flatMap((f) => [f.trm, f.ves])
-        .flatMap((t) => (t?.correcciones ?? []).map((c) => ({ tasa: t, c })))
-        .sort((a, b) => (b.c.corregidaEn ?? "").localeCompare(a.c.corregidaEn ?? "")),
-    [filas],
-  );
+  // D-06: el listado trae `correcciones` vacío; solo el detalle de cada tasa las incluye. Se pide el
+  // detalle de las fechas más recientes del rango (máximo DIAS_CON_CORRECCIONES).
+  const conDetalle = filas
+    .slice(0, DIAS_CON_CORRECCIONES)
+    .flatMap((f) => [f.trm, f.ves])
+    .filter((t): t is Tasa & { id: number } => t?.id !== undefined);
+  const detalles = useQueries({
+    queries: conDetalle.map((t) => ({
+      ...$api.queryOptions("get", "/api/v1/tasas/{id}", { params: { path: { id: t.id } } }),
+      staleTime: 5 * 60_000,
+    })),
+  });
+  const correcciones = detalles
+    .flatMap((d) => (d.data?.correcciones ?? []).map((c) => ({ tasa: d.data, c })))
+    .sort((a, b) => (b.c.corregidaEn ?? "").localeCompare(a.c.corregidaEn ?? ""));
+  const correccionesParciales = filas.length > DIAS_CON_CORRECCIONES;
 
   const datos = vigentes.data;
   const bolivarHoy = datos?.bolivar?.esDeHoy ? comoTasa(datos.bolivar) : null;
@@ -279,6 +289,9 @@ export function Component() {
           {T.correcciones}
         </h2>
         <Alerta>{T.correccionesNota}</Alerta>
+        {correccionesParciales && (
+          <p className="m-0 text-xs text-neutro-700">{T.correccionesParciales(DIAS_CON_CORRECCIONES)}</p>
+        )}
         {correcciones.length === 0 ? (
           <p className="m-0 text-sm text-neutro-700">{T.sinCorrecciones}</p>
         ) : (

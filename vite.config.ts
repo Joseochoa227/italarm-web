@@ -31,7 +31,12 @@ function politicaSeguridad(env: Record<string, string>): Plugin {
     // Los scripts siguen estrictos, que es lo que protege el token.
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
-    `img-src 'self' data: blob:${archivos ? ` ${archivos}` : ""}`,
+    // Las fotos y el logo llegan con enlaces firmados: en modo disco los sirve la propia API
+    // (/api/v1/archivos) y en S3 el almacenamiento (VITE_ORIGEN_ARCHIVOS).
+    `img-src 'self' data: blob:${[api, archivos]
+      .filter(Boolean)
+      .map((o) => ` ${o}`)
+      .join("")}`,
     `connect-src 'self'${api ? ` ${api}` : ""}`,
     "worker-src 'self'",
     "manifest-src 'self'",

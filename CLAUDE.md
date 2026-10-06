@@ -61,10 +61,15 @@ Las páginas exportan `Component`, porque React Router las carga con `lazy`.
   - la escala de espaciado es la del prototipo: 1 unidad = 3,4 px (`p-4` = 13,6 px). Los tamaños fijos se escriben con valores arbitrarios (`min-h-[44px]`);
   - corte celular / computador: 820 px (`escritorio:` en CSS, `useEsEscritorio()` en componentes).
 - **Accesibilidad:** áreas táctiles de al menos 44 px, etiqueta en todos los campos, foco visible y botones de solo ícono con `aria-label` (BF-11).
+- **Formularios con datos del servidor:** `defaultValues` (nunca `values`) y `key={registro.version}` en el componente del formulario: al guardar o recargar por conflicto se vuelve a montar con los datos actuales.
+- **Errores de consultas:** `errorDeConsultas(consulta, …)` (en `api/problema.ts`), porque el tipo de `error` de openapi-react-query no corresponde al `ErrorApi` real.
+- **Archivos:** `api.PUT(ruta, { body: { archivo }, bodySerializer: comoFormulario })`, después de `comprimirImagen()` (BF-14).
 - **Pruebas:**
   - se prueba lo que ve el usuario (roles y textos);
   - la API se simula con `http` de `@/test/servidor`, tipado con el contrato;
-  - `renderizarApp({ ruta, conToken, escritorio })` monta la app completa.
+  - `renderizarApp({ ruta, conToken, escritorio })` monta la app completa;
+  - datos de prueba en `src/test/datos.ts`; `problema(status, codigo, detalle)` arma los errores;
+  - en MSW, una ruta con `{id}` también coincide con rutas fijas del mismo nivel (`/tasas/{id}` con `/tasas/vigentes`): el manejador debe devolver `undefined` si no le corresponde.
 
 ## Decisiones técnicas
 
@@ -79,6 +84,9 @@ Las páginas exportan `Component`, porque React Router las carga con `lazy`.
 | Menú según RF-01/RF-03; Configuración y Usuarios en el menú del usuario           | W-01. Proveedores irá dentro de Compras y Tasas, en el recuadro de tasas (Fase 1).                                                                                                                                          |
 | Ícono provisional: "I" blanca sobre #5980a6                                       | W-03. `npm run iconos:generar`; se reemplaza por el logo de ITALARM.                                                                                                                                                        |
 | `zod/mini` en los archivos que cargan al arrancar (`problema.ts`, `entorno.ts`)   | Menos peso en la primera carga (BF-12). Los formularios usan Zod completo en sus paquetes diferidos.                                                                                                                        |
+| Tipos generados con `scripts/generar-api.mjs` (API de openapi-typescript)         | Los archivos (`format: binary`) se tipan como `Blob` para enviarlos en multipart.                                                                                                                                           |
+| `img-src` de la CSP incluye el origen de la API                                   | En modo disco el backend sirve las fotos y el logo por `/api/v1/archivos`.                                                                                                                                                  |
+| Decimales: coma o punto, uno solo, sin separador de miles (`lib/decimal.ts`)      | W-04. Debajo del campo se muestra cómo quedó el valor.                                                                                                                                                                      |
 | TypeScript 5.9                                                                    | typescript-eslint y openapi-typescript todavía no admiten TypeScript 7.                                                                                                                                                     |
 | Service worker solo con los archivos de la app                                    | BF-13: no se trabaja sin conexión y las respuestas de la API nunca se guardan en caché.                                                                                                                                     |
 
@@ -90,4 +98,7 @@ Ver `docs/plan-fase-0.md`, sección 10: acceso a los listados de Compras y Cotiz
 
 - **D-01:** `ProblemDetail` no declara `codigo`, `correlationId` ni `errores`. Por ahora se validan en `api/problema.ts`.
 - **D-02:** los esquemas de respuesta no marcan qué campos son obligatorios ni cuáles pueden llegar `null`, así que todos quedan opcionales en TypeScript.
+- **D-04:** el contrato pide `version` también al crear; se envía 0.
+- **D-05:** colisión de nombres (`Linea`, `Movimiento`, `TotalMoneda`) en el contrato. El historial del cliente se valida en `features/clientes/schemas/historial.ts`. **Debe corregirse en italarm-api antes de la Fase 2.**
+- **D-06:** `GET /tasas` no trae las correcciones; la pantalla de tasas pide el detalle de cada tasa.
 - **P-04:** el hosting define la URL de pruebas, el origen de los archivos (`VITE_ORIGEN_ARCHIVOS`) y las cabeceras de seguridad.

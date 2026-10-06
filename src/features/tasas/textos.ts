@@ -21,6 +21,8 @@ export const TEXTOS_TASAS = {
   correcciones: "Correcciones de tasas",
   correccionesNota: "Los documentos ya guardados conservan la tasa con la que se registraron.",
   sinCorrecciones: "No hay correcciones en estas fechas.",
+  correccionesParciales: (dias: number) =>
+    `Se muestran las correcciones de los ${String(dias)} días más recientes del rango.`,
   trmOficial: "TRM oficial (automática)",
   consulta: {
     EXITO: "Se obtuvo la TRM oficial de hoy.",

@@ -1,6 +1,6 @@
 # Plan de la Fase 1 — Catálogo, terceros, tasas y configuración (italarm-web)
 
-> Estado: **aprobado por ITALARM el 06/10/2026**, con las propuestas de W-04 y W-05. En implementación.
+> Estado: **implementado el 06/10/2026** (aprobado por ITALARM con las propuestas de W-04 y W-05). Falta la CI en GitHub y el despliegue (F6-02).
 > Base: `docs/requerimientos.md` (3.3, 3.5, 3.6 —proveedores—, 3.10, 3.17 y 12.3), `italarm-api/docs/preguntas.md` (P-09 a P-18), `italarm-api/docs/guia-frontend.md` (§3 a §8), `italarm-api/docs/plan-fase-1.md` (endpoints ya terminados), el prototipo `docs/Italarm v2.html` (pantallas Inventario, Clientes, Cliente · detalle y Tasas de cambio) y el contrato `contrato/openapi.json` (`dev` @ `4977fa0`).
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado; no se necesitan endpoints nuevos.
 
@@ -50,7 +50,7 @@ Siguen la pantalla Inventario del prototipo. En la Fase 2, esa misma pantalla su
   - Campos de 3.3: código, nombre, marca, modelo, categoría, unidad de medida, controla serial, moneda del precio (USD por defecto), precio instalador, precio cliente final, stock mínimo (con los decimales que admita la unidad) y descripción.
   - Foto: subir, reemplazar y quitar. Solo después de crear el producto, porque necesita su `id`.
   - El stock y el costo actual se muestran de solo lectura (RF-16).
-  - Si el producto ya tiene movimientos, la unidad y "controla serial" quedan bloqueadas con su explicación (P-17). El backend responde `PRODUCTO_CAMBIO_NO_PERMITIDO`, que se muestra junto al campo.
+  - Si el producto ya tiene movimientos, la unidad y "controla serial" no se pueden cambiar (P-17). El contrato no dice si el producto tiene movimientos, así que el formulario de edición lo explica junto a la unidad, y el rechazo del backend (`PRODUCTO_CAMBIO_NO_PERMITIDO`) se muestra en el campo que el usuario cambió.
   - `PRODUCTO_CODIGO_DUPLICADO` se muestra en el campo Código.
 - **Acciones:**
   - Desactivar y activar (RF-14).
@@ -73,7 +73,7 @@ Siguen la pantalla Inventario del prototipo. En la Fase 2, esa misma pantalla su
   - **WhatsApp**: abre `https://wa.me/<número>`.
   - Botones **Venta**, **Instalación** y **Cotización**, que llevan al formulario con el cliente elegido (`?clienteId=`). Esos formularios siguen pendientes hasta las fases 3 a 5.
   - Precio que se le aplica y cantidad de compras de material e instalaciones.
-  - Historial (`GET /clientes/{id}/historial`): consecutivo, tipo, descripción, fecha y usuario, tal como los entrega la API (el contrato no trae valor ni estado en el historial). Estará vacío hasta que existan ventas e instalaciones.
+  - Historial (`GET /clientes/{id}/historial`): consecutivo, tipo, descripción, fecha, valor y estado (las anuladas, marcadas). Las filas se validan al recibirlas por D-05. Estará vacío hasta que existan ventas e instalaciones.
 
 ### T4. Proveedores (3.6, RF-37) — `feat:`
 
@@ -195,10 +195,10 @@ Todos existen en el contrato; no se pide nada nuevo al backend.
 ## 7. Definición de terminado (12.1)
 
 - [ ] Pull Request con la CI en verde (tipos sincronizados, lint, formato, tipos, pruebas con cobertura ≥ 80 %, compilación y e2e).
-- [ ] Pruebas de la sección 6 escritas y pasando, incluidos CP-10, CP-11 y CP-12.
-- [ ] Cliente generado desde el contrato vigente.
+- [x] Pruebas de la sección 6 escritas y pasando, incluidos CP-10, CP-11 y CP-12: 176 de componentes (cobertura 94,6 % de líneas) y 5 escenarios extremo a extremo, cada uno en celular y computador. Además, el recorrido completo se probó en el navegador contra el backend real de `dev` en local.
+- [x] Cliente generado desde el contrato vigente (`dev` @ `4977fa0`).
 - [ ] Desplegado en pruebas. _(Pasa a la Fase 6: F6-02.)_
-- [ ] `CHANGELOG.md` actualizado y lista para ITALARM:
+- [x] `CHANGELOG.md` actualizado y lista para ITALARM:
   1. Registrar la tasa del bolívar: digitarla distinta (no deja), luego bien con más del 5 % de variación (pide confirmar).
   2. Ver las tasas en el menú (computador) y en la barra superior (celular).
   3. Crear las categorías y unidades que falten.
@@ -229,5 +229,13 @@ Todos existen en el contrato; no se pide nada nuevo al backend.
 - **D-05 (nuevo, encontrado al implementar):** el backend tiene registros internos con el mismo nombre (`Linea` en compras, ventas, instalaciones, cotizaciones y vistas previas; `Movimiento` en el historial del cliente y en el del serial; `TotalMoneda` en los listados de compras, ventas e instalaciones), y springdoc publicó **una sola** versión de cada uno. Los tipos generados para esos campos son incorrectos.
   - En esta fase solo afecta el historial del cliente: sus filas se validan al recibirlas (como D-01), con los campos reales (`tipo`, `id`, `consecutivo`, `fecha`, `descripcion`, `total` y `estado`).
   - **Bloquea la Fase 2 en adelante**, donde están las líneas de compras, ventas, instalaciones y cotizaciones. Debe corregirse en italarm-api antes de la Fase 2: un nombre de esquema único por registro (por ejemplo `CompraVistaLinea`), regenerando `contrato/openapi.json`.
+- **D-06 (nuevo, encontrado al probar con el backend real):** `GET /tasas` devuelve siempre `correcciones: []`; solo el detalle `GET /tasas/{id}` trae las correcciones, aunque el contrato muestra el campo en ambos. La pantalla de tasas pide el detalle de las 31 fechas más recientes del rango para mostrar las correcciones (hasta 62 peticiones pequeñas). Se propone que el listado incluya las correcciones o un indicador de si las tiene (con F6-03).
 - **TRM automática:** desde el entorno del agente, datos.gov.co está bloqueado, así que la falla de la TRM se prueba simulada. La consulta real se verifica en tu equipo.
 - **Fotos en Safari:** no genera WebP desde el navegador; por eso se usa JPEG o PNG en ese caso (T1).
+
+## 10. Cambios durante la implementación
+
+- **Formularios:** usan `defaultValues` y se vuelven a montar con una `key` por versión del registro. Con la opción `values`, React Hook Form reinicia el formulario en un efecto justo después de montarlo y puede borrar lo que el usuario alcanzó a escribir (lo detectó Playwright).
+- **CSP:** `img-src` incluye el origen de la API, porque en modo disco el backend sirve las fotos y el logo por `/api/v1/archivos` (lo detectó la prueba contra el backend real).
+- **Cliente de la API:** los tipos se generan con `scripts/generar-api.mjs`, que tipa los archivos (`format: binary`) como `Blob` para enviarlos en `multipart/form-data`.
+- **Errores de las consultas:** openapi-react-query tipa `error` según las respuestas de error del contrato (a veces ninguna, y queda `never`). Se leen con `errorDeConsultas()`, que los trata como `unknown`.

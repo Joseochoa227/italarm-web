@@ -317,7 +317,11 @@ describe("Pantalla de tasas (RF-34, RF-36)", () => {
     servidor.use(
       http.get("/api/v1/tasas", ({ request, response }) => {
         const par = new URL(request.url).searchParams.get("par");
-        const contenido = par === "USD_COP" ? historialCop : historialVes;
+        // Como el backend real (D-06): el listado trae `correcciones` vacío y el detalle las incluye.
+        const contenido = (par === "USD_COP" ? historialCop : historialVes).map((t) => ({
+          ...t,
+          correcciones: [],
+        }));
         return response(200).json({
           contenido,
           pagina: 0,
@@ -325,6 +329,11 @@ describe("Pantalla de tasas (RF-34, RF-36)", () => {
           totalElementos: contenido.length,
           totalPaginas: 1,
         });
+      }),
+      // "/tasas/{id}" también coincide con "/tasas/vigentes": si no es una tasa, sigue al siguiente manejador.
+      http.get("/api/v1/tasas/{id}", ({ params, response }) => {
+        const tasa = [...historialCop, ...historialVes].find((t) => String(t.id) === params.id);
+        return tasa ? response(200).json(tasa) : undefined;
       }),
     );
   });

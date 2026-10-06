@@ -76,5 +76,7 @@ test("la app compilada declara la CSP estricta", async ({ page }) => {
   const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute("content");
   expect(csp).toContain("script-src 'self';");
   expect(csp).toContain("connect-src 'self' http://localhost:8080");
+  // Los enlaces firmados de fotos y logo los sirve la API en modo disco.
+  expect(csp).toContain("img-src 'self' data: blob: http://localhost:8080");
   expect(csp).toContain("object-src 'none'");
 });
