@@ -12,32 +12,32 @@ Entregable (12.2): Jose y Victor ingresan con su correo y contraseña desde el c
 
 ## 2. Decisiones que cambian o precisan los requerimientos
 
-| Tema | Requerimientos / prototipo | Lo que se construye | Fuente |
-|---|---|---|---|
-| Sesión | Cookie + CSRF (9.1) | Token `Bearer` en `localStorage`, sin cookies ni CSRF. | P-05, guía §1 |
-| Ingreso | Campo "Usuario" (RU-05, prototipo) | Campo **Correo**. | P-01 |
-| Duración de la sesión | — | El token no vence. Cualquier 401 cierra la sesión en el navegador y vuelve al ingreso. | P-03, guía §1 |
-| Contraseña nueva | — | Al menos 8 caracteres, con mayúscula, minúscula, número y signo. El backend también lo valida. | P-07, P-08 |
-| Usuarios del prototipo | Andrés y Julián | Los datos vienen de `GET /sesion` (Jose y Victor). | Sección 8 |
-| Menú | El prototipo tiene "Documentos", "Tasas de cambio" y "Más" | Se siguen RF-01 y RF-03, que prevalecen sobre el prototipo (AG-01). Ver la pregunta W-01. | RF-01, RF-03 |
+| Tema                   | Requerimientos / prototipo                                 | Lo que se construye                                                                            | Fuente        |
+| ---------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------- |
+| Sesión                 | Cookie + CSRF (9.1)                                        | Token `Bearer` en `localStorage`, sin cookies ni CSRF.                                         | P-05, guía §1 |
+| Ingreso                | Campo "Usuario" (RU-05, prototipo)                         | Campo **Correo**.                                                                              | P-01          |
+| Duración de la sesión  | —                                                          | El token no vence. Cualquier 401 cierra la sesión en el navegador y vuelve al ingreso.         | P-03, guía §1 |
+| Contraseña nueva       | —                                                          | Al menos 8 caracteres, con mayúscula, minúscula, número y signo. El backend también lo valida. | P-07, P-08    |
+| Usuarios del prototipo | Andrés y Julián                                            | Los datos vienen de `GET /sesion` (Jose y Victor).                                             | Sección 8     |
+| Menú                   | El prototipo tiene "Documentos", "Tasas de cambio" y "Más" | Se siguen RF-01 y RF-03, que prevalecen sobre el prototipo (AG-01). Ver la pregunta W-01.      | RF-01, RF-03  |
 
 ## 3. Tecnología
 
-| Tema | Elección | Por qué |
-|---|---|---|
-| Base | React 19 + TypeScript (`strict`, más `noUncheckedIndexedAccess` y `exactOptionalPropertyTypes`) + Vite | Cumple 9.1 ("React 18+") y BF-01. |
-| Estilos | Tailwind CSS v4 con los tokens del prototipo en `src/styles/tokens.css` (`@theme`) | 9.1, 11.1 (`styles/`). |
-| Tipografías | Barlow (400, 500 y 700) y Barlow Condensed (400 y 600), servidas desde la propia app con `@fontsource` | Son las del prototipo. Se sirven localmente para no abrir la CSP a Google Fonts. |
-| Íconos | `lucide-react` | El prototipo usa los mismos trazos de Lucide (house, package, cart, wrench, truck, file, users, chart…). |
-| Componentes accesibles | Primitivas de Radix (Dialog, DropdownMenu y Toast) con estilo propio en `components/ui/`, al estilo shadcn/ui | 9.1 y BF-11. |
-| Rutas | React Router (modo datos), con rutas diferidas | BF-12. |
-| Datos del servidor | TanStack Query | BF-03. |
-| Formularios | React Hook Form + Zod, con mensajes en español | BF-05. |
-| **Cliente de la API** | **openapi-typescript + openapi-fetch + openapi-react-query** | Ver la sección 3.1. |
-| Pruebas | Vitest, React Testing Library, MSW (con `openapi-msw` para que los simulacros se validen contra el contrato) y Playwright | 11.3. |
-| PWA | `vite-plugin-pwa` | BF-13. |
-| Calidad | ESLint (flat config: `typescript-eslint` estricto con tipos, `react-hooks`, `react-refresh`, `jsx-a11y`), Prettier con `prettier-plugin-tailwindcss`, Husky + lint-staged | BF-16. |
-| Node | 22 LTS (`.nvmrc`) | Es la versión del entorno. |
+| Tema                   | Elección                                                                                                                                                                  | Por qué                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Base                   | React 19 + TypeScript (`strict`, más `noUncheckedIndexedAccess` y `exactOptionalPropertyTypes`) + Vite                                                                    | Cumple 9.1 ("React 18+") y BF-01.                                                                        |
+| Estilos                | Tailwind CSS v4 con los tokens del prototipo en `src/styles/tokens.css` (`@theme`)                                                                                        | 9.1, 11.1 (`styles/`).                                                                                   |
+| Tipografías            | Barlow (400, 500 y 700) y Barlow Condensed (400 y 600), servidas desde la propia app con `@fontsource`                                                                    | Son las del prototipo. Se sirven localmente para no abrir la CSP a Google Fonts.                         |
+| Íconos                 | `lucide-react`                                                                                                                                                            | El prototipo usa los mismos trazos de Lucide (house, package, cart, wrench, truck, file, users, chart…). |
+| Componentes accesibles | Primitivas de Radix (Dialog, DropdownMenu y Toast) con estilo propio en `components/ui/`, al estilo shadcn/ui                                                             | 9.1 y BF-11.                                                                                             |
+| Rutas                  | React Router (modo datos), con rutas diferidas                                                                                                                            | BF-12.                                                                                                   |
+| Datos del servidor     | TanStack Query                                                                                                                                                            | BF-03.                                                                                                   |
+| Formularios            | React Hook Form + Zod, con mensajes en español                                                                                                                            | BF-05.                                                                                                   |
+| **Cliente de la API**  | **openapi-typescript + openapi-fetch + openapi-react-query**                                                                                                              | Ver la sección 3.1.                                                                                      |
+| Pruebas                | Vitest, React Testing Library, MSW (con `openapi-msw` para que los simulacros se validen contra el contrato) y Playwright                                                 | 11.3.                                                                                                    |
+| PWA                    | `vite-plugin-pwa`                                                                                                                                                         | BF-13.                                                                                                   |
+| Calidad                | ESLint (flat config: `typescript-eslint` estricto con tipos, `react-hooks`, `react-refresh`, `jsx-a11y`), Prettier con `prettier-plugin-tailwindcss`, Husky + lint-staged | BF-16.                                                                                                   |
+| Node                   | 22 LTS (`.nvmrc`)                                                                                                                                                         | Es la versión del entorno.                                                                               |
 
 Las versiones exactas son las estables al momento de instalar y quedan fijadas en `package-lock.json`.
 
@@ -57,34 +57,39 @@ openapi-typescript genera los tipos a partir de las **rutas** (`/api/v1/sesion`,
 ## 4. Tareas
 
 ### T0. Orden del repositorio — `docs:`
+
 - Renombrar `docs/Requerimientos_Sistema_Inventario_v0.7.md` a `docs/requerimientos.md`, igual que en el backend (tienen el mismo contenido).
 - `README.md` (cómo instalar, ejecutar contra la API local y probar), `CLAUDE.md` (comandos, convenciones y decisiones técnicas, AG-07), `CHANGELOG.md`, `.editorconfig`, `.nvmrc`, `.gitignore`.
 
 ### T1. Proyecto base — `build:`
+
 - Vite + React + TypeScript con las opciones estrictas de la sección 3.
 - Estructura de 11.1: `app/`, `api/`, `components/ui/`, `features/<funcionalidad>/{components,hooks,pages,schemas}`, `lib/` y `styles/`.
 - `.env.example` con `VITE_API_URL=http://localhost:8080`. `lib/entorno.ts` lee y valida las variables con Zod al arrancar: si falta una, la app lo dice claramente en lugar de fallar en silencio (BF-15).
 
 ### T2. Calidad — `build:`
+
 - ESLint y Prettier (sección 3). `any` queda prohibido: si alguna vez hace falta, se justifica con un comentario (BF-01).
 - Scripts: `dev`, `build`, `preview`, `lint`, `format`, `format:check`, `typecheck`, `test`, `test:cobertura`, `e2e`, `api:generar` y `api:sincronizar`.
 - Husky + lint-staged: ESLint y Prettier sobre los archivos del commit.
 
 ### T3. Tokens del prototipo y Tailwind — `feat:`
+
 Se traducen a `@theme` los tokens del prototipo (`:root` del archivo `Italarm v2.html`):
 
-| Grupo | Valores |
-|---|---|
-| Base | `bg #f2f2f3`, `surface #e9e9ea`, `text #1d1f20`, `accent #5980a6`, `accent-2 #728fab`, `divider` = texto al 16 %; tarjetas `#fafafb` con borde de texto al 9 % |
-| Escalas 100–900 | `neutral` (#f5f5f8 … #2b2b2d), `accent` (#eef6ff … #1d2d3d), `accent-2` (#eef6ff … #1f2d3a) |
-| Tipografía | títulos en Barlow Condensed 600 (interletrado −0,015 em; la marca ITALARM con 0,14 em); texto en Barlow 15 px / 1,55 |
-| Radios | `sm 2px`, `md 4px`, `lg 7px` |
-| Sombras | `sm`, `md` y `lg` en tinta #2b2b2d al 14, 16 y 22 % |
-| Espaciado | escala del prototipo con base de 3,4 px (`space-1` … `space-8`) |
+| Grupo           | Valores                                                                                                                                                        |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Base            | `bg #f2f2f3`, `surface #e9e9ea`, `text #1d1f20`, `accent #5980a6`, `accent-2 #728fab`, `divider` = texto al 16 %; tarjetas `#fafafb` con borde de texto al 9 % |
+| Escalas 100–900 | `neutral` (#f5f5f8 … #2b2b2d), `accent` (#eef6ff … #1d2d3d), `accent-2` (#eef6ff … #1f2d3a)                                                                    |
+| Tipografía      | títulos en Barlow Condensed 600 (interletrado −0,015 em; la marca ITALARM con 0,14 em); texto en Barlow 15 px / 1,55                                           |
+| Radios          | `sm 2px`, `md 4px`, `lg 7px`                                                                                                                                   |
+| Sombras         | `sm`, `md` y `lg` en tinta #2b2b2d al 14, 16 y 22 %                                                                                                            |
+| Espaciado       | escala del prototipo con base de 3,4 px (`space-1` … `space-8`)                                                                                                |
 
 Se toma lo que muestran las pantallas del prototipo (radios `md`/`lg` en botones, campos y tarjetas), no la variante "blueprint" de esquinas rectas que trae su hoja de estilos base. Áreas táctiles de al menos 44 px (BF-11).
 
 ### T4. Cliente de la API — `feat:`
+
 - Generación de tipos (sección 3.2).
 - `api/cliente.ts`: una instancia de openapi-fetch con `baseUrl = VITE_API_URL` y dos middlewares:
   1. agrega `Authorization: Bearer <token>` cuando hay token;
@@ -97,6 +102,7 @@ Se toma lo que muestran las pantallas del prototipo (radios `md`/`lg` en botones
 - TanStack Query: no reintenta los 4xx; reintenta una vez los errores de red y los 5xx de las consultas; las mutaciones nunca se reintentan solas.
 
 ### T5. Sesión — `feat:`
+
 - `features/auth`:
   - token en `localStorage` (`italarm.token`), con todo acceso dentro de try/catch;
   - la sesión es la consulta `['sesion']` = `GET /api/v1/sesion` (BF-03): no se copia a ningún otro estado.
@@ -113,6 +119,7 @@ Se toma lo que muestran las pantallas del prototipo (radios `md`/`lg` en botones
   - Al terminar, un toast: "Contraseña cambiada. Se cerraron tus otras sesiones."
 
 ### T6. Layout y navegación — `feat:`
+
 Según el prototipo, con el corte entre celular y computador en **820 px** (el mismo del prototipo):
 
 - **Computador** (RF-01): menú lateral fijo de 240 px.
@@ -129,13 +136,16 @@ Según el prototipo, con el corte entre celular y computador en **820 px** (el m
 - Los indicadores del menú (cantidad bajo mínimo en Inventario, RF-02) y el aviso de tasas quedan para las fases 1 y 2.
 
 ### T7. Sistema de diseño base — `feat:`
+
 - `components/ui/`: Botón (primario, secundario, fantasma, ícono; con estado "guardando"), Campo (etiqueta, ayuda y error asociados con `aria-describedby`), Entrada, Contraseña con "mostrar", Tarjeta, Etiqueta (tag), Diálogo, Menú desplegable, Hoja inferior, Toast, Esqueleto, Estado vacío y Estado de error con Reintentar.
 - Error boundary por ruta con Reintentar (BF-09).
 - Aviso "Sin conexión a internet" en la parte superior mientras el navegador esté desconectado (BF-13).
 - Textos de la interfaz en español, en un archivo `textos.ts` por funcionalidad (BF-17).
 
 ### T8. Formato de dinero y fechas — `feat:`
+
 `lib/formato.ts` (BF-07, guía §3), sin pasar nunca el texto decimal por `number`:
+
 - `formatearDinero({ monto: "1250000.0000", moneda: "COP" })` → `$ 1.250.000` (COP, sin decimales);
 - `formatearDinero({ monto: "1939.04", moneda: "USD" })` → `US$ 1.939,04`;
 - `formatearDinero({ monto: "1234.56", moneda: "VES" })` → `Bs 1.234,56`.
@@ -147,9 +157,10 @@ Según el prototipo, con el corte entre celular y computador en **820 px** (el m
 - `formatearCantidad("12.5", unidad)` → `12,5`.
 
 ### T9. PWA y seguridad del navegador — `feat:`
+
 - `vite-plugin-pwa`:
   - manifiesto "ITALARM", `theme_color #5980a6`, `background_color #f2f2f3`, `display: standalone`;
-  - íconos de 192 y 512 px y su versión *maskable* (ver W-03);
+  - íconos de 192 y 512 px y su versión _maskable_ (ver W-03);
   - el service worker guarda en caché solo los archivos de la app, **nunca** las respuestas de la API;
   - cuando hay una versión nueva, un toast ofrece "Actualizar".
 - **CSP estricta** en la compilación de producción (guía §1, por el token en `localStorage`): `default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob: <origen de archivos>; connect-src 'self' <VITE_API_URL>; base-uri 'self'; form-action 'self'; object-src 'none'`.
@@ -159,7 +170,9 @@ Según el prototipo, con el corte entre celular y computador en **820 px** (el m
   - Prohibido `dangerouslySetInnerHTML` (regla de ESLint).
 
 ### T10. CI — `ci:`
+
 GitHub Actions en cada push y Pull Request:
+
 1. `npm ci`;
 2. revisar que los tipos generados coincidan con el contrato;
 3. `lint`, `format:check` y `typecheck`;
@@ -168,17 +181,18 @@ GitHub Actions en cada push y Pull Request:
 6. Playwright en tamaño celular (390×844) y computador (1280×800) contra la app compilada, con la API simulada.
 
 ### T11. Documentación — `docs:`
+
 - `CLAUDE.md` y `README.md` con los comandos y las decisiones de este plan.
 - `CHANGELOG.md` con la Fase 0.
 - La lista de verificación para ITALARM (sección 7).
 
 ## 5. Endpoints que usa esta fase
 
-| Método y ruta | Uso |
-|---|---|
-| `POST /api/v1/sesion` | Ingresar: `{ correo, contrasena }` → `{ token, usuario }` |
-| `GET /api/v1/sesion` | Validar el token al cargar y obtener el usuario (`id`, `nombre`, `correo`) |
-| `DELETE /api/v1/sesion` | Cerrar sesión |
+| Método y ruta                            | Uso                                                                          |
+| ---------------------------------------- | ---------------------------------------------------------------------------- |
+| `POST /api/v1/sesion`                    | Ingresar: `{ correo, contrasena }` → `{ token, usuario }`                    |
+| `GET /api/v1/sesion`                     | Validar el token al cargar y obtener el usuario (`id`, `nombre`, `correo`)   |
+| `DELETE /api/v1/sesion`                  | Cerrar sesión                                                                |
 | `PUT /api/v1/usuarios/actual/contrasena` | Cambiar la contraseña: `{ contrasenaActual, contrasenaNueva, confirmacion }` |
 
 No hay migraciones: el frontend no tiene base de datos.
@@ -186,6 +200,7 @@ No hay migraciones: el frontend no tiene base de datos.
 ## 6. Pruebas
 
 **Componentes y hooks** (Vitest + RTL + MSW), probando lo que ve y hace el usuario (BF-18, BF-19):
+
 - **Ingreso correcto:** se guarda el token y se ve el menú con el nombre del usuario.
 - **Ingreso incorrecto:** se ve el mensaje de `CREDENCIALES_INVALIDAS` y no se guarda ningún token.
 - **Botón deshabilitado** mientras se ingresa (BF-10).
@@ -210,6 +225,7 @@ No hay migraciones: el frontend no tiene base de datos.
 - **Formato** (CP de la Fase 0): COP, USD y VES con los ejemplos de BF-07, cantidades con y sin decimales, fechas sin corrimiento de zona y textos con más de 15 dígitos sin perder precisión.
 
 **Extremo a extremo** (Playwright, BF-20), en celular y en computador: ingresar, navegar el menú, cambiar la contraseña y cerrar sesión.
+
 - En la CI corre contra la API simulada.
 - Contra el ambiente de pruebas real cuando exista (P-04).
 - Si el entorno lo permite, se prueba también una vez contra el backend local (`docker compose` en italarm-api).
@@ -217,10 +233,10 @@ No hay migraciones: el frontend no tiene base de datos.
 ## 7. Definición de terminado (12.1) aplicada a esta fase
 
 - [ ] Pull Request revisado, con la CI en verde (tipos sincronizados, lint, formato, tipos, pruebas con cobertura ≥ 80 %, compilación y e2e).
-- [ ] Pruebas de la sección 6 escritas y pasando.
-- [ ] Cliente generado desde el contrato vigente de italarm-api.
-- [ ] Desplegado en pruebas y probado en celular y computador junto con el backend. *(Requiere P-04.)*
-- [ ] `CHANGELOG.md` actualizado y lista para ITALARM:
+- [x] Pruebas de la sección 6 escritas y pasando (Vitest y Playwright). Además, el recorrido completo se probó con el navegador contra el backend real de `dev` en local.
+- [x] Cliente generado desde el contrato vigente de italarm-api (`dev` @ `4977fa0`).
+- [ ] Desplegado en pruebas y probado en celular y computador junto con el backend. _(Requiere P-04.)_
+- [x] `CHANGELOG.md` actualizado y lista para ITALARM:
   1. Abrir la app en el celular y en el computador.
   2. Ingresar como Jose y como Victor con el correo y la contraseña inicial.
   3. Intentar con una contraseña errada y ver el mensaje.
@@ -231,13 +247,14 @@ No hay migraciones: el frontend no tiene base de datos.
 
 ## 8. Preguntas para ITALARM y dependencias
 
-| # | Tema | Pregunta | Propuesta | Respuesta de ITALARM |
-|---|---|---|---|---|
-| W-01 | Menú | El prototipo tiene "Documentos", "Tasas de cambio" y un botón "Más" en el celular. RF-01 y RF-03 no los incluyen, y no dicen dónde quedan Configuración, Usuarios y Proveedores. | Seguir RF-01 y RF-03 al pie de la letra. Configuración y Usuarios van en el menú del usuario (junto a Cambiar contraseña y Cerrar sesión). Proveedores va dentro de Compras. Tasas se abre desde el recuadro de tasas (Fase 1). | De acuerdo con la propuesta. |
-| W-02 | Colores de error | El prototipo solo usa azules y grises: sus alertas son `accent-200` con texto `accent-900`. No tiene rojo para errores, "Anulada" o "Stock insuficiente". | Agregar una sola escala roja de "peligro", con la misma luminosidad que las demás. Se usaría solo para errores, acciones destructivas y estados negativos, siempre con ícono y texto (no solo color). Los avisos siguen en azul, como en el prototipo. | De acuerdo con la propuesta. |
-| W-03 | Ícono de la app | No hay logo de ITALARM en el repositorio. | Ícono provisional: "I" en Barlow Condensed blanco sobre `#5980a6`. Se reemplaza cuando ITALARM entregue el logo. | De acuerdo con la propuesta. |
+| #    | Tema             | Pregunta                                                                                                                                                                         | Propuesta                                                                                                                                                                                                                                              | Respuesta de ITALARM         |
+| ---- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------- |
+| W-01 | Menú             | El prototipo tiene "Documentos", "Tasas de cambio" y un botón "Más" en el celular. RF-01 y RF-03 no los incluyen, y no dicen dónde quedan Configuración, Usuarios y Proveedores. | Seguir RF-01 y RF-03 al pie de la letra. Configuración y Usuarios van en el menú del usuario (junto a Cambiar contraseña y Cerrar sesión). Proveedores va dentro de Compras. Tasas se abre desde el recuadro de tasas (Fase 1).                        | De acuerdo con la propuesta. |
+| W-02 | Colores de error | El prototipo solo usa azules y grises: sus alertas son `accent-200` con texto `accent-900`. No tiene rojo para errores, "Anulada" o "Stock insuficiente".                        | Agregar una sola escala roja de "peligro", con la misma luminosidad que las demás. Se usaría solo para errores, acciones destructivas y estados negativos, siempre con ícono y texto (no solo color). Los avisos siguen en azul, como en el prototipo. | De acuerdo con la propuesta. |
+| W-03 | Ícono de la app  | No hay logo de ITALARM en el repositorio.                                                                                                                                        | Ícono provisional: "I" en Barlow Condensed blanco sobre `#5980a6`. Se reemplaza cuando ITALARM entregue el logo.                                                                                                                                       | De acuerdo con la propuesta. |
 
 **Dependencias con el backend (no bloquean esta fase):**
+
 - **D-01:** el esquema `ProblemDetail` del contrato no declara `codigo`, `correlationId` ni `errores`. Se propone documentarlos en italarm-api, para que también salgan del contrato. Mientras tanto, el frontend los valida en tiempo de ejecución (T4).
 - **D-02:** 92 de los 122 esquemas no marcan sus campos como obligatorios, y los que pueden llegar `null` (por ejemplo `aviso` en las tasas) no lo declaran. Con eso todos los campos de respuesta quedan opcionales en TypeScript. Se propone que el backend marque los campos obligatorios y los que admiten `null` antes de la Fase 1, que es donde empieza a pesar.
 - **D-03:** el contrato con las fases 0 a 5 está en la rama `dev` de italarm-api; `main` todavía no lo tiene. La copia se toma de `dev`.
