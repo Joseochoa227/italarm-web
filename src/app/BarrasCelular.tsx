@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from "react-router";
 
 import { Dialogo } from "@/components/ui/Dialogo";
 import { useSesion } from "@/features/auth/hooks/contextoSesion";
+import { TasasBarra } from "@/features/tasas/components/RecuadroTasas";
 import { cx } from "@/lib/clases";
 import { inicial } from "@/lib/texto";
 
@@ -22,7 +23,7 @@ export function BarraSuperior() {
   return (
     <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-divisor bg-fondo px-4 py-2">
       <span className="flex-1 marca text-[22px]">ITALARM</span>
-      {/* Fase 1: aquí va la TRM y la tasa del bolívar del día (RF-03). */}
+      <TasasBarra />
       <MenuUsuario
         disparador={
           <button

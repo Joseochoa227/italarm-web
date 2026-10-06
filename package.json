@@ -18,7 +18,7 @@
     "test:vigilar": "vitest",
     "test:cobertura": "vitest run --coverage",
     "e2e": "playwright test",
-    "api:generar": "openapi-typescript contrato/openapi.json -o src/api/esquema.ts --root-types --root-types-no-schema-prefix",
+    "api:generar": "node scripts/generar-api.mjs",
     "api:verificar": "npm run api:generar && git diff --exit-code -- src/api/esquema.ts",
     "api:sincronizar": "node scripts/sincronizar-contrato.mjs && npm run api:generar",
     "prepare": "husky",
@@ -77,7 +77,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs}": [
-      "eslint --max-warnings=0 --fix",
+      "eslint --max-warnings=0 --no-warn-ignored --fix",
       "prettier --write"
     ],
     "*.{json,md,css,html,yml}": [

@@ -1,6 +1,7 @@
 import {
   formatearCantidad,
   formatearDinero,
+  formatearDecimal,
   formatearDineroDe,
   formatearFecha,
   formatearFechaHora,
@@ -49,6 +50,14 @@ describe("formatearCantidad", () => {
     expect(formatearCantidad("12.5")).toBe("12,5");
     expect(formatearCantidad("0")).toBe("0");
     expect(formatearCantidad("1500")).toBe("1.500");
+  });
+});
+
+describe("formatearDecimal", () => {
+  it("formatea tasas y porcentajes sin ceros sobrantes", () => {
+    expect(formatearDecimal("3912.450000")).toBe("3.912,45");
+    expect(formatearDecimal("36.5")).toBe("36,5");
+    expect(formatearDecimal("5.25")).toBe("5,25");
   });
 });
 

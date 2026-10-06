@@ -4,6 +4,8 @@ import { createOpenApiHttp } from "openapi-msw";
 
 import type { paths } from "@/api/esquema";
 
+import { configuracion, tasasVigentes } from "./datos";
+
 export const API = "http://api.prueba";
 
 /** Simulador de la API tipado con el contrato (BF-19): las respuestas deben cumplir openapi.json. */
@@ -35,6 +37,8 @@ export const manejadores = [
     return response(200).json(USUARIO_JOSE);
   }),
   http.delete("/api/v1/sesion", ({ response }) => response(204).empty()),
+  http.get("/api/v1/tasas/vigentes", ({ response }) => response(200).json(tasasVigentes())),
+  http.get("/api/v1/configuracion", ({ response }) => response(200).json(configuracion())),
 ];
 
 export const servidor = setupServer(...manejadores);

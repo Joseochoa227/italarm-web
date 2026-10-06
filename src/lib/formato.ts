@@ -58,6 +58,13 @@ export function formatearCantidad(cantidad: string): string {
   return formatoCantidad.format(validarDecimal(cantidad));
 }
 
+const formatoDecimal = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 6 });
+
+/** Número sin moneda, con hasta 6 decimales: tasas y porcentajes ("3912.450000" → "3.912,45"). */
+export function formatearDecimal(valor: string): string {
+  return formatoDecimal.format(validarDecimal(valor));
+}
+
 const FECHA = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 /**

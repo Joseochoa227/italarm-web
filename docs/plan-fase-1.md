@@ -1,6 +1,6 @@
 # Plan de la Fase 1 — Catálogo, terceros, tasas y configuración (italarm-web)
 
-> Estado: **propuesto, en espera de aprobación de ITALARM** (AG-02). No se escribe código hasta que se apruebe.
+> Estado: **aprobado por ITALARM el 06/10/2026**, con las propuestas de W-04 y W-05. En implementación.
 > Base: `docs/requerimientos.md` (3.3, 3.5, 3.6 —proveedores—, 3.10, 3.17 y 12.3), `italarm-api/docs/preguntas.md` (P-09 a P-18), `italarm-api/docs/guia-frontend.md` (§3 a §8), `italarm-api/docs/plan-fase-1.md` (endpoints ya terminados), el prototipo `docs/Italarm v2.html` (pantallas Inventario, Clientes, Cliente · detalle y Tasas de cambio) y el contrato `contrato/openapi.json` (`dev` @ `4977fa0`).
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado; no se necesitan endpoints nuevos.
 
@@ -73,7 +73,7 @@ Siguen la pantalla Inventario del prototipo. En la Fase 2, esa misma pantalla su
   - **WhatsApp**: abre `https://wa.me/<número>`.
   - Botones **Venta**, **Instalación** y **Cotización**, que llevan al formulario con el cliente elegido (`?clienteId=`). Esos formularios siguen pendientes hasta las fases 3 a 5.
   - Precio que se le aplica y cantidad de compras de material e instalaciones.
-  - Historial (`GET /clientes/{id}/historial`): consecutivo, descripción, fecha, valor y estado (las anuladas, marcadas). Estará vacío hasta que existan ventas e instalaciones.
+  - Historial (`GET /clientes/{id}/historial`): consecutivo, tipo, descripción, fecha y usuario, tal como los entrega la API (el contrato no trae valor ni estado en el historial). Estará vacío hasta que existan ventas e instalaciones.
 
 ### T4. Proveedores (3.6, RF-37) — `feat:`
 
@@ -213,8 +213,8 @@ Todos existen en el contrato; no se pide nada nuevo al backend.
 
 | #    | Tema                          | Pregunta                                                                                                                                                                 | Propuesta                                                                                                                                                                                                                                                                    |
 | ---- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| W-04 | Separador decimal al escribir | Al digitar tasas, precios y cantidades, ¿qué separador se usa? "3.912,45" (colombiano) y "3912.45" se escriben distinto, y con las tasas un error de separador es grave. | Se acepta **coma o punto** como separador decimal, uno solo, y **sin separador de miles** al escribir. Debajo del campo se muestra cómo quedó el valor ("Se guardará: 3.912,45"). En las tasas, además, la doble digitación y la alerta de variación atajan un valor errado. |
-| W-05 | Aviso de tasa sin registrar   | RF-07 pide el aviso en Inicio, "antes que cualquier otro bloque". El prototipo lo muestra en **todas** las pantallas, salvo en la de Tasas.                              | Mostrarlo en todas las pantallas, como el prototipo, porque toda venta, compra o cotización usa las tasas (RF-33). En Inicio queda arriba de todo.                                                                                                                           |
+| W-04 | Separador decimal al escribir | Al digitar tasas, precios y cantidades, ¿qué separador se usa? "3.912,45" (colombiano) y "3912.45" se escriben distinto, y con las tasas un error de separador es grave. | Se acepta **coma o punto** como separador decimal, uno solo, y **sin separador de miles** al escribir. Debajo del campo se muestra cómo quedó el valor ("Se guardará: 3.912,45"). En las tasas, además, la doble digitación y la alerta de variación atajan un valor errado. | De acuerdo con la propuesta. |
+| W-05 | Aviso de tasa sin registrar   | RF-07 pide el aviso en Inicio, "antes que cualquier otro bloque". El prototipo lo muestra en **todas** las pantallas, salvo en la de Tasas.                              | Mostrarlo en todas las pantallas, como el prototipo, porque toda venta, compra o cotización usa las tasas (RF-33). En Inicio queda arriba de todo.                                                                                                                           | De acuerdo con la propuesta. |
 
 **Decisiones de diseño (no requieren respuesta salvo que no estés de acuerdo):**
 
@@ -226,5 +226,8 @@ Todos existen en el contrato; no se pide nada nuevo al backend.
 
 - **D-02 (pasa a la Fase 6, F6-03):** en el contrato, todos los campos de respuesta son opcionales. En esta fase eso obliga a manejar en cada pantalla un posible dato faltante (se muestra "—"). Es más código y más pruebas, no un bloqueo.
 - **D-04 (nuevo):** el contrato marca `version` como obligatoria también al **crear** categorías, unidades, productos, clientes y proveedores, aunque el backend solo la exige al editar. Al crear se enviará `version: 0`, que el backend ignora. Se anota para corregirlo junto con F6-03.
+- **D-05 (nuevo, encontrado al implementar):** el backend tiene registros internos con el mismo nombre (`Linea` en compras, ventas, instalaciones, cotizaciones y vistas previas; `Movimiento` en el historial del cliente y en el del serial; `TotalMoneda` en los listados de compras, ventas e instalaciones), y springdoc publicó **una sola** versión de cada uno. Los tipos generados para esos campos son incorrectos.
+  - En esta fase solo afecta el historial del cliente: sus filas se validan al recibirlas (como D-01), con los campos reales (`tipo`, `id`, `consecutivo`, `fecha`, `descripcion`, `total` y `estado`).
+  - **Bloquea la Fase 2 en adelante**, donde están las líneas de compras, ventas, instalaciones y cotizaciones. Debe corregirse en italarm-api antes de la Fase 2: un nombre de esquema único por registro (por ejemplo `CompraVistaLinea`), regenerando `contrato/openapi.json`.
 - **TRM automática:** desde el entorno del agente, datos.gov.co está bloqueado, así que la falla de la TRM se prueba simulada. La consulta real se verifica en tu equipo.
 - **Fotos en Safari:** no genera WebP desde el navegador; por eso se usa JPEG o PNG en ese caso (T1).

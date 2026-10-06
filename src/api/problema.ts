@@ -88,3 +88,12 @@ export function comoErrorApi(error: unknown): ErrorApi {
   if (error instanceof ErrorApi) return error;
   return new ErrorApi(0, SIN_CONEXION, null);
 }
+
+/**
+ * Primer error de un grupo de consultas. openapi-react-query tipa `error` según las respuestas de
+ * error que declara el contrato (a veces ninguna, y queda `never`); en realidad siempre es un ErrorApi
+ * lanzado por el middleware del cliente. Por eso se trata como unknown.
+ */
+export function errorDeConsultas(...consultas: { isError: boolean; error: unknown }[]): unknown {
+  return consultas.find((c) => c.isError)?.error ?? null;
+}

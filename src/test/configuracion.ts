@@ -11,6 +11,7 @@ beforeAll(() => {
 afterEach(() => {
   cleanup();
   servidor.resetHandlers();
+  servidor.events.removeAllListeners();
   localStorage.clear();
   pantalla.escritorio = true;
 });

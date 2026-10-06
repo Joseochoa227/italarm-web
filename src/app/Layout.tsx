@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Outlet } from "react-router";
 
 import { Esqueleto } from "@/components/ui/Esqueleto";
+import { AvisoTasas } from "@/features/tasas/components/AvisoTasas";
 import { useEsEscritorio } from "@/lib/medios";
 
 import { AvisoSinConexion } from "./AvisoSinConexion";
@@ -27,6 +28,7 @@ export function Layout() {
         {!escritorio && <BarraSuperior />}
         <AvisoSinConexion />
         <main className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-6 px-4 py-6 escritorio:px-10 escritorio:py-8">
+          <AvisoTasas />
           <Suspense fallback={<CargandoPagina />}>
             <Outlet />
           </Suspense>
