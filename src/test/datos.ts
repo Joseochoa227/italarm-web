@@ -74,3 +74,19 @@ export function pagina<T>(
     totalPaginas: contenido.length ? 1 : 0,
   };
 }
+
+export const CATEGORIAS: S["CategoriaVista"][] = [
+  { id: 1, nombre: "Cámaras", cantidadProductos: 3, version: 0 },
+  { id: 2, nombre: "Cable", cantidadProductos: 0, version: 0 },
+];
+
+export const UNIDADES: S["UnidadMedidaVista"][] = [
+  { id: 1, nombre: "Unidad", abreviatura: "und", admiteDecimales: false, version: 0 },
+  { id: 2, nombre: "Metro", abreviatura: "m", admiteDecimales: true, version: 0 },
+];
+
+export const USUARIOS: S["UsuarioVista"][] = [
+  { id: 1, nombre: "Jose Ochoa", correo: "jose@italarm.test", activo: true, version: 0 },
+  { id: 2, nombre: "Victor", correo: "victor@italarm.test", activo: true, version: 0 },
+  { id: 3, nombre: "Ayudante", correo: "ayudante@italarm.test", activo: false, version: 1 },
+];

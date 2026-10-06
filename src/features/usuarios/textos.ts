@@ -1,0 +1,37 @@
+/** Textos de usuarios (BF-17). */
+export const TEXTOS_USUARIOS = {
+  titulo: "Usuarios",
+  subtitulo:
+    "Todos los usuarios tienen acceso completo (RU-02). Los técnicos de las instalaciones salen de esta lista.",
+  nuevo: "Nuevo usuario",
+  vacio: "No hay usuarios.",
+  activo: "Activo",
+  inactivo: "Inactivo",
+  tu: "Tú",
+  desactivar: "Desactivar",
+  activar: "Activar",
+  restablecer: "Restablecer contraseña",
+  confirmarDesactivar: (nombre: string) => `¿Desactivar a ${nombre}?`,
+  explicacionDesactivar: "No podrá ingresar y se cerrarán todas sus sesiones. Su historial se conserva.",
+  desactivado: "Usuario desactivado",
+  activado: "Usuario activado",
+  creado: "Usuario creado",
+  restablecida: "Contraseña restablecida",
+  restablecidaDetalle: "Se cerraron sus sesiones. Entrégale la contraseña nueva.",
+  formulario: {
+    nombre: "Nombre",
+    correo: "Correo",
+    contrasena: "Contraseña inicial",
+    contrasenaNueva: "Contraseña nueva",
+    confirmacion: "Repite la contraseña",
+    reglas: "Mínimo 8 caracteres, con mayúscula, minúscula, número y signo.",
+    tituloRestablecer: (nombre: string) => `Restablecer la contraseña de ${nombre}`,
+    guardar: "Guardar",
+    cancelar: "Cancelar",
+  },
+  validacion: {
+    nombre: "Escribe el nombre.",
+    nombreLargo: "Máximo 100 caracteres.",
+    correo: "Escribe un correo válido.",
+  },
+} as const;

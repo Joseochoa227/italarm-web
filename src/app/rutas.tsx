@@ -41,7 +41,7 @@ export const rutas: RouteObject[] = [
                 path: "configuracion",
                 lazy: () => import("@/features/configuracion/pages/PaginaConfiguracion"),
               },
-              { path: "usuarios", lazy: () => import("@/features/configuracion/pages/PaginaUsuarios") },
+              { path: "usuarios", lazy: () => import("@/features/usuarios/pages/PaginaUsuarios") },
               {
                 path: "cuenta/contrasena",
                 lazy: () => import("@/features/auth/pages/PaginaCambioContrasena"),

@@ -5,6 +5,8 @@ import { comoErrorApi, type ErrorApi, RESPUESTA_INVALIDA, SIN_CONEXION } from "@
 /** Mensajes del frontend para los errores que no traen un `detail` útil (guía §2, BF-09). */
 export const MENSAJES_ERROR = {
   sinConexion: "No hay conexión con el servidor. Revisa tu internet e inténtalo de nuevo.",
+  conflicto:
+    "Otro usuario modificó este registro. Se cargaron los datos actuales: revisa y vuelve a guardar.",
   generico: "Algo salió mal. Inténtalo de nuevo; si sigue fallando, avísanos con el código de soporte.",
 } as const;
 
@@ -58,4 +60,9 @@ export function aplicarErroresDeCampo<T extends FieldValues>(
   const lista = erroresDeCampo(error, campos, codigosPorCampo);
   for (const { campo, mensaje } of lista) setError(campo, { type: "servidor", message: mensaje });
   return lista.length > 0;
+}
+
+/** Otro usuario guardó el registro antes (BP-12, guía §5): hay que recargarlo y volver a guardar. */
+export function esConflictoDeVersion(error: unknown): boolean {
+  return comoErrorApi(error).codigo === "MODIFICADO_POR_OTRO_USUARIO";
 }
