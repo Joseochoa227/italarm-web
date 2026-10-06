@@ -82,6 +82,10 @@ Las páginas exportan `Component`, porque React Router las carga con `lazy`.
 | TypeScript 5.9                                                                    | typescript-eslint y openapi-typescript todavía no admiten TypeScript 7.                                                                                                                                                     |
 | Service worker solo con los archivos de la app                                    | BF-13: no se trabaja sin conexión y las respuestas de la API nunca se guardan en caché.                                                                                                                                     |
 
+## Pendientes para la Fase 6
+
+Ver `docs/plan-fase-0.md`, sección 10: acceso a los listados de Compras y Cotizaciones en el celular (F6-01), despliegue a pruebas (F6-02), ajustes del contrato (F6-03), logo (F6-04) y CI en GitHub (F6-05).
+
 ## Dependencias abiertas con el backend
 
 - **D-01:** `ProblemDetail` no declara `codigo`, `correlationId` ni `errores`. Por ahora se validan en `api/problema.ts`.

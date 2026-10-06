@@ -1,6 +1,6 @@
 # Plan de la Fase 0 — Fundaciones (italarm-web)
 
-> Estado: **aprobado por ITALARM el 06/10/2026**, con las propuestas de W-01, W-02 y W-03. En implementación; el despliegue a pruebas espera P-04.
+> Estado: **terminado el 06/10/2026** y subido a la rama `dev`. Aprobado por ITALARM con las propuestas de W-01, W-02 y W-03. Lo pendiente pasa a la Fase 6 (sección 10).
 > Base: `italarm-api/docs/requerimientos.md` (secciones 3.1, 8, 9, 11, 12.1 y 12.2), `italarm-api/docs/preguntas.md` (P-01 a P-08 y P-16), `italarm-api/docs/guia-frontend.md` (secciones 1, 2, 3 y 18), el prototipo `docs/Italarm v2.html` y el contrato `italarm-api/contrato/openapi.json` (rama `dev`, commit `4977fa0`, fases 0 a 5).
 > Alcance: solo el repositorio **italarm-web**. El backend de la Fase 0 ya está terminado (`italarm-api/docs/plan-fase-0.md`).
 
@@ -261,3 +261,15 @@ No hay migraciones: el frontend no tiene base de datos.
 - **P-04 (hosting):** bloquea solo el despliegue a pruebas, la CSP definitiva (origen de la API y de los archivos) y el e2e contra el ambiente real.
 
 **Rama:** el trabajo se sube a `claude/vibrant-euler-91glev`, la rama indicada para esta sesión, con commits por tarea (Conventional Commits, AG-06).
+
+## 10. Pendientes que pasan a la Fase 6
+
+Por decisión de ITALARM (06/10/2026), estos puntos quedan para la Fase 6:
+
+| #     | Pendiente                                                     | Detalle                                                                                                                                                                                                                                               |
+| ----- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F6-01 | Acceso a los listados de Compras y Cotizaciones en el celular | RF-03 no los pone en la barra inferior; hoy, en el celular solo se llega a sus formularios con Nuevo (+). Se resuelve con los bloques de Inicio de la Fase 6 o con un acceso en el menú del usuario.                                                  |
+| F6-02 | Despliegue a pruebas y prueba en celulares reales             | Requiere el hosting (P-04). Con él se completan la CSP definitiva (origen de la API y de los archivos), `frame-ancestors` y las cabeceras de seguridad en el hosting, y el e2e contra el ambiente real.                                               |
+| F6-03 | Ajustes del contrato en italarm-api                           | D-01: declarar `codigo`, `correlationId` y `errores` en `ProblemDetail`. D-02: marcar los campos obligatorios y los que admiten `null`. Mientras tanto, el frontend valida los errores al recibirlos y trata como opcionales los campos de respuesta. |
+| F6-04 | Logo de ITALARM                                               | Reemplaza el ícono provisional (W-03) con `npm run iconos:generar` o con los archivos que entregue ITALARM.                                                                                                                                           |
+| F6-05 | Revisión de la CI en GitHub                                   | La CI está escrita y sus pasos pasan en local y en un clon limpio. Falta verla en verde en GitHub Actions al abrir el primer Pull Request.                                                                                                            |

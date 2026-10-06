@@ -17,3 +17,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 - PWA instalable con íconos provisionales (W-03), aviso de versión nueva y aviso de sin conexión.
 - CSP en la compilación de producción.
 - CI en GitHub Actions: contrato sincronizado, lint, formato, tipos, pruebas con cobertura, compilación y Playwright en celular y computador.
+
+#### Pendiente (pasa a la Fase 6)
+
+- Acceso a los listados de Compras y Cotizaciones en el celular, despliegue a pruebas (P-04), ajustes del contrato (D-01, D-02), logo de ITALARM y CI en verde en GitHub. Detalle en `docs/plan-fase-0.md`, sección 10.
