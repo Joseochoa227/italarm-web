@@ -1,0 +1,36 @@
+/** Textos de la sesión (BF-17). */
+export const TEXTOS_AUTH = {
+  ingreso: {
+    subtitulo: "Inventario · Ventas · Instalaciones",
+    correo: "Correo",
+    contrasena: "Contraseña",
+    ingresar: "Ingresar",
+    pie: "Cada movimiento queda con usuario, fecha y hora",
+  },
+  contrasena: {
+    titulo: "Cambiar contraseña",
+    descripcion: "Al cambiarla se cierran tus sesiones en los demás dispositivos.",
+    actual: "Contraseña actual",
+    nueva: "Contraseña nueva",
+    confirmacion: "Repite la contraseña nueva",
+    reglas: "Mínimo 8 caracteres, con mayúscula, minúscula, número y signo.",
+    guardar: "Cambiar contraseña",
+    exito: "Contraseña cambiada",
+    exitoDetalle: "Se cerraron tus otras sesiones.",
+  },
+  validacion: {
+    correoRequerido: "Escribe tu correo.",
+    correoInvalido: "Escribe un correo válido, por ejemplo nombre@correo.com.",
+    contrasenaRequerida: "Escribe tu contraseña.",
+    actualRequerida: "Escribe tu contraseña actual.",
+    minimo: "Debe tener al menos 8 caracteres.",
+    maximo: "Debe tener máximo 64 caracteres.",
+    mayuscula: "Debe tener al menos una mayúscula.",
+    minuscula: "Debe tener al menos una minúscula.",
+    numero: "Debe tener al menos un número.",
+    signo: "Debe tener al menos un signo, por ejemplo ! # $ % * .",
+    noCoinciden: "Las contraseñas no coinciden.",
+    igualALaActual: "La contraseña nueva debe ser distinta de la actual.",
+  },
+  cargando: "Cargando tu sesión…",
+} as const;
