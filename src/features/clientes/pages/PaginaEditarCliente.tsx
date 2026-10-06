@@ -61,6 +61,7 @@ export function Component() {
         volver={{ a: `/clientes/${String(id)}`, etiqueta: consulta.data.nombre ?? TEXTOS_CLIENTES.titulo }}
       />
       <FormularioCliente
+        key={consulta.data.version}
         valores={valoresDeCliente(consulta.data)}
         ocupado={guardado.isPending}
         error={guardado.error ? comoErrorApi(guardado.error) : null}

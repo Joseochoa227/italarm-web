@@ -138,6 +138,8 @@ export function Component() {
       />
       {!activo && <Alerta tono="aviso">{F.inactivoAviso}</Alerta>}
       <FormularioProducto
+        // Al recargar (guardado o conflicto de versión) el formulario se vuelve a montar con los datos actuales.
+        key={producto.version}
         valores={valoresDeProducto(producto)}
         edicion
         ocupado={guardado.isPending}

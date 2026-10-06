@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 
@@ -50,13 +49,17 @@ function valoresDe(c: Configuracion): Entrada {
 export function FormularioValores({
   configuracion,
   recargar,
+  conflicto,
+  setConflicto,
 }: {
   configuracion: Configuracion;
   recargar: () => Promise<unknown>;
+  /** El aviso de conflicto vive en la página: el formulario se vuelve a montar al recargar. */
+  conflicto: boolean;
+  setConflicto: (conflicto: boolean) => void;
 }) {
   const avisar = useAvisar();
   const guardar = useGuardarConfiguracion();
-  const [conflicto, setConflicto] = useState(false);
   const {
     register,
     handleSubmit,
@@ -64,7 +67,7 @@ export function FormularioValores({
     formState: { errors },
   } = useForm<Entrada, unknown, z.output<typeof esquemaValores>>({
     resolver: zodResolver(esquemaValores),
-    values: valoresDe(configuracion),
+    defaultValues: valoresDe(configuracion),
   });
   // Conflicto de versión: se recargan los datos actuales y se avisa (guía §5).
   const alFallar = async (e: unknown) => {

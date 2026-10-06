@@ -40,16 +40,16 @@ test("ingresar, recorrer el menú, cambiar la contraseña y cerrar sesión", asy
       .getByRole("button", { name: "Nueva cotización" })
       .click();
     await expect(page.getByRole("heading", { name: "Nueva cotización" })).toBeVisible();
-    await menu.getByRole("link", { name: "Clientes" }).click();
+    await menu.getByRole("link", { name: "Reportes" }).click();
   } else {
     await expect(menu.getByRole("link")).toHaveCount(8);
-    await menu.getByRole("link", { name: "Clientes" }).click();
+    await menu.getByRole("link", { name: "Reportes" }).click();
   }
-  await expect(page.getByText("Esta sección llega en la Fase 1")).toBeVisible();
+  await expect(page.getByText("Esta sección llega en la Fase 6")).toBeVisible();
 
   // Recargar conserva la sesión (token en localStorage)
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Clientes" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Reportes" })).toBeVisible();
 
   // Cambiar la contraseña desde el menú de la cuenta
   await page.getByRole("button", { name: "Menú de tu cuenta" }).click();
@@ -58,7 +58,7 @@ test("ingresar, recorrer el menú, cambiar la contraseña y cerrar sesión", asy
   await page.getByLabel("Contraseña nueva", { exact: true }).fill("Nueva.Clave9");
   await page.getByLabel("Repite la contraseña nueva").fill("Nueva.Clave9");
   await page.getByRole("button", { name: "Cambiar contraseña" }).click();
-  await expect(page.getByText("Contraseña cambiada")).toBeVisible();
+  await expect(page.getByText("Contraseña cambiada").first()).toBeVisible();
 
   // Cerrar sesión y volver a ingresar con la nueva
   await page.getByRole("button", { name: "Menú de tu cuenta" }).click();

@@ -37,7 +37,7 @@ export function FormularioProveedor({
     formState: { errors },
   } = useForm<EntradaProveedor, unknown, DatosProveedor>({
     resolver: zodResolver(esquemaProveedor),
-    values: valores,
+    defaultValues: valores,
   });
   const delServidor = error
     ? Object.fromEntries(erroresDeCampo(error, CAMPOS).map((e) => [e.campo, e.mensaje]))

@@ -57,6 +57,7 @@ export function Component() {
     <>
       <EncabezadoPagina titulo={F.tituloEditar} volver={{ a: LISTA, etiqueta: F.volver }} />
       <FormularioProveedor
+        key={p.version}
         valores={{
           nombre: p.nombre ?? "",
           nit: p.nit ?? "",

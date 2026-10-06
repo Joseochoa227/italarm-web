@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useSearchParams } from "react-router";
 
 import { errorDeConsultas } from "@/api/problema";
@@ -11,6 +12,7 @@ import { FormularioEmpresa } from "../components/FormularioEmpresa";
 import { FormularioValores } from "../components/FormularioValores";
 import { GestionCategorias } from "../components/GestionCategorias";
 import { GestionUnidades } from "../components/GestionUnidades";
+import { LogoEmpresa } from "../components/LogoEmpresa";
 import { useConfiguracion } from "../hooks/configuracion";
 import { TEXTOS_CONFIGURACION } from "../textos";
 
@@ -29,15 +31,24 @@ export function Component() {
   const configuracion = useConfiguracion();
   const error = errorDeConsultas(configuracion);
   const recargar = () => configuracion.refetch();
+  const [conflicto, setConflicto] = useState(false);
+  const datos = configuracion.data;
+  // Al guardar o recargar cambia la versión y el formulario se vuelve a montar con los datos actuales.
+  const formulario = { recargar, conflicto, setConflicto };
 
   let contenido;
   if (activa === "categorias") contenido = <GestionCategorias />;
   else if (activa === "unidades") contenido = <GestionUnidades />;
   else if (error) contenido = <EstadoError error={error} alReintentar={() => void recargar()} />;
-  else if (!configuracion.data) contenido = <CargandoLista filas={3} />;
+  else if (!datos) contenido = <CargandoLista filas={3} />;
   else if (activa === "empresa")
-    contenido = <FormularioEmpresa configuracion={configuracion.data} recargar={recargar} />;
-  else contenido = <FormularioValores configuracion={configuracion.data} recargar={recargar} />;
+    contenido = (
+      <>
+        <FormularioEmpresa key={datos.version} {...formulario} configuracion={datos} />
+        <LogoEmpresa url={datos.logoUrl} />
+      </>
+    );
+  else contenido = <FormularioValores key={datos.version} {...formulario} configuracion={datos} />;
 
   return (
     <>

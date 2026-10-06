@@ -1,22 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 
-import { api } from "@/api/cliente";
-import { comoFormulario } from "@/api/archivos";
 import { comoErrorApi } from "@/api/problema";
 import { Alerta } from "@/components/ui/Alerta";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { useAvisar } from "@/components/ui/contextoAvisos";
 import { EstadoError } from "@/components/ui/EstadoError";
-import { SelectorImagen } from "@/components/ui/SelectorImagen";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { aplicarErroresDeCampo, erroresDeCampo, esConflictoDeVersion, MENSAJES_ERROR } from "@/lib/errores";
 
-import { type Configuracion, CONSULTA_CONFIGURACION, useGuardarConfiguracion } from "../hooks/configuracion";
+import { type Configuracion, useGuardarConfiguracion } from "../hooks/configuracion";
 import { esquemaEmpresa } from "../schemas/esquemas";
 import { TEXTOS_CONFIGURACION } from "../textos";
 
@@ -46,14 +41,17 @@ function valoresDe(c: Configuracion): Entrada {
 export function FormularioEmpresa({
   configuracion,
   recargar,
+  conflicto,
+  setConflicto,
 }: {
   configuracion: Configuracion;
   recargar: () => Promise<unknown>;
+  /** El aviso de conflicto vive en la página: el formulario se vuelve a montar al recargar. */
+  conflicto: boolean;
+  setConflicto: (conflicto: boolean) => void;
 }) {
   const avisar = useAvisar();
-  const clienteConsultas = useQueryClient();
   const guardar = useGuardarConfiguracion();
-  const [conflicto, setConflicto] = useState(false);
   const {
     register,
     handleSubmit,
@@ -61,13 +59,8 @@ export function FormularioEmpresa({
     formState: { errors },
   } = useForm<Entrada, unknown, z.output<typeof esquemaEmpresa>>({
     resolver: zodResolver(esquemaEmpresa),
-    // Al recargar (guardado o conflicto de versión) el formulario muestra los datos actuales.
-    values: valoresDe(configuracion),
+    defaultValues: valoresDe(configuracion),
   });
-
-  const actualizarLogo = (nueva: Configuracion | undefined) => {
-    if (nueva) clienteConsultas.setQueryData(CONSULTA_CONFIGURACION.queryKey, nueva);
-  };
 
   // Conflicto de versión: se recargan los datos actuales y se avisa (guía §5).
   const alFallar = async (e: unknown) => {
@@ -142,23 +135,6 @@ export function FormularioEmpresa({
             {T.guardar}
           </Boton>
         </form>
-      </Tarjeta>
-      <Tarjeta>
-        <SelectorImagen
-          etiqueta={T.empresa.logo}
-          uso="logo"
-          url={configuracion.logoUrl}
-          alSubir={async (archivo) => {
-            const r = await api.PUT("/api/v1/configuracion/logo", {
-              body: { archivo },
-              bodySerializer: comoFormulario,
-            });
-            actualizarLogo(r.data);
-          }}
-          alQuitar={async () => {
-            actualizarLogo((await api.DELETE("/api/v1/configuracion/logo")).data);
-          }}
-        />
       </Tarjeta>
     </div>
   );

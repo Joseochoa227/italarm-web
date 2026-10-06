@@ -60,7 +60,7 @@ export function FormularioCliente({
     formState: { errors },
   } = useForm<EntradaCliente, unknown, DatosCliente>({
     resolver: zodResolver(esquemaCliente),
-    values: valores,
+    defaultValues: valores,
   });
   const tipo = useWatch({ control, name: "tipo" });
 

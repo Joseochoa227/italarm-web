@@ -67,7 +67,10 @@ export function FormularioProducto({
     register,
     handleSubmit,
     formState: { errors, dirtyFields },
-  } = useForm<EntradaProducto, unknown, DatosProducto>({ resolver: zodResolver(esquema), values: valores });
+  } = useForm<EntradaProducto, unknown, DatosProducto>({
+    resolver: zodResolver(esquema),
+    defaultValues: valores,
+  });
 
   // P-17: el backend dice qué no se pudo cambiar; se muestra en el campo que el usuario cambió.
   const campoBloqueado = dirtyFields.unidadMedidaId ? "unidadMedidaId" : "controlaSerial";
