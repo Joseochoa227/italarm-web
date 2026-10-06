@@ -1,0 +1,78 @@
+/*
+ * Tokens de diseño del prototipo (docs/Italarm v2.html, bloque :root).
+ * Nombres en español; entre paréntesis, el nombre original del prototipo.
+ * La escala "peligro" no existe en el prototipo: se agregó por W-02 con la misma
+ * luminosidad OKLCH de las demás escalas, solo para errores y acciones destructivas.
+ */
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --color-fondo: #f2f2f3; /* (--color-bg) */
+  --color-superficie: #e9e9ea; /* (--color-surface) */
+  --color-tarjeta: #fafafb; /* fondo de tarjetas en las pantallas del prototipo */
+  --color-tinta: #1d1f20; /* (--color-text) */
+  --color-acento: #5980a6; /* (--color-accent) */
+  --color-acento-2: #728fab; /* (--color-accent-2) */
+  --color-divisor: color-mix(in srgb, #1d1f20 16%, transparent); /* (--color-divider) */
+  --color-borde: color-mix(in srgb, #1d1f20 9%, transparent); /* borde de tarjetas */
+  --color-tenue: color-mix(in srgb, #1d1f20 4%, transparent); /* fondo al pasar el cursor */
+
+  --color-neutro-100: #f5f5f8;
+  --color-neutro-200: #e7e7ea;
+  --color-neutro-300: #d4d4d7;
+  --color-neutro-400: #b7b7ba;
+  --color-neutro-500: #98989b;
+  --color-neutro-600: #7a7a7d;
+  --color-neutro-700: #5d5d60;
+  --color-neutro-800: #424244;
+  --color-neutro-900: #2b2b2d;
+
+  --color-acento-100: #eef6ff;
+  --color-acento-200: #d6ebff;
+  --color-acento-300: #b5d9fd;
+  --color-acento-400: #94bce3;
+  --color-acento-500: #749dc4;
+  --color-acento-600: #597ea3;
+  --color-acento-700: #416180;
+  --color-acento-800: #2c455d;
+  --color-acento-900: #1d2d3d;
+
+  --color-acento-2-100: #eef6ff;
+  --color-acento-2-200: #d6ebff;
+  --color-acento-2-300: #bdd8f2;
+  --color-acento-2-400: #9ebbd8;
+  --color-acento-2-500: #7e9cb8;
+  --color-acento-2-600: #627d98;
+  --color-acento-2-700: #486077;
+  --color-acento-2-800: #314457;
+  --color-acento-2-900: #1f2d3a;
+
+  --color-peligro-100: #fef2f0;
+  --color-peligro-200: #ffe0dc;
+  --color-peligro-300: #fec4bd;
+  --color-peligro-400: #ff968b;
+  --color-peligro-500: #e17369;
+  --color-peligro-600: #bd564d;
+  --color-peligro-700: #963e37;
+  --color-peligro-800: #6e2a25;
+  --color-peligro-900: #481c18;
+
+  --font-titulo: "Barlow Condensed", system-ui, sans-serif; /* (--font-heading), peso 600 */
+  --font-texto: "Barlow", system-ui, sans-serif; /* (--font-body) */
+
+  /* Escala de espaciado del prototipo: base de 3,4 px (--space-1 … --space-8). */
+  --spacing: 3.4px;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 7px;
+
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #2b2b2d 14%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, #2b2b2d 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, #2b2b2d 22%, transparent);
+
+  --breakpoint-escritorio: 820px; /* corte celular / computador del prototipo */
+}
