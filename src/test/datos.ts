@@ -112,3 +112,37 @@ export function producto(cambios: Partial<S["ProductoVista"]> = {}): S["Producto
     ...cambios,
   };
 }
+
+export function cliente(cambios: Partial<S["ClienteVista"]> = {}): S["ClienteVista"] {
+  return {
+    id: 20,
+    tipo: "INSTALADOR",
+    nombre: "Ferretería El Tornillo",
+    tipoDocumento: "NIT",
+    numeroDocumento: "900111222-3",
+    telefono: "+573001234567",
+    correo: "tornillo@correo.test",
+    direccion: "Calle 10 # 5-20",
+    ciudad: "Cúcuta",
+    precioAplicado: "INSTALADOR",
+    precioAplicadoDescripcion: "Se le aplicará el precio instalador",
+    cantidadMovimientos: 2,
+    fechaUltimoMovimiento: "2026-10-01",
+    version: 1,
+    ...cambios,
+  };
+}
+
+export function proveedor(cambios: Partial<S["ProveedorVista"]> = {}): S["ProveedorVista"] {
+  return {
+    id: 30,
+    nombre: "Distribuidora Seguridad Total",
+    nit: "800555444-1",
+    telefono: "+573109998877",
+    correo: "ventas@seguridadtotal.test",
+    ciudad: "Bogotá",
+    monedaHabitual: "COP",
+    version: 0,
+    ...cambios,
+  };
+}

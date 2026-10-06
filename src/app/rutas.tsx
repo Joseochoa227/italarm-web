@@ -35,6 +35,14 @@ export const rutas: RouteObject[] = [
               { path: "compras", lazy: () => import("@/features/compras/pages/PaginaCompras") },
               { path: "compras/nueva", lazy: () => import("@/features/compras/pages/PaginaNuevaCompra") },
               {
+                path: "compras/proveedores/nuevo",
+                lazy: () => import("@/features/compras/pages/PaginaNuevoProveedor"),
+              },
+              {
+                path: "compras/proveedores/:id/editar",
+                lazy: () => import("@/features/compras/pages/PaginaEditarProveedor"),
+              },
+              {
                 path: "cotizaciones",
                 lazy: () => import("@/features/cotizaciones/pages/PaginaCotizaciones"),
               },
@@ -43,6 +51,12 @@ export const rutas: RouteObject[] = [
                 lazy: () => import("@/features/cotizaciones/pages/PaginaNuevaCotizacion"),
               },
               { path: "clientes", lazy: () => import("@/features/clientes/pages/PaginaClientes") },
+              { path: "clientes/nuevo", lazy: () => import("@/features/clientes/pages/PaginaNuevoCliente") },
+              { path: "clientes/:id", lazy: () => import("@/features/clientes/pages/PaginaCliente") },
+              {
+                path: "clientes/:id/editar",
+                lazy: () => import("@/features/clientes/pages/PaginaEditarCliente"),
+              },
               { path: "tasas", lazy: () => import("@/features/tasas/pages/PaginaTasas") },
               { path: "reportes", lazy: () => import("@/features/reportes/pages/PaginaReportes") },
               {

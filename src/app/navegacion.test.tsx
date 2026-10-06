@@ -112,7 +112,6 @@ describe("Secciones pendientes (entregable de la Fase 0: menú vacío)", () => {
     ["/instalaciones/nueva", "Nueva instalación", 4],
     ["/cotizaciones", "Cotizaciones", 5],
     ["/cotizaciones/nueva", "Nueva cotización", 5],
-    ["/clientes", "Clientes", 1],
     ["/reportes", "Reportes", 6],
   ])("%s muestra «%s» y la fase en que llega", async (ruta, titulo, fase) => {
     renderizarApp({ ruta });
