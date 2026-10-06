@@ -1,6 +1,6 @@
 # Plan de la Fase 0 — Fundaciones (italarm-web)
 
-> Estado: **propuesto, en espera de aprobación de ITALARM** (AG-02). No se escribe código hasta que se apruebe.
+> Estado: **aprobado por ITALARM el 06/10/2026**, con las propuestas de W-01, W-02 y W-03. En implementación; el despliegue a pruebas espera P-04.
 > Base: `italarm-api/docs/requerimientos.md` (secciones 3.1, 8, 9, 11, 12.1 y 12.2), `italarm-api/docs/preguntas.md` (P-01 a P-08 y P-16), `italarm-api/docs/guia-frontend.md` (secciones 1, 2, 3 y 18), el prototipo `docs/Italarm v2.html` y el contrato `italarm-api/contrato/openapi.json` (rama `dev`, commit `4977fa0`, fases 0 a 5).
 > Alcance: solo el repositorio **italarm-web**. El backend de la Fase 0 ya está terminado (`italarm-api/docs/plan-fase-0.md`).
 
@@ -231,11 +231,11 @@ No hay migraciones: el frontend no tiene base de datos.
 
 ## 8. Preguntas para ITALARM y dependencias
 
-| # | Tema | Pregunta | Propuesta |
-|---|---|---|---|
-| W-01 | Menú | El prototipo tiene "Documentos", "Tasas de cambio" y un botón "Más" en el celular. RF-01 y RF-03 no los incluyen, y no dicen dónde quedan Configuración, Usuarios y Proveedores. | Seguir RF-01 y RF-03 al pie de la letra. Configuración y Usuarios van en el menú del usuario (junto a Cambiar contraseña y Cerrar sesión). Proveedores va dentro de Compras. Tasas se abre desde el recuadro de tasas (Fase 1). |
-| W-02 | Colores de error | El prototipo solo usa azules y grises: sus alertas son `accent-200` con texto `accent-900`. No tiene rojo para errores, "Anulada" o "Stock insuficiente". | Agregar una sola escala roja de "peligro", con la misma luminosidad que las demás. Se usaría solo para errores, acciones destructivas y estados negativos, siempre con ícono y texto (no solo color). Los avisos siguen en azul, como en el prototipo. |
-| W-03 | Ícono de la app | No hay logo de ITALARM en el repositorio. | Ícono provisional: "I" en Barlow Condensed blanco sobre `#5980a6`. Se reemplaza cuando ITALARM entregue el logo. |
+| # | Tema | Pregunta | Propuesta | Respuesta de ITALARM |
+|---|---|---|---|---|
+| W-01 | Menú | El prototipo tiene "Documentos", "Tasas de cambio" y un botón "Más" en el celular. RF-01 y RF-03 no los incluyen, y no dicen dónde quedan Configuración, Usuarios y Proveedores. | Seguir RF-01 y RF-03 al pie de la letra. Configuración y Usuarios van en el menú del usuario (junto a Cambiar contraseña y Cerrar sesión). Proveedores va dentro de Compras. Tasas se abre desde el recuadro de tasas (Fase 1). | De acuerdo con la propuesta. |
+| W-02 | Colores de error | El prototipo solo usa azules y grises: sus alertas son `accent-200` con texto `accent-900`. No tiene rojo para errores, "Anulada" o "Stock insuficiente". | Agregar una sola escala roja de "peligro", con la misma luminosidad que las demás. Se usaría solo para errores, acciones destructivas y estados negativos, siempre con ícono y texto (no solo color). Los avisos siguen en azul, como en el prototipo. | De acuerdo con la propuesta. |
+| W-03 | Ícono de la app | No hay logo de ITALARM en el repositorio. | Ícono provisional: "I" en Barlow Condensed blanco sobre `#5980a6`. Se reemplaza cuando ITALARM entregue el logo. | De acuerdo con la propuesta. |
 
 **Dependencias con el backend (no bloquean esta fase):**
 - **D-01:** el esquema `ProblemDetail` del contrato no declara `codigo`, `correlationId` ni `errores`. Se propone documentarlos en italarm-api, para que también salgan del contrato. Mientras tanto, el frontend los valida en tiempo de ejecución (T4).
