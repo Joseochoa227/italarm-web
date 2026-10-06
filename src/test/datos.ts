@@ -90,3 +90,25 @@ export const USUARIOS: S["UsuarioVista"][] = [
   { id: 2, nombre: "Victor", correo: "victor@italarm.test", activo: true, version: 0 },
   { id: 3, nombre: "Ayudante", correo: "ayudante@italarm.test", activo: false, version: 1 },
 ];
+
+export function producto(cambios: Partial<S["ProductoVista"]> = {}): S["ProductoVista"] {
+  return {
+    id: 10,
+    codigo: "CAM-D2",
+    nombre: "Cámara domo 2MP",
+    marca: "Hikvision",
+    modelo: "DS-2CE56D0T",
+    categoria: { id: 1, nombre: "Cámaras" },
+    unidadMedida: { id: 1, nombre: "Unidad", abreviatura: "und", admiteDecimales: false, version: 0 },
+    controlaSerial: true,
+    precioInstalador: { monto: "25.5000", moneda: "USD" },
+    precioClienteFinal: { monto: "32.0000", moneda: "USD" },
+    stockMinimo: "5",
+    stock: "0",
+    bajoMinimo: true,
+    activo: true,
+    descripcion: "Cámara para interiores",
+    version: 2,
+    ...cambios,
+  };
+}

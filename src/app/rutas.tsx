@@ -19,6 +19,14 @@ export const rutas: RouteObject[] = [
             children: [
               { index: true, lazy: () => import("@/features/inicio/pages/PaginaInicio") },
               { path: "inventario", lazy: () => import("@/features/inventario/pages/PaginaInventario") },
+              {
+                path: "inventario/productos/nuevo",
+                lazy: () => import("@/features/inventario/pages/PaginaNuevoProducto"),
+              },
+              {
+                path: "inventario/productos/:id/editar",
+                lazy: () => import("@/features/inventario/pages/PaginaEditarProducto"),
+              },
               { path: "ventas/nueva", lazy: () => import("@/features/ventas/pages/PaginaNuevaVenta") },
               {
                 path: "instalaciones/nueva",
