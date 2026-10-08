@@ -8,6 +8,7 @@ import { EstadoError } from "@/components/ui/EstadoError";
 import { Pestanas } from "@/components/ui/Pestanas";
 import { pestanaActiva } from "@/lib/pestanas";
 
+import { CargaInicial } from "../components/CargaInicial";
 import { FormularioEmpresa } from "../components/FormularioEmpresa";
 import { FormularioValores } from "../components/FormularioValores";
 import { GestionCategorias } from "../components/GestionCategorias";
@@ -22,9 +23,10 @@ const PESTANAS = [
   { valor: "valores", etiqueta: T.pestanas.valores },
   { valor: "categorias", etiqueta: T.pestanas.categorias },
   { valor: "unidades", etiqueta: T.pestanas.unidades },
+  { valor: "carga", etiqueta: T.pestanas.carga },
 ] as const;
 
-/** Configuración (3.17): empresa, valores por defecto, categorías y unidades (RF-145 a RF-148). */
+/** Configuración (3.17): empresa, valores por defecto, categorías, unidades (RF-145 a RF-148) y carga inicial (3.18). */
 export function Component() {
   const [parametros] = useSearchParams();
   const activa = pestanaActiva(parametros.get("pestana"), PESTANAS);
@@ -39,6 +41,7 @@ export function Component() {
   let contenido;
   if (activa === "categorias") contenido = <GestionCategorias />;
   else if (activa === "unidades") contenido = <GestionUnidades />;
+  else if (activa === "carga") contenido = <CargaInicial />;
   else if (error) contenido = <EstadoError error={error} alReintentar={() => void recargar()} />;
   else if (!datos) contenido = <CargandoLista filas={3} />;
   else if (activa === "empresa")
