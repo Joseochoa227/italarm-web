@@ -99,6 +99,6 @@ Ver `docs/plan-fase-0.md`, sección 10: acceso a los listados de Compras y Cotiz
 - **D-01:** `ProblemDetail` no declara `codigo`, `correlationId` ni `errores`. Por ahora se validan en `api/problema.ts`.
 - **D-02:** los esquemas de respuesta no marcan qué campos son obligatorios ni cuáles pueden llegar `null`, así que todos quedan opcionales en TypeScript.
 - **D-04:** el contrato pide `version` también al crear; se envía 0.
-- **D-05:** colisión de nombres (`Linea`, `Movimiento`, `TotalMoneda`) en el contrato. El historial del cliente se valida en `features/clientes/schemas/historial.ts`. **Debe corregirse en italarm-api antes de la Fase 2.**
+- **D-05 (resuelto el 08/10/2026):** los registros anidados se publican con el nombre de su contenedor (`CompraVistaLinea`, `VentaVistaLinea`, `MovimientosClienteMovimiento`…).
 - **D-06:** `GET /tasas` no trae las correcciones; la pantalla de tasas pide el detalle de cada tasa.
 - **P-04:** el hosting define la URL de pruebas, el origen de los archivos (`VITE_ORIGEN_ARCHIVOS`) y las cabeceras de seguridad.

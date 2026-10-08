@@ -1590,18 +1590,6 @@ export interface components {
             tipo?: string;
             valorUsd?: components["schemas"]["Dinero"];
         };
-        Anulacion: {
-            /** Format: date-time */
-            fecha?: string;
-            motivo?: string;
-            usuario?: string;
-        };
-        Aviso: {
-            mensaje?: string;
-            /** Format: int64 */
-            productoId?: number;
-            tipo?: string;
-        };
         CambioCostoVista: {
             costoAnteriorUsd?: components["schemas"]["Dinero"];
             costoFactura?: components["schemas"]["Dinero"];
@@ -1697,7 +1685,7 @@ export interface components {
             moneda?: "USD" | "COP" | "VES";
             numeroFactura?: string;
             productos?: string;
-            proveedor?: components["schemas"]["Referencia"];
+            proveedor?: components["schemas"]["CompraVistaReferencia"];
             /** Format: date-time */
             registradaEn?: string;
             registradaPor?: string;
@@ -1707,7 +1695,7 @@ export interface components {
         };
         CompraVista: {
             anulable?: boolean;
-            anulacion?: components["schemas"]["Anulacion"];
+            anulacion?: components["schemas"]["CompraVistaAnulacion"];
             consecutivo?: string;
             estado?: string;
             facturaUrl?: string;
@@ -1715,18 +1703,48 @@ export interface components {
             fecha?: string;
             /** Format: int64 */
             id?: number;
-            lineas?: components["schemas"]["Linea"][];
+            lineas?: components["schemas"]["CompraVistaLinea"][];
             /** @enum {string} */
             moneda?: "USD" | "COP" | "VES";
             motivoNoAnulable?: string;
             numeroFactura?: string;
-            proveedor?: components["schemas"]["Referencia"];
+            proveedor?: components["schemas"]["CompraVistaReferencia"];
             /** Format: date-time */
             registradaEn?: string;
             registradaPor?: string;
             tasas?: components["schemas"]["TasasCompraVista"];
             total?: components["schemas"]["Dinero"];
             totalUsd?: components["schemas"]["Dinero"];
+        };
+        CompraVistaAnulacion: {
+            /** Format: date-time */
+            fecha?: string;
+            motivo?: string;
+            usuario?: string;
+        };
+        CompraVistaLinea: {
+            abreviatura?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            cantidad?: string;
+            codigo?: string;
+            costoAnteriorUsd?: components["schemas"]["Dinero"];
+            costoNuevoUsd?: components["schemas"]["Dinero"];
+            costoUnitario?: components["schemas"]["Dinero"];
+            costoUnitarioUsd?: components["schemas"]["Dinero"];
+            nombre?: string;
+            /** Format: int64 */
+            productoId?: number;
+            regla?: string;
+            seriales?: string[];
+            subtotal?: components["schemas"]["Dinero"];
+        };
+        CompraVistaReferencia: {
+            /** Format: int64 */
+            id?: number;
+            nombre?: string;
         };
         ConfiguracionVista: {
             condicionesGarantia?: string;
@@ -1753,7 +1771,7 @@ export interface components {
             version?: number;
         };
         ConversionCotizacionVista: {
-            avisos?: components["schemas"]["Aviso"][];
+            avisos?: components["schemas"]["ConversionCotizacionVistaAviso"][];
             cliente?: string;
             /** Format: int64 */
             clienteId?: number;
@@ -1769,7 +1787,7 @@ export interface components {
              */
             descuentoValor?: string;
             direccion?: string;
-            lineas?: components["schemas"]["Linea"][];
+            lineas?: components["schemas"]["ConversionCotizacionVistaLinea"][];
             /**
              * Format: decimal
              * @example 19.5000
@@ -1782,22 +1800,34 @@ export interface components {
             puedeGuardar?: boolean;
             tipo?: string;
         };
-        CorreccionVista: {
-            automatica?: boolean;
-            /** Format: date-time */
-            corregidaEn?: string;
-            corregidaPor?: string;
-            motivo?: string;
+        ConversionCotizacionVistaAviso: {
+            mensaje?: string;
+            /** Format: int64 */
+            productoId?: number;
+            tipo?: string;
+        };
+        ConversionCotizacionVistaLinea: {
+            abreviatura?: string;
             /**
              * Format: decimal
              * @example 19.5000
              */
-            valorAnterior?: string;
+            cantidad?: string;
+            codigo?: string;
+            controlaSerial?: boolean;
             /**
              * Format: decimal
              * @example 19.5000
              */
-            valorNuevo?: string;
+            disponible?: string;
+            nombre?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            precioUnitario?: string;
+            /** Format: int64 */
+            productoId?: number;
         };
         CotizacionOrigenVista: {
             consecutivo?: string;
@@ -1843,7 +1873,7 @@ export interface components {
             descuentoValor?: string;
             /** Format: int64 */
             diasParaVencer?: number;
-            documentoGenerado?: components["schemas"]["DocumentoGenerado"];
+            documentoGenerado?: components["schemas"]["CotizacionVistaDocumentoGenerado"];
             /** Format: date-time */
             enviadaEn?: string;
             estado?: string;
@@ -1851,7 +1881,7 @@ export interface components {
             fecha?: string;
             /** Format: int64 */
             id?: number;
-            lineas?: components["schemas"]["Linea"][];
+            lineas?: components["schemas"]["CotizacionVistaLinea"][];
             /** @enum {string} */
             moneda?: "USD" | "COP" | "VES";
             monedasComprobante?: ("USD" | "COP" | "VES")[];
@@ -1864,7 +1894,7 @@ export interface components {
              * @example 19.5000
              */
             porcentajeUtilidad?: string;
-            rechazo?: components["schemas"]["Rechazo"];
+            rechazo?: components["schemas"]["CotizacionVistaRechazo"];
             /** Format: date-time */
             registradaEn?: string;
             registradaPor?: string;
@@ -1881,7 +1911,67 @@ export interface components {
             vencidaEl?: string;
             /** Format: int64 */
             version?: number;
-            versionesAnteriores?: components["schemas"]["VersionAnterior"][];
+            versionesAnteriores?: components["schemas"]["CotizacionVistaVersionAnterior"][];
+        };
+        CotizacionVistaDocumentoGenerado: {
+            consecutivo?: string;
+            /** Format: date-time */
+            fecha?: string;
+            /** Format: int64 */
+            id?: number;
+            tipo?: string;
+        };
+        CotizacionVistaLinea: {
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            cantidad?: string;
+            codigo?: string;
+            costoUnitarioUsd?: components["schemas"]["Dinero"];
+            descripcion?: string;
+            precioSugerido?: components["schemas"]["Dinero"];
+            precioUnitario?: components["schemas"]["Dinero"];
+            /** Format: int64 */
+            productoId?: number;
+            subtotal?: components["schemas"]["Dinero"];
+            unidad?: string;
+        };
+        CotizacionVistaLineaAnterior: {
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            cantidad?: string;
+            codigo?: string;
+            descripcion?: string;
+            precioUnitario?: components["schemas"]["Dinero"];
+            /** Format: int64 */
+            productoId?: number;
+            subtotal?: components["schemas"]["Dinero"];
+            unidad?: string;
+        };
+        CotizacionVistaRechazo: {
+            detalle?: string;
+            /** Format: date-time */
+            fecha?: string;
+            motivo?: string;
+        };
+        CotizacionVistaVersionAnterior: {
+            descripcion?: string;
+            descuento?: components["schemas"]["Dinero"];
+            /** Format: date */
+            fecha?: string;
+            lineas?: components["schemas"]["CotizacionVistaLineaAnterior"][];
+            manoDeObra?: components["schemas"]["Dinero"];
+            /** Format: int32 */
+            numeroVersion?: number;
+            /** Format: date-time */
+            reemplazadaEn?: string;
+            reemplazadaPor?: string;
+            total?: components["schemas"]["Dinero"];
+            /** Format: date */
+            vence?: string;
         };
         Dinero: {
             /** @enum {string} */
@@ -1891,14 +1981,6 @@ export interface components {
              * @example 19.5000
              */
             monto?: string;
-        };
-        DocumentoGenerado: {
-            consecutivo?: string;
-            /** Format: date-time */
-            fecha?: string;
-            /** Format: int64 */
-            id?: number;
-            tipo?: string;
         };
         DocumentoRef: {
             consecutivo?: string;
@@ -1934,18 +2016,6 @@ export interface components {
             fila?: number;
             hoja?: string;
             mensaje?: string;
-        };
-        Foto: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: date-time */
-            subidaEn?: string;
-            url?: string;
-        };
-        Fotos: {
-            antes?: components["schemas"]["Foto"][];
-            despues?: components["schemas"]["Foto"][];
-            durante?: components["schemas"]["Foto"][];
         };
         GarantiaVista: {
             clase?: string;
@@ -1987,13 +2057,23 @@ export interface components {
             compras?: number;
             /** Format: int64 */
             instalaciones?: number;
-            movimientos?: components["schemas"]["Movimiento"][];
+            movimientos?: components["schemas"]["MovimientosClienteMovimiento"][];
             nombre?: string;
         };
         HistorialSerialVista: {
-            movimientos?: components["schemas"]["Movimiento"][];
-            reclamos?: components["schemas"]["Reclamo"][];
+            movimientos?: components["schemas"]["HistorialSerialVistaMovimiento"][];
+            reclamos?: components["schemas"]["ReclamosSerialReclamo"][];
             serial?: components["schemas"]["SerialVista"];
+        };
+        HistorialSerialVistaMovimiento: {
+            detalle?: string;
+            documento?: components["schemas"]["DocumentoRef"];
+            /** Format: date */
+            fecha?: string;
+            /** Format: date-time */
+            registradoEn?: string;
+            tipo?: string;
+            usuario?: string;
         };
         InstalacionResumenVista: {
             cliente?: string;
@@ -2021,7 +2101,7 @@ export interface components {
             venceManoObra?: string;
         };
         InstalacionVista: {
-            anulacion?: components["schemas"]["Anulacion"];
+            anulacion?: components["schemas"]["InstalacionVistaAnulacion"];
             cliente?: components["schemas"]["ClienteDocumentoVista"];
             consecutivo?: string;
             cotizacion?: components["schemas"]["CotizacionOrigenVista"];
@@ -2036,11 +2116,11 @@ export interface components {
             estado?: string;
             /** Format: date */
             fecha?: string;
-            fotos?: components["schemas"]["Fotos"];
+            fotos?: components["schemas"]["InstalacionVistaFotos"];
             garantias?: components["schemas"]["GarantiasInstalacionVista"];
             /** Format: int64 */
             id?: number;
-            lineas?: components["schemas"]["Linea"][];
+            lineas?: components["schemas"]["InstalacionVistaLinea"][];
             /** @enum {string} */
             moneda?: "USD" | "COP" | "VES";
             monedasComprobante?: ("USD" | "COP" | "VES")[];
@@ -2061,14 +2141,25 @@ export interface components {
             /** Format: int64 */
             version?: number;
         };
-        InventarioVista: {
-            avisos?: string[];
-            productos?: components["schemas"]["PaginaProducto"];
-            /** Format: int64 */
-            totalProductos?: number;
-            valorTotal?: components["schemas"]["MontoEnMonedas"];
+        InstalacionVistaAnulacion: {
+            /** Format: date-time */
+            fecha?: string;
+            motivo?: string;
+            usuario?: string;
         };
-        Linea: {
+        InstalacionVistaFoto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            subidaEn?: string;
+            url?: string;
+        };
+        InstalacionVistaFotos: {
+            antes?: components["schemas"]["InstalacionVistaFoto"][];
+            despues?: components["schemas"]["InstalacionVistaFoto"][];
+            durante?: components["schemas"]["InstalacionVistaFoto"][];
+        };
+        InstalacionVistaLinea: {
             /**
              * Format: decimal
              * @example 19.5000
@@ -2081,23 +2172,48 @@ export interface components {
             precioUnitario?: components["schemas"]["Dinero"];
             /** Format: int64 */
             productoId?: number;
-            seriales?: components["schemas"]["SerialVendido"][];
+            seriales?: components["schemas"]["InstalacionVistaSerialInstalado"][];
             subtotal?: components["schemas"]["Dinero"];
             unidad?: string;
         };
-        LineaAnterior: {
+        InstalacionVistaSerialInstalado: {
+            /** Format: int64 */
+            id?: number;
+            numero?: string;
+            /** Format: date */
+            vencimientoGarantia?: string;
+        };
+        InventarioVista: {
+            avisos?: string[];
+            productos?: components["schemas"]["PaginaInventarioVistaProducto"];
+            /** Format: int64 */
+            totalProductos?: number;
+            valorTotal?: components["schemas"]["MontoEnMonedas"];
+        };
+        InventarioVistaProducto: {
+            abreviatura?: string;
+            activo?: boolean;
+            bajoMinimo?: boolean;
+            categoria?: string;
+            codigo?: string;
+            controlaSerial?: boolean;
+            costoActualUsd?: components["schemas"]["Dinero"];
+            fotoUrl?: string;
+            /** Format: int64 */
+            id?: number;
+            marca?: string;
+            nombre?: string;
             /**
              * Format: decimal
              * @example 19.5000
              */
-            cantidad?: string;
-            codigo?: string;
-            descripcion?: string;
-            precioUnitario?: components["schemas"]["Dinero"];
-            /** Format: int64 */
-            productoId?: number;
-            subtotal?: components["schemas"]["Dinero"];
-            unidad?: string;
+            stock?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            stockMinimo?: string;
+            valorEnBodega?: components["schemas"]["MontoEnMonedas"];
         };
         LineaVistaPrevia: {
             abreviatura?: string;
@@ -2123,7 +2239,22 @@ export interface components {
             /** Format: int64 */
             productoId?: number;
             subtotal?: components["schemas"]["MontoEnMonedas"];
-            ultimaCompra?: components["schemas"]["UltimaCompra"];
+            ultimaCompra?: components["schemas"]["LineaVistaPreviaUltimaCompra"];
+        };
+        LineaVistaPreviaUltimaCompra: {
+            consecutivo?: string;
+            /** Format: date */
+            fecha?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            tasaVes?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            trm?: string;
         };
         ListadoComprasVista: {
             compras?: components["schemas"]["PaginaCompraResumenVista"];
@@ -2132,7 +2263,13 @@ export interface components {
             /** Format: date */
             hasta?: string;
             totalUsd?: components["schemas"]["Dinero"];
-            totalesPorMoneda?: components["schemas"]["TotalMoneda"][];
+            totalesPorMoneda?: components["schemas"]["ListadoComprasVistaTotalMoneda"][];
+        };
+        ListadoComprasVistaTotalMoneda: {
+            /** Format: int64 */
+            compras?: number;
+            total?: components["schemas"]["Dinero"];
+            totalUsd?: components["schemas"]["Dinero"];
         };
         ListadoInstalacionesVista: {
             /** Format: date */
@@ -2141,8 +2278,17 @@ export interface components {
             hasta?: string;
             instalaciones?: components["schemas"]["PaginaInstalacionResumenVista"];
             totalUsd?: components["schemas"]["Dinero"];
-            totalesPorMoneda?: components["schemas"]["TotalMoneda"][];
+            totalesPorMoneda?: components["schemas"]["ListadoInstalacionesVistaTotalMoneda"][];
             utilidadUsd?: components["schemas"]["Dinero"];
+        };
+        ListadoInstalacionesVistaTotalMoneda: {
+            costo?: components["schemas"]["Dinero"];
+            /** Format: int64 */
+            instalaciones?: number;
+            manoDeObra?: components["schemas"]["Dinero"];
+            material?: components["schemas"]["Dinero"];
+            total?: components["schemas"]["Dinero"];
+            utilidad?: components["schemas"]["Dinero"];
         };
         ListadoVentasVista: {
             /** Format: date */
@@ -2150,24 +2296,21 @@ export interface components {
             /** Format: date */
             hasta?: string;
             totalUsd?: components["schemas"]["Dinero"];
-            totalesPorMoneda?: components["schemas"]["TotalMoneda"][];
+            totalesPorMoneda?: components["schemas"]["ListadoVentasVistaTotalMoneda"][];
             utilidadUsd?: components["schemas"]["Dinero"];
             ventas?: components["schemas"]["PaginaVentaResumenVista"];
+        };
+        ListadoVentasVistaTotalMoneda: {
+            costo?: components["schemas"]["Dinero"];
+            total?: components["schemas"]["Dinero"];
+            utilidad?: components["schemas"]["Dinero"];
+            /** Format: int64 */
+            ventas?: number;
         };
         MontoEnMonedas: {
             cop?: components["schemas"]["Dinero"];
             usd?: components["schemas"]["Dinero"];
             ves?: components["schemas"]["Dinero"];
-        };
-        Movimiento: {
-            detalle?: string;
-            documento?: components["schemas"]["DocumentoRef"];
-            /** Format: date */
-            fecha?: string;
-            /** Format: date-time */
-            registradoEn?: string;
-            tipo?: string;
-            usuario?: string;
         };
         MovimientoKardexVista: {
             costoUnitarioUsd?: components["schemas"]["Dinero"];
@@ -2197,6 +2340,17 @@ export interface components {
             tipo?: string;
             tipoEtiqueta?: string;
             usuario?: string;
+        };
+        MovimientosClienteMovimiento: {
+            consecutivo?: string;
+            descripcion?: string;
+            estado?: string;
+            /** Format: date */
+            fecha?: string;
+            /** Format: int64 */
+            id?: number;
+            tipo?: string;
+            total?: components["schemas"]["Dinero"];
         };
         PaginaAjusteVista: {
             contenido?: components["schemas"]["AjusteVista"][];
@@ -2264,8 +2418,8 @@ export interface components {
             /** Format: int32 */
             totalPaginas?: number;
         };
-        PaginaMovimientoKardexVista: {
-            contenido?: components["schemas"]["MovimientoKardexVista"][];
+        PaginaInventarioVistaProducto: {
+            contenido?: components["schemas"]["InventarioVistaProducto"][];
             /** Format: int32 */
             pagina?: number;
             /** Format: int32 */
@@ -2275,8 +2429,8 @@ export interface components {
             /** Format: int32 */
             totalPaginas?: number;
         };
-        PaginaProducto: {
-            contenido?: components["schemas"]["Producto"][];
+        PaginaMovimientoKardexVista: {
+            contenido?: components["schemas"]["MovimientoKardexVista"][];
             /** Format: int32 */
             pagina?: number;
             /** Format: int32 */
@@ -2343,31 +2497,6 @@ export interface components {
             /** Format: uri */
             type?: string;
         };
-        Producto: {
-            abreviatura?: string;
-            activo?: boolean;
-            bajoMinimo?: boolean;
-            categoria?: string;
-            codigo?: string;
-            controlaSerial?: boolean;
-            costoActualUsd?: components["schemas"]["Dinero"];
-            fotoUrl?: string;
-            /** Format: int64 */
-            id?: number;
-            marca?: string;
-            nombre?: string;
-            /**
-             * Format: decimal
-             * @example 19.5000
-             */
-            stock?: string;
-            /**
-             * Format: decimal
-             * @example 19.5000
-             */
-            stockMinimo?: string;
-            valorEnBodega?: components["schemas"]["MontoEnMonedas"];
-        };
         ProductoInventarioVista: {
             abreviatura?: string;
             activo?: boolean;
@@ -2385,7 +2514,7 @@ export interface components {
             nombre?: string;
             precioClienteFinal?: components["schemas"]["MontoEnMonedas"];
             precioInstalador?: components["schemas"]["MontoEnMonedas"];
-            seriales?: components["schemas"]["SerialesPorEstado"];
+            seriales?: components["schemas"]["ProductoInventarioVistaSerialesPorEstado"];
             /**
              * Format: decimal
              * @example 19.5000
@@ -2398,6 +2527,18 @@ export interface components {
             stockMinimo?: string;
             valorEnBodega?: components["schemas"]["MontoEnMonedas"];
         };
+        ProductoInventarioVistaSerialesPorEstado: {
+            /** Format: int64 */
+            anulados?: number;
+            /** Format: int64 */
+            dadosDeBaja?: number;
+            /** Format: int64 */
+            enBodega?: number;
+            /** Format: int64 */
+            instalados?: number;
+            /** Format: int64 */
+            vendidos?: number;
+        };
         ProductoReferencia: {
             codigo?: string;
             /** Format: int64 */
@@ -2407,7 +2548,7 @@ export interface components {
         ProductoVista: {
             activo?: boolean;
             bajoMinimo?: boolean;
-            categoria?: components["schemas"]["Referencia"];
+            categoria?: components["schemas"]["ProductoVistaReferencia"];
             codigo?: string;
             controlaSerial?: boolean;
             costoActual?: components["schemas"]["Dinero"];
@@ -2434,6 +2575,11 @@ export interface components {
             /** Format: int64 */
             version?: number;
         };
+        ProductoVistaReferencia: {
+            /** Format: int64 */
+            id?: number;
+            nombre?: string;
+        };
         ProveedorVista: {
             ciudad?: string;
             correo?: string;
@@ -2446,21 +2592,6 @@ export interface components {
             telefono?: string;
             /** Format: int64 */
             version?: number;
-        };
-        Rechazo: {
-            detalle?: string;
-            /** Format: date-time */
-            fecha?: string;
-            motivo?: string;
-        };
-        Reclamo: {
-            enGarantia?: boolean;
-            /** Format: date */
-            fecha?: string;
-            /** Format: int64 */
-            id?: number;
-            problema?: string;
-            solucion?: string;
         };
         ReclamoVista: {
             cliente?: string;
@@ -2488,10 +2619,14 @@ export interface components {
             /** Format: int64 */
             version?: number;
         };
-        Referencia: {
+        ReclamosSerialReclamo: {
+            enGarantia?: boolean;
+            /** Format: date */
+            fecha?: string;
             /** Format: int64 */
             id?: number;
-            nombre?: string;
+            problema?: string;
+            solucion?: string;
         };
         RespuestaIngreso: {
             /** @description Token de sesión. Se entrega una sola vez. */
@@ -2500,8 +2635,19 @@ export interface components {
         };
         ResultadoCargaVista: {
             errores?: components["schemas"]["ErrorCarga"][];
-            resumen?: components["schemas"]["Resumen"];
+            resumen?: components["schemas"]["ResultadoCargaVistaResumen"];
             valido?: boolean;
+        };
+        ResultadoCargaVistaResumen: {
+            /** Format: int32 */
+            clientes?: number;
+            /** Format: int32 */
+            productos?: number;
+            /** Format: int32 */
+            productosConStock?: number;
+            /** Format: int32 */
+            proveedores?: number;
+            valorUsd?: components["schemas"]["Dinero"];
         };
         ResultadoTrm: {
             detalle?: string;
@@ -2514,17 +2660,6 @@ export interface components {
              * @example 19.5000
              */
             valor?: string;
-        };
-        Resumen: {
-            /** Format: int32 */
-            clientes?: number;
-            /** Format: int32 */
-            productos?: number;
-            /** Format: int32 */
-            productosConStock?: number;
-            /** Format: int32 */
-            proveedores?: number;
-            valorUsd?: components["schemas"]["Dinero"];
         };
         ResumenCobroVista: {
             costo?: components["schemas"]["MontoEnMonedas"];
@@ -2544,13 +2679,6 @@ export interface components {
             mensaje?: string;
             whatsappUrl?: string;
         };
-        SerialVendido: {
-            /** Format: int64 */
-            id?: number;
-            numero?: string;
-            /** Format: date */
-            vencimientoGarantia?: string;
-        };
         SerialVista: {
             documentoEntrada?: components["schemas"]["DocumentoRef"];
             documentoSalida?: components["schemas"]["DocumentoRef"];
@@ -2563,18 +2691,6 @@ export interface components {
             producto?: components["schemas"]["ProductoReferencia"];
             /** Format: date */
             vencimientoGarantia?: string;
-        };
-        SerialesPorEstado: {
-            /** Format: int64 */
-            anulados?: number;
-            /** Format: int64 */
-            dadosDeBaja?: number;
-            /** Format: int64 */
-            enBodega?: number;
-            /** Format: int64 */
-            instalados?: number;
-            /** Format: int64 */
-            vendidos?: number;
         };
         SolicitudAjuste: {
             /**
@@ -2687,7 +2803,7 @@ export interface components {
              * @example 19.5000
              */
             descuentoValor?: string;
-            lineas?: components["schemas"]["SolicitudLineaCotizacion"][];
+            lineas?: components["schemas"]["SolicitudCotizacionSolicitudLineaCotizacion"][];
             /**
              * Format: decimal
              * @example 19.5000
@@ -2703,6 +2819,20 @@ export interface components {
             validezDias?: number;
             /** Format: int64 */
             version: number;
+        };
+        SolicitudCotizacionSolicitudLineaCotizacion: {
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            cantidad: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            precioUnitario?: string;
+            /** Format: int64 */
+            productoId: number;
         };
         SolicitudEdicionInstalacion: {
             condicionesGarantia?: string;
@@ -2744,7 +2874,7 @@ export interface components {
             fecha?: string;
             /** Format: int32 */
             garantiaManoObraMeses?: number;
-            lineas?: components["schemas"]["SolicitudLineaMaterial"][];
+            lineas?: components["schemas"]["SolicitudInstalacionSolicitudLineaMaterial"][];
             /**
              * Format: decimal
              * @example 19.5000
@@ -2755,6 +2885,21 @@ export interface components {
             monedasComprobante?: ("USD" | "COP" | "VES")[];
             observaciones?: string;
             tecnicos: number[];
+        };
+        SolicitudInstalacionSolicitudLineaMaterial: {
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            cantidad?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            precioUnitario?: string;
+            /** Format: int64 */
+            productoId: number;
+            seriales?: string[];
         };
         SolicitudLineaCompra: {
             /**
@@ -2767,35 +2912,6 @@ export interface components {
              * @example 19.5000
              */
             costoUnitario: string;
-            /** Format: int64 */
-            productoId: number;
-            seriales?: string[];
-        };
-        SolicitudLineaCotizacion: {
-            /**
-             * Format: decimal
-             * @example 19.5000
-             */
-            cantidad: string;
-            /**
-             * Format: decimal
-             * @example 19.5000
-             */
-            precioUnitario?: string;
-            /** Format: int64 */
-            productoId: number;
-        };
-        SolicitudLineaMaterial: {
-            /**
-             * Format: decimal
-             * @example 19.5000
-             */
-            cantidad?: string;
-            /**
-             * Format: decimal
-             * @example 19.5000
-             */
-            precioUnitario?: string;
             /** Format: int64 */
             productoId: number;
             seriales?: string[];
@@ -2966,7 +3082,7 @@ export interface components {
             valor?: string;
         };
         TasaVista: {
-            correcciones?: components["schemas"]["CorreccionVista"][];
+            correcciones?: components["schemas"]["TasaVistaCorreccionVista"][];
             /** Format: date */
             fecha?: string;
             /** @enum {string} */
@@ -2983,6 +3099,23 @@ export interface components {
              * @example 19.5000
              */
             valor?: string;
+        };
+        TasaVistaCorreccionVista: {
+            automatica?: boolean;
+            /** Format: date-time */
+            corregidaEn?: string;
+            corregidaPor?: string;
+            motivo?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            valorAnterior?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            valorNuevo?: string;
         };
         TasasCompraVista: {
             /** Format: date */
@@ -3022,28 +3155,6 @@ export interface components {
             hoy?: string;
             trm?: components["schemas"]["TasaVigenteVista"];
             trmAutomaticaFallo?: boolean;
-        };
-        TotalMoneda: {
-            costo?: components["schemas"]["Dinero"];
-            total?: components["schemas"]["Dinero"];
-            utilidad?: components["schemas"]["Dinero"];
-            /** Format: int64 */
-            ventas?: number;
-        };
-        UltimaCompra: {
-            consecutivo?: string;
-            /** Format: date */
-            fecha?: string;
-            /**
-             * Format: decimal
-             * @example 19.5000
-             */
-            tasaVes?: string;
-            /**
-             * Format: decimal
-             * @example 19.5000
-             */
-            trm?: string;
         };
         UnidadMedidaVista: {
             abreviatura?: string;
@@ -3118,7 +3229,7 @@ export interface components {
             utilidad?: components["schemas"]["Dinero"];
         };
         VentaVista: {
-            anulacion?: components["schemas"]["Anulacion"];
+            anulacion?: components["schemas"]["VentaVistaAnulacion"];
             cliente?: components["schemas"]["ClienteDocumentoVista"];
             consecutivo?: string;
             cotizacion?: components["schemas"]["CotizacionOrigenVista"];
@@ -3133,7 +3244,7 @@ export interface components {
             fecha?: string;
             /** Format: int64 */
             id?: number;
-            lineas?: components["schemas"]["Linea"][];
+            lineas?: components["schemas"]["VentaVistaLinea"][];
             /** @enum {string} */
             moneda?: "USD" | "COP" | "VES";
             monedasComprobante?: ("USD" | "COP" | "VES")[];
@@ -3153,31 +3264,68 @@ export interface components {
             /** Format: int64 */
             version?: number;
         };
-        VersionAnterior: {
-            descripcion?: string;
-            descuento?: components["schemas"]["Dinero"];
-            /** Format: date */
-            fecha?: string;
-            lineas?: components["schemas"]["LineaAnterior"][];
-            manoDeObra?: components["schemas"]["Dinero"];
-            /** Format: int32 */
-            numeroVersion?: number;
+        VentaVistaAnulacion: {
             /** Format: date-time */
-            reemplazadaEn?: string;
-            reemplazadaPor?: string;
-            total?: components["schemas"]["Dinero"];
+            fecha?: string;
+            motivo?: string;
+            usuario?: string;
+        };
+        VentaVistaLinea: {
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            cantidad?: string;
+            codigo?: string;
+            costoUnitarioUsd?: components["schemas"]["Dinero"];
+            descripcion?: string;
+            precioSugerido?: components["schemas"]["Dinero"];
+            precioUnitario?: components["schemas"]["Dinero"];
+            /** Format: int64 */
+            productoId?: number;
+            seriales?: components["schemas"]["VentaVistaSerialVendido"][];
+            subtotal?: components["schemas"]["Dinero"];
+            unidad?: string;
+        };
+        VentaVistaSerialVendido: {
+            /** Format: int64 */
+            id?: number;
+            numero?: string;
             /** Format: date */
-            vence?: string;
+            vencimientoGarantia?: string;
         };
         VistaPreviaCompraVista: {
             avisos?: string[];
             /** Format: date */
             fecha?: string;
-            lineas?: components["schemas"]["Linea"][];
+            lineas?: components["schemas"]["VistaPreviaCompraVistaLinea"][];
             /** @enum {string} */
             moneda?: "USD" | "COP" | "VES";
             tasas?: components["schemas"]["TasasCompraVista"];
             total?: components["schemas"]["MontoEnMonedas"];
+        };
+        VistaPreviaCompraVistaLinea: {
+            abreviatura?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            cantidad?: string;
+            codigo?: string;
+            costoActualUsd?: components["schemas"]["Dinero"];
+            costoNuevoUsd?: components["schemas"]["Dinero"];
+            costoUnitario?: components["schemas"]["Dinero"];
+            costoUnitarioUsd?: components["schemas"]["Dinero"];
+            nombre?: string;
+            /** Format: int64 */
+            productoId?: number;
+            regla?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            stockActual?: string;
+            subtotal?: components["schemas"]["MontoEnMonedas"];
         };
         VistaPreviaCotizacionVista: {
             avisos?: string[];
@@ -3229,8 +3377,6 @@ export interface components {
     pathItems: never;
 }
 export type AjusteVista = components['schemas']['AjusteVista'];
-export type Anulacion = components['schemas']['Anulacion'];
-export type Aviso = components['schemas']['Aviso'];
 export type CambioCostoVista = components['schemas']['CambioCostoVista'];
 export type CargaInicialVista = components['schemas']['CargaInicialVista'];
 export type CategoriaVista = components['schemas']['CategoriaVista'];
@@ -3238,68 +3384,80 @@ export type ClienteDocumentoVista = components['schemas']['ClienteDocumentoVista
 export type ClienteVista = components['schemas']['ClienteVista'];
 export type CompraResumenVista = components['schemas']['CompraResumenVista'];
 export type CompraVista = components['schemas']['CompraVista'];
+export type CompraVistaAnulacion = components['schemas']['CompraVistaAnulacion'];
+export type CompraVistaLinea = components['schemas']['CompraVistaLinea'];
+export type CompraVistaReferencia = components['schemas']['CompraVistaReferencia'];
 export type ConfiguracionVista = components['schemas']['ConfiguracionVista'];
 export type ConversionCotizacionVista = components['schemas']['ConversionCotizacionVista'];
-export type CorreccionVista = components['schemas']['CorreccionVista'];
+export type ConversionCotizacionVistaAviso = components['schemas']['ConversionCotizacionVistaAviso'];
+export type ConversionCotizacionVistaLinea = components['schemas']['ConversionCotizacionVistaLinea'];
 export type CotizacionOrigenVista = components['schemas']['CotizacionOrigenVista'];
 export type CotizacionResumenVista = components['schemas']['CotizacionResumenVista'];
 export type CotizacionVista = components['schemas']['CotizacionVista'];
+export type CotizacionVistaDocumentoGenerado = components['schemas']['CotizacionVistaDocumentoGenerado'];
+export type CotizacionVistaLinea = components['schemas']['CotizacionVistaLinea'];
+export type CotizacionVistaLineaAnterior = components['schemas']['CotizacionVistaLineaAnterior'];
+export type CotizacionVistaRechazo = components['schemas']['CotizacionVistaRechazo'];
+export type CotizacionVistaVersionAnterior = components['schemas']['CotizacionVistaVersionAnterior'];
 export type Dinero = components['schemas']['Dinero'];
-export type DocumentoGenerado = components['schemas']['DocumentoGenerado'];
 export type DocumentoRef = components['schemas']['DocumentoRef'];
 export type EnlaceComprobante = components['schemas']['EnlaceComprobante'];
 export type EnlaceComprobanteVista = components['schemas']['EnlaceComprobanteVista'];
 export type EnlaceCotizacionVista = components['schemas']['EnlaceCotizacionVista'];
 export type ErrorCarga = components['schemas']['ErrorCarga'];
-export type Foto = components['schemas']['Foto'];
-export type Fotos = components['schemas']['Fotos'];
 export type GarantiaVista = components['schemas']['GarantiaVista'];
 export type GarantiasInstalacionVista = components['schemas']['GarantiasInstalacionVista'];
 export type HistorialClienteVista = components['schemas']['HistorialClienteVista'];
 export type HistorialSerialVista = components['schemas']['HistorialSerialVista'];
+export type HistorialSerialVistaMovimiento = components['schemas']['HistorialSerialVistaMovimiento'];
 export type InstalacionResumenVista = components['schemas']['InstalacionResumenVista'];
 export type InstalacionVista = components['schemas']['InstalacionVista'];
+export type InstalacionVistaAnulacion = components['schemas']['InstalacionVistaAnulacion'];
+export type InstalacionVistaFoto = components['schemas']['InstalacionVistaFoto'];
+export type InstalacionVistaFotos = components['schemas']['InstalacionVistaFotos'];
+export type InstalacionVistaLinea = components['schemas']['InstalacionVistaLinea'];
+export type InstalacionVistaSerialInstalado = components['schemas']['InstalacionVistaSerialInstalado'];
 export type InventarioVista = components['schemas']['InventarioVista'];
-export type Linea = components['schemas']['Linea'];
-export type LineaAnterior = components['schemas']['LineaAnterior'];
+export type InventarioVistaProducto = components['schemas']['InventarioVistaProducto'];
 export type LineaVistaPrevia = components['schemas']['LineaVistaPrevia'];
+export type LineaVistaPreviaUltimaCompra = components['schemas']['LineaVistaPreviaUltimaCompra'];
 export type ListadoComprasVista = components['schemas']['ListadoComprasVista'];
+export type ListadoComprasVistaTotalMoneda = components['schemas']['ListadoComprasVistaTotalMoneda'];
 export type ListadoInstalacionesVista = components['schemas']['ListadoInstalacionesVista'];
+export type ListadoInstalacionesVistaTotalMoneda = components['schemas']['ListadoInstalacionesVistaTotalMoneda'];
 export type ListadoVentasVista = components['schemas']['ListadoVentasVista'];
+export type ListadoVentasVistaTotalMoneda = components['schemas']['ListadoVentasVistaTotalMoneda'];
 export type MontoEnMonedas = components['schemas']['MontoEnMonedas'];
-export type Movimiento = components['schemas']['Movimiento'];
 export type MovimientoKardexVista = components['schemas']['MovimientoKardexVista'];
+export type MovimientosClienteMovimiento = components['schemas']['MovimientosClienteMovimiento'];
 export type PaginaAjusteVista = components['schemas']['PaginaAjusteVista'];
 export type PaginaClienteVista = components['schemas']['PaginaClienteVista'];
 export type PaginaCompraResumenVista = components['schemas']['PaginaCompraResumenVista'];
 export type PaginaCotizacionResumenVista = components['schemas']['PaginaCotizacionResumenVista'];
 export type PaginaGarantiaVista = components['schemas']['PaginaGarantiaVista'];
 export type PaginaInstalacionResumenVista = components['schemas']['PaginaInstalacionResumenVista'];
+export type PaginaInventarioVistaProducto = components['schemas']['PaginaInventarioVistaProducto'];
 export type PaginaMovimientoKardexVista = components['schemas']['PaginaMovimientoKardexVista'];
-export type PaginaProducto = components['schemas']['PaginaProducto'];
 export type PaginaProductoVista = components['schemas']['PaginaProductoVista'];
 export type PaginaProveedorVista = components['schemas']['PaginaProveedorVista'];
 export type PaginaTasaVista = components['schemas']['PaginaTasaVista'];
 export type PaginaVentaResumenVista = components['schemas']['PaginaVentaResumenVista'];
 export type ProblemDetail = components['schemas']['ProblemDetail'];
-export type Producto = components['schemas']['Producto'];
 export type ProductoInventarioVista = components['schemas']['ProductoInventarioVista'];
+export type ProductoInventarioVistaSerialesPorEstado = components['schemas']['ProductoInventarioVistaSerialesPorEstado'];
 export type ProductoReferencia = components['schemas']['ProductoReferencia'];
 export type ProductoVista = components['schemas']['ProductoVista'];
+export type ProductoVistaReferencia = components['schemas']['ProductoVistaReferencia'];
 export type ProveedorVista = components['schemas']['ProveedorVista'];
-export type Rechazo = components['schemas']['Rechazo'];
-export type Reclamo = components['schemas']['Reclamo'];
 export type ReclamoVista = components['schemas']['ReclamoVista'];
-export type Referencia = components['schemas']['Referencia'];
+export type ReclamosSerialReclamo = components['schemas']['ReclamosSerialReclamo'];
 export type RespuestaIngreso = components['schemas']['RespuestaIngreso'];
 export type ResultadoCargaVista = components['schemas']['ResultadoCargaVista'];
+export type ResultadoCargaVistaResumen = components['schemas']['ResultadoCargaVistaResumen'];
 export type ResultadoTrm = components['schemas']['ResultadoTrm'];
-export type Resumen = components['schemas']['Resumen'];
 export type ResumenCobroVista = components['schemas']['ResumenCobroVista'];
 export type SeguimientoCotizacionVista = components['schemas']['SeguimientoCotizacionVista'];
-export type SerialVendido = components['schemas']['SerialVendido'];
 export type SerialVista = components['schemas']['SerialVista'];
-export type SerialesPorEstado = components['schemas']['SerialesPorEstado'];
 export type SolicitudAjuste = components['schemas']['SolicitudAjuste'];
 export type SolicitudAnulacion = components['schemas']['SolicitudAnulacion'];
 export type SolicitudAnulacionInstalacion = components['schemas']['SolicitudAnulacionInstalacion'];
@@ -3311,13 +3469,13 @@ export type SolicitudCompra = components['schemas']['SolicitudCompra'];
 export type SolicitudConfiguracion = components['schemas']['SolicitudConfiguracion'];
 export type SolicitudCorreccionTasa = components['schemas']['SolicitudCorreccionTasa'];
 export type SolicitudCotizacion = components['schemas']['SolicitudCotizacion'];
+export type SolicitudCotizacionSolicitudLineaCotizacion = components['schemas']['SolicitudCotizacionSolicitudLineaCotizacion'];
 export type SolicitudEdicionInstalacion = components['schemas']['SolicitudEdicionInstalacion'];
 export type SolicitudEdicionVenta = components['schemas']['SolicitudEdicionVenta'];
 export type SolicitudIngreso = components['schemas']['SolicitudIngreso'];
 export type SolicitudInstalacion = components['schemas']['SolicitudInstalacion'];
+export type SolicitudInstalacionSolicitudLineaMaterial = components['schemas']['SolicitudInstalacionSolicitudLineaMaterial'];
 export type SolicitudLineaCompra = components['schemas']['SolicitudLineaCompra'];
-export type SolicitudLineaCotizacion = components['schemas']['SolicitudLineaCotizacion'];
-export type SolicitudLineaMaterial = components['schemas']['SolicitudLineaMaterial'];
 export type SolicitudLineaVenta = components['schemas']['SolicitudLineaVenta'];
 export type SolicitudNuevoUsuario = components['schemas']['SolicitudNuevoUsuario'];
 export type SolicitudProducto = components['schemas']['SolicitudProducto'];
@@ -3333,11 +3491,10 @@ export type SolicitudVistaPrevia = components['schemas']['SolicitudVistaPrevia']
 export type SolicitudVistaPreviaCompra = components['schemas']['SolicitudVistaPreviaCompra'];
 export type TasaVigenteVista = components['schemas']['TasaVigenteVista'];
 export type TasaVista = components['schemas']['TasaVista'];
+export type TasaVistaCorreccionVista = components['schemas']['TasaVistaCorreccionVista'];
 export type TasasCompraVista = components['schemas']['TasasCompraVista'];
 export type TasasDocumentoVista = components['schemas']['TasasDocumentoVista'];
 export type TasasVigentesVista = components['schemas']['TasasVigentesVista'];
-export type TotalMoneda = components['schemas']['TotalMoneda'];
-export type UltimaCompra = components['schemas']['UltimaCompra'];
 export type UnidadMedidaVista = components['schemas']['UnidadMedidaVista'];
 export type UsuarioActual = components['schemas']['UsuarioActual'];
 export type UsuarioReferencia = components['schemas']['UsuarioReferencia'];
@@ -3345,8 +3502,11 @@ export type UsuarioVista = components['schemas']['UsuarioVista'];
 export type VariacionVista = components['schemas']['VariacionVista'];
 export type VentaResumenVista = components['schemas']['VentaResumenVista'];
 export type VentaVista = components['schemas']['VentaVista'];
-export type VersionAnterior = components['schemas']['VersionAnterior'];
+export type VentaVistaAnulacion = components['schemas']['VentaVistaAnulacion'];
+export type VentaVistaLinea = components['schemas']['VentaVistaLinea'];
+export type VentaVistaSerialVendido = components['schemas']['VentaVistaSerialVendido'];
 export type VistaPreviaCompraVista = components['schemas']['VistaPreviaCompraVista'];
+export type VistaPreviaCompraVistaLinea = components['schemas']['VistaPreviaCompraVistaLinea'];
 export type VistaPreviaCotizacionVista = components['schemas']['VistaPreviaCotizacionVista'];
 export type VistaPreviaInstalacionVista = components['schemas']['VistaPreviaInstalacionVista'];
 export type VistaPreviaVentaVista = components['schemas']['VistaPreviaVentaVista'];

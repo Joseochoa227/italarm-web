@@ -13,7 +13,6 @@ import { cx } from "@/lib/clases";
 import { formatearDineroDe, formatearFecha } from "@/lib/formato";
 
 import { enlaceWhatsapp } from "../hooks/clientes";
-import { leerMovimientos } from "../schemas/historial";
 import { TEXTOS_CLIENTES } from "../textos";
 
 const T = TEXTOS_CLIENTES;
@@ -65,7 +64,7 @@ export function Component() {
   if (!c) return <CargandoLista filas={4} />;
 
   const whatsapp = enlaceWhatsapp(c.telefono);
-  const movimientos = leerMovimientos(historial.data?.movimientos);
+  const movimientos = historial.data?.movimientos ?? [];
   const errorHistorial = errorDeConsultas(historial);
   const conCliente = `?clienteId=${String(id)}`;
 

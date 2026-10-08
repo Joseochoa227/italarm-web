@@ -180,7 +180,6 @@ describe("Clientes · detalle (RF-77)", () => {
           nombre: "Ferretería El Tornillo",
           compras: 2,
           instalaciones: 0,
-          // Campos reales del backend (D-05): el contrato los describe con otro esquema.
           movimientos: [
             {
               tipo: "VENTA",
@@ -200,8 +199,7 @@ describe("Clientes · detalle (RF-77)", () => {
               total: { monto: "200000.0000", moneda: "COP" },
               estado: "ACTIVA",
             },
-            { malformado: true },
-          ] as never,
+          ],
         }),
       ),
     );

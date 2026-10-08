@@ -4,6 +4,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [Sin publicar]
 
+### Contrato con nombres únicos (D-05)
+
+#### Cambiado
+
+- Contrato sincronizado con italarm-api (nombres de esquema únicos para los registros anidados). El historial del cliente usa los tipos generados en lugar de validarse a mano.
+
 ### Fase 1 — Catálogo, terceros, tasas y configuración
 
 #### Agregado
@@ -23,7 +29,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 #### Dependencias con el backend
 
-- D-05: colisión de nombres en el contrato (`Linea`, `Movimiento`, `TotalMoneda`); **debe corregirse antes de la Fase 2**.
+- D-05: colisión de nombres en el contrato (`Linea`, `Movimiento`, `TotalMoneda`). Resuelto en italarm-api el 08/10/2026.
 - D-06: el listado de tasas no trae las correcciones.
 
 ### Fase 0 — Fundaciones
