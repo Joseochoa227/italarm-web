@@ -74,7 +74,8 @@ export async function leerProblema(respuesta: Response): Promise<ErrorApi> {
     p.codigo ?? RESPUESTA_INVALIDA,
     p.detail ?? null,
     (p.errores ?? []).map((e) => ({
-      campo: e.campo ?? null,
+      // "lineas[0].cantidad" (Spring) → "lineas.0.cantidad" (React Hook Form).
+      campo: e.campo?.replace(/\[(\d+)\]/g, ".$1") ?? null,
       mensaje: e.mensaje,
       hoja: e.hoja ?? null,
       fila: e.fila ?? null,

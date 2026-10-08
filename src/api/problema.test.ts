@@ -33,6 +33,19 @@ describe("leerProblema (guía §2)", () => {
     expect(error.message).toBe("Revisa los datos ingresados.");
   });
 
+  it("nombra los campos de las listas como React Hook Form", async () => {
+    const error = await leerProblema(
+      respuesta(
+        {
+          codigo: "VALIDACION",
+          errores: [{ campo: "lineas[2].seriales[0]", mensaje: "Hay un serial vacío." }],
+        },
+        400,
+      ),
+    );
+    expect(error.errorDeCampo("lineas.2.seriales.0")).toBe("Hay un serial vacío.");
+  });
+
   it("lee los errores por hoja y fila de la carga inicial", async () => {
     const error = await leerProblema(
       respuesta(

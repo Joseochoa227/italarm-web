@@ -1,4 +1,11 @@
-import { decimalAEdicion, leerDecimal, MENSAJES_DECIMAL } from "./decimal";
+import {
+  compararDecimales,
+  decimalAEdicion,
+  leerDecimal,
+  MENSAJES_DECIMAL,
+  restarDecimales,
+  sumarDecimales,
+} from "./decimal";
 
 const dos = { maxDecimales: 2 };
 
@@ -44,5 +51,23 @@ describe("decimalAEdicion", () => {
     expect(decimalAEdicion("12")).toBe("12");
     expect(decimalAEdicion(null)).toBe("");
     expect(decimalAEdicion(undefined)).toBe("");
+  });
+});
+
+describe("aritmética decimal sin number", () => {
+  it("suma y resta con distintas escalas y signos", () => {
+    expect(sumarDecimales("10", "2")).toBe("12");
+    expect(sumarDecimales("12.5", "0.25")).toBe("12.75");
+    expect(sumarDecimales("0.1", "0.2")).toBe("0.3");
+    expect(restarDecimales("10", "12.5")).toBe("-2.5");
+    expect(restarDecimales("5.000", "5")).toBe("0");
+    expect(sumarDecimales("-0.5", "0.5")).toBe("0");
+    expect(sumarDecimales("12345678901234567.89", "0.11")).toBe("12345678901234568");
+  });
+
+  it("compara", () => {
+    expect(compararDecimales("10", "9.99")).toBe(1);
+    expect(compararDecimales("2.50", "2.5")).toBe(0);
+    expect(compararDecimales("-1", "0")).toBe(-1);
   });
 });

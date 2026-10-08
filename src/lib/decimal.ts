@@ -49,3 +49,45 @@ export function decimalAEdicion(valor: string | null | undefined): string {
   const recortados = decimales.replace(/0+$/, "");
   return recortados ? `${entero},${recortados}` : entero;
 }
+
+/**
+ * Aritmética de textos decimales con enteros grandes (BigInt), sin pasar por number. Solo para
+ * vistas previas del frontend (por ejemplo, el nuevo stock de un ajuste); los valores oficiales los
+ * calcula el backend (BF-06).
+ */
+function aEscala(valor: string, escala: number): bigint {
+  const negativo = valor.startsWith("-");
+  const [entero = "0", decimales = ""] = (negativo ? valor.slice(1) : valor).split(".");
+  const n = BigInt(entero + decimales.padEnd(escala, "0").slice(0, escala));
+  return negativo ? -n : n;
+}
+
+function deEscala(n: bigint, escala: number): string {
+  const negativo = n < 0n;
+  const texto = (negativo ? -n : n).toString().padStart(escala + 1, "0");
+  const entero = texto.slice(0, texto.length - escala);
+  const decimales = texto.slice(texto.length - escala).replace(/0+$/, "");
+  const resultado = decimales ? `${entero}.${decimales}` : entero;
+  return negativo && resultado !== "0" ? `-${resultado}` : resultado;
+}
+
+function escalaDe(...valores: string[]): number {
+  return Math.max(0, ...valores.map((v) => v.split(".")[1]?.length ?? 0));
+}
+
+export function sumarDecimales(a: string, b: string): string {
+  const escala = escalaDe(a, b);
+  return deEscala(aEscala(a, escala) + aEscala(b, escala), escala);
+}
+
+export function restarDecimales(a: string, b: string): string {
+  const escala = escalaDe(a, b);
+  return deEscala(aEscala(a, escala) - aEscala(b, escala), escala);
+}
+
+/** -1 si a < b, 0 si son iguales, 1 si a > b. */
+export function compararDecimales(a: string, b: string): -1 | 0 | 1 {
+  const escala = escalaDe(a, b);
+  const diferencia = aEscala(a, escala) - aEscala(b, escala);
+  return diferencia < 0n ? -1 : diferencia > 0n ? 1 : 0;
+}
