@@ -219,3 +219,37 @@ export function sinCampos<T extends object>(objeto: T, ...campos: (keyof T & str
     Object.entries(objeto).filter(([clave]) => !(campos as string[]).includes(clave)),
   ) as T;
 }
+
+export function compra(cambios: Partial<S["CompraVista"]> = {}): S["CompraVista"] {
+  return {
+    id: 40,
+    consecutivo: "C-0001",
+    estado: "ACTIVA",
+    proveedor: { id: 30, nombre: "Distribuidora Seguridad Total" },
+    numeroFactura: "FE-123",
+    fecha: "2026-10-01",
+    moneda: "COP",
+    tasas: { trm: "4000", fechaTrm: "2026-10-01", tasaVes: "50", fechaTasaVes: "2026-10-01" },
+    registradaPor: "Jose Ochoa",
+    registradaEn: "2026-10-01T15:30:00Z",
+    total: { monto: "400000.0000", moneda: "COP" },
+    totalUsd: { monto: "100.0000", moneda: "USD" },
+    anulable: true,
+    lineas: [
+      {
+        productoId: 10,
+        codigo: "CAM-D2",
+        nombre: "Cámara domo 2MP",
+        abreviatura: "und",
+        cantidad: "5",
+        costoUnitario: { monto: "80000.0000", moneda: "COP" },
+        costoUnitarioUsd: { monto: "20.0000", moneda: "USD" },
+        subtotal: { monto: "400000.0000", moneda: "COP" },
+        costoNuevoUsd: { monto: "20.0000", moneda: "USD" },
+        regla: "SIN_STOCK",
+        seriales: ["SN-1", "SN-2", "SN-3", "SN-4", "SN-5"],
+      },
+    ],
+    ...cambios,
+  };
+}

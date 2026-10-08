@@ -88,7 +88,7 @@ describe("Navegación en celular (RF-03, RF-04)", () => {
 
     await usuario.click(within(hoja).getByRole("button", { name: "Registrar compra" }));
 
-    expect(await screen.findByRole("heading", { name: "Registrar compra" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Nueva compra" })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/compras/nueva");
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
@@ -106,8 +106,6 @@ describe("Navegación en celular (RF-03, RF-04)", () => {
 
 describe("Secciones pendientes (entregable de la Fase 0: menú vacío)", () => {
   it.each([
-    ["/compras", "Compras", 2],
-    ["/compras/nueva", "Registrar compra", 2],
     ["/ventas/nueva", "Nueva venta", 3],
     ["/instalaciones/nueva", "Nueva instalación", 4],
     ["/cotizaciones", "Cotizaciones", 5],

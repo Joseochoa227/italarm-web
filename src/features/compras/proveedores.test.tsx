@@ -13,9 +13,9 @@ describe("Proveedores (RF-37, W-01)", () => {
         return response(200).json(pagina([proveedor()]));
       }),
     );
-    const { usuario } = renderizarApp({ ruta: "/compras" });
+    const { usuario } = renderizarApp({ ruta: "/compras?pestana=compras" });
 
-    expect(await screen.findByText("Esta sección llega en la Fase 2")).toBeVisible();
+    expect(await screen.findByRole("link", { name: "Registrar compra" })).toBeVisible();
     await usuario.click(screen.getByRole("link", { name: "Proveedores" }));
 
     const [fila] = within(await screen.findByRole("list", { name: "Proveedores" })).getAllByRole("listitem");

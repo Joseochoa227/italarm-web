@@ -1,3 +1,4 @@
+import { ShoppingCart } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -7,6 +8,7 @@ import { comoErrorApi, errorDeConsultas } from "@/api/problema";
 import { CargandoLista } from "@/components/ui/CargandoLista";
 import { useAvisar } from "@/components/ui/contextoAvisos";
 import { EncabezadoPagina } from "@/components/ui/EncabezadoPagina";
+import { EnlaceBoton } from "@/components/ui/EnlaceBoton";
 import { EstadoError } from "@/components/ui/EstadoError";
 import { esConflictoDeVersion } from "@/lib/errores";
 import { sinIndefinidos } from "@/lib/objetos";
@@ -55,7 +57,15 @@ export function Component() {
   if (!p) return <CargandoLista filas={3} />;
   return (
     <>
-      <EncabezadoPagina titulo={F.tituloEditar} volver={{ a: LISTA, etiqueta: F.volver }} />
+      <EncabezadoPagina
+        titulo={F.tituloEditar}
+        volver={{ a: LISTA, etiqueta: F.volver }}
+        acciones={
+          <EnlaceBoton a={`/compras?proveedor=${String(id)}`} icono={<ShoppingCart aria-hidden size={16} />}>
+            {TEXTOS_COMPRAS.proveedores.verCompras}
+          </EnlaceBoton>
+        }
+      />
       <FormularioProveedor
         key={p.version}
         valores={{

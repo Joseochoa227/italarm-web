@@ -18,9 +18,15 @@ const T = TEXTOS_INVENTARIO.selector;
 export function SelectorProducto({
   excluir,
   alElegir,
+  etiqueta = T.agregar,
+  soloActivos = true,
 }: {
+  /** Texto del botón que abre el selector. */
+  etiqueta?: string;
+  /** En los filtros también se buscan los inactivos. */
+  soloActivos?: boolean;
   /** Productos ya agregados: una línea por producto (P-20). */
-  excluir: ReadonlySet<number>;
+  excluir?: ReadonlySet<number>;
   alElegir: (producto: Producto) => void;
 }) {
   const [abierto, setAbierto] = useState(false);
@@ -28,11 +34,15 @@ export function SelectorProducto({
   const consulta = $api.useQuery(
     "get",
     "/api/v1/productos",
-    { params: { query: { activo: true, size: 10, page: 0, ...(buscar ? { buscar } : {}) } } },
+    {
+      params: {
+        query: { size: 10, page: 0, ...(soloActivos ? { activo: true } : {}), ...(buscar ? { buscar } : {}) },
+      },
+    },
     { enabled: abierto },
   );
   const error = errorDeConsultas(consulta);
-  const productos = (consulta.data?.contenido ?? []).filter((p) => p.id !== undefined && !excluir.has(p.id));
+  const productos = (consulta.data?.contenido ?? []).filter((p) => p.id !== undefined && !excluir?.has(p.id));
 
   return (
     <>
@@ -42,9 +52,9 @@ export function SelectorProducto({
         }}
       >
         <Plus aria-hidden size={16} />
-        {T.agregar}
+        {etiqueta}
       </Boton>
-      <Dialogo abierto={abierto} alCambiar={setAbierto} titulo={T.titulo}>
+      <Dialogo abierto={abierto} alCambiar={setAbierto} titulo={etiqueta}>
         <Buscador etiqueta={T.buscar} placeholder={T.buscar} valor={buscar} alBuscar={setBuscar} />
         {error ? (
           <EstadoError error={error} alReintentar={() => void consulta.refetch()} />
