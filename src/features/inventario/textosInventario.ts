@@ -93,6 +93,7 @@ export const TEXTOS_INVENTARIO = {
     campo: "Número de serie",
     buscar: "Buscar",
     vacio: "No se encontró ningún serial con ese número.",
+    resultados: "Seriales encontrados",
     minimo: "Escribe al menos 2 caracteres.",
   },
   serial: {
@@ -106,6 +107,18 @@ export const TEXTOS_INVENTARIO = {
     movimientos: "Historial",
     reclamos: "Reclamos",
     sinReclamos: "Sin reclamos.",
+    sinMovimientos: "Sin movimientos.",
+    fueraDeGarantia: "Fuera de garantía",
+    solucion: (s: string) => `Solución: ${s}`,
+    tipos: {
+      ENTRADA: "Entrada",
+      BAJA: "Baja",
+      ANULACION: "Anulación de la entrada",
+      VENTA: "Venta",
+      ANULACION_VENTA: "Anulación de la venta",
+      INSTALACION: "Instalación",
+      ANULACION_INSTALACION: "Anulación de la instalación",
+    } as Record<string, string>,
   },
   ajuste: {
     titulo: "Ajustar inventario",

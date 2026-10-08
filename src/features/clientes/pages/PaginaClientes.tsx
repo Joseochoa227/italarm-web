@@ -1,10 +1,10 @@
 import { Plus, Users } from "lucide-react";
-import { Link } from "react-router";
 
 import { $api } from "@/api/cliente";
 import { errorDeConsultas } from "@/api/problema";
 import { Buscador } from "@/components/ui/Buscador";
 import { CargandoLista } from "@/components/ui/CargandoLista";
+import { EnlaceBoton } from "@/components/ui/EnlaceBoton";
 import { EncabezadoPagina } from "@/components/ui/EncabezadoPagina";
 import { EstadoError } from "@/components/ui/EstadoError";
 import { EstadoVacio } from "@/components/ui/EstadoVacio";
@@ -50,13 +50,9 @@ export function Component() {
         titulo={T.titulo}
         subtitulo={T.subtitulo}
         acciones={
-          <Link
-            to="/clientes/nuevo"
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-acento-700 px-4 font-titulo text-[15px] font-semibold text-fondo no-underline hover:bg-acento-800 hover:text-fondo"
-          >
-            <Plus aria-hidden size={16} />
+          <EnlaceBoton a="/clientes/nuevo" variante="primario" icono={<Plus aria-hidden size={16} />}>
             {T.nuevo}
-          </Link>
+          </EnlaceBoton>
         }
       />
       <div className="flex flex-wrap items-center gap-3">

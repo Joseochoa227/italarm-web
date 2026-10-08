@@ -6,6 +6,7 @@ import { RecuadroTasas } from "@/features/tasas/components/RecuadroTasas";
 import { cx } from "@/lib/clases";
 import { inicial } from "@/lib/texto";
 
+import { BotonBuscarSerial } from "./BotonBuscarSerial";
 import { MenuUsuario } from "./MenuUsuario";
 import { MENU_LATERAL, TEXTOS_NAVEGACION } from "./navegacion";
 
@@ -20,6 +21,7 @@ export function MenuLateral() {
           {TEXTOS_NAVEGACION.marcaSubtitulo}
         </span>
       </div>
+      <BotonBuscarSerial conTexto />
       <nav aria-label={TEXTOS_NAVEGACION.menuPrincipal} className="flex flex-col gap-0.5">
         {MENU_LATERAL.map(({ ruta, etiqueta, icono: Icono }) => (
           <NavLink

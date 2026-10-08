@@ -3,6 +3,7 @@ import {
   formatearDinero,
   formatearDecimal,
   formatearDineroDe,
+  formatearEnMonedas,
   formatearFecha,
   formatearFechaHora,
   formatearFechaLarga,
@@ -42,6 +43,22 @@ describe("formatearDinero (BF-07)", () => {
   it("formatea el objeto Dinero del contrato y usa una raya si falta un dato", () => {
     expect(sinNbsp(formatearDineroDe({ monto: "25.5000", moneda: "USD" }))).toBe("US$ 25,50");
     expect(formatearDineroDe({ monto: "25.5" })).toBe("—");
+  });
+});
+
+describe("formatearEnMonedas (RF-31)", () => {
+  it("une los valores en las tres monedas y omite los que faltan", () => {
+    expect(
+      sinNbsp(
+        formatearEnMonedas({
+          usd: { monto: "1939.04", moneda: "USD" },
+          cop: { monto: "7586000.0000", moneda: "COP" },
+          ves: { monto: "96952", moneda: "VES" },
+        }),
+      ),
+    ).toBe("US$ 1.939,04 · $ 7.586.000 · Bs 96.952,00");
+    expect(sinNbsp(formatearEnMonedas({ usd: { monto: "10", moneda: "USD" } }))).toBe("US$ 10,00");
+    expect(formatearEnMonedas(undefined)).toBe("—");
   });
 });
 

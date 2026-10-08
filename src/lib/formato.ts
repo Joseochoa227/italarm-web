@@ -51,6 +51,19 @@ export function formatearDineroDe(dinero: Dinero): string {
   return formatearDinero(dinero.monto, dinero.moneda);
 }
 
+type MontoEnMonedas = components["schemas"]["MontoEnMonedas"];
+
+/**
+ * Un valor en USD, COP y VES (RF-31): "US$ 1.939,04 · $ 7.586.000 · Bs 96.952,00". Los
+ * equivalentes que faltan (no hay tasa) se omiten; si no hay ninguno, "—".
+ */
+export function formatearEnMonedas(montos: MontoEnMonedas | undefined): string {
+  const partes = [montos?.usd, montos?.cop, montos?.ves].flatMap((d) =>
+    d?.monto !== undefined && d.moneda !== undefined ? [formatearDinero(d.monto, d.moneda)] : [],
+  );
+  return partes.length ? partes.join(" · ") : "—";
+}
+
 const formatoCantidad = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 });
 
 /** "12.5" → "12,5"; "1500" → "1.500". Las cantidades llegan sin ceros sobrantes. */

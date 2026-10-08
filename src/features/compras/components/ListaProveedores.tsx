@@ -1,8 +1,8 @@
 import { Plus, Truck } from "lucide-react";
-import { Link } from "react-router";
 
 import { $api } from "@/api/cliente";
 import { errorDeConsultas } from "@/api/problema";
+import { EnlaceBoton } from "@/components/ui/EnlaceBoton";
 import { Buscador } from "@/components/ui/Buscador";
 import { CargandoLista } from "@/components/ui/CargandoLista";
 import { EstadoError } from "@/components/ui/EstadoError";
@@ -37,13 +37,13 @@ export function ListaProveedores() {
             filtros.cambiar({ buscar: texto });
           }}
         />
-        <Link
-          to="/compras/proveedores/nuevo"
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-acento-700 px-4 font-titulo text-[15px] font-semibold text-fondo no-underline hover:bg-acento-800 hover:text-fondo"
+        <EnlaceBoton
+          a="/compras/proveedores/nuevo"
+          variante="primario"
+          icono={<Plus aria-hidden size={16} />}
         >
-          <Plus aria-hidden size={16} />
           {P.nuevo}
-        </Link>
+        </EnlaceBoton>
       </div>
       {error ? (
         <EstadoError error={error} alReintentar={() => void consulta.refetch()} />

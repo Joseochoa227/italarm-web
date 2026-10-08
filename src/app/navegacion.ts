@@ -67,4 +67,5 @@ export const TEXTOS_NAVEGACION = {
   sinConexion: "Sin conexión a internet. Los cambios no se guardarán hasta que vuelva la conexión.",
   nuevaVersion: "Hay una versión nueva de ITALARM",
   actualizar: "Actualizar",
+  buscarSerial: "Buscar serial",
 } as const;

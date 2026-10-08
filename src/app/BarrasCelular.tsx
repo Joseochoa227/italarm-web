@@ -8,6 +8,7 @@ import { TasasBarra } from "@/features/tasas/components/RecuadroTasas";
 import { cx } from "@/lib/clases";
 import { inicial } from "@/lib/texto";
 
+import { BotonBuscarSerial } from "./BotonBuscarSerial";
 import { MenuUsuario } from "./MenuUsuario";
 import {
   BARRA_INFERIOR_DERECHA,
@@ -17,13 +18,14 @@ import {
   TEXTOS_NAVEGACION,
 } from "./navegacion";
 
-/** Barra superior del celular (RF-03): marca, tasas (Fase 1) y usuario. */
+/** Barra superior del celular (RF-03): marca, tasas, búsqueda de seriales (W-06) y usuario. */
 export function BarraSuperior() {
   const { usuario } = useSesion();
   return (
     <header className="sticky top-0 z-10 flex items-center gap-3 border-b border-divisor bg-fondo px-4 py-2">
       <span className="flex-1 marca text-[22px]">ITALARM</span>
       <TasasBarra />
+      <BotonBuscarSerial />
       <MenuUsuario
         disparador={
           <button

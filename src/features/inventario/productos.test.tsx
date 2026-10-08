@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 
 import type * as Imagen from "@/lib/imagen";
-import { pagina, producto } from "@/test/datos";
+import { pagina, producto, productoInventario, sinCampos } from "@/test/datos";
 import { renderizarApp } from "@/test/renderizar";
 import { http, problema, servidor } from "@/test/servidor";
 
@@ -22,48 +22,67 @@ const sinNbsp = (t: string | null) => (t ?? "").replaceAll(" ", " ");
 function registrarConsultas() {
   const consultas: URLSearchParams[] = [];
   servidor.use(
-    http.get("/api/v1/productos", ({ request, response }) => {
+    http.get("/api/v1/inventario", ({ request, response }) => {
       const parametros = new URL(request.url).searchParams;
       consultas.push(parametros);
       const lista =
         parametros.get("buscar") === "nada"
           ? []
           : [
-              producto(),
-              producto({
-                id: 11,
-                nombre: "Cable UTP",
-                codigo: "CAB-UTP",
-                activo: false,
-                bajoMinimo: false,
-                controlaSerial: false,
-                unidadMedida: { id: 2, abreviatura: "m" },
-                stock: "120.5",
-              }),
+              productoInventario(),
+              sinCampos(
+                productoInventario({
+                  id: 11,
+                  nombre: "Cable UTP",
+                  codigo: "CAB-UTP",
+                  categoria: "Cable",
+                  activo: false,
+                  bajoMinimo: false,
+                  controlaSerial: false,
+                  abreviatura: "m",
+                  stock: "120.5",
+                  valorEnBodega: {},
+                }),
+                "marca",
+                "costoActualUsd",
+              ),
             ];
-      return response(200).json({ ...pagina(lista), totalPaginas: 2, totalElementos: 25 });
+      return response(200).json({
+        totalProductos: 25,
+        valorTotal: {
+          usd: { monto: "80.0000", moneda: "USD" },
+          cop: { monto: "320000.0000", moneda: "COP" },
+        },
+        avisos: ["No hay tasa del bolívar para hoy."],
+        productos: { ...pagina(lista), totalPaginas: 2, totalElementos: 25 },
+      });
     }),
   );
   return consultas;
 }
 
-describe("Inventario · listado de productos (3.3)", () => {
-  it("muestra cada producto con stock, etiqueta Bajo, precios y estado", async () => {
+describe("Inventario valorizado (RF-49 a RF-52)", () => {
+  it("muestra cada producto con stock, etiqueta Bajo, costo, valor en bodega y estado", async () => {
     registrarConsultas();
     renderizarApp({ ruta: "/inventario" });
 
     const lista = await screen.findByRole("list", { name: "Inventario" });
     const [camara, cable] = within(lista).getAllByRole("listitem");
     expect(camara).toHaveTextContent("Cámara domo 2MP");
-    expect(camara).toHaveTextContent("CAM-D2 · Cámaras · Con serial");
-    expect(camara).toHaveTextContent("0 und");
+    expect(camara).toHaveTextContent("CAM-D2 · Cámaras · Hikvision · Con serial");
+    expect(camara).toHaveTextContent("4 und");
     expect(within(camara!).getByText("Bajo")).toBeVisible();
-    expect(sinNbsp(camara!.textContent)).toContain("US$ 25,50");
-    expect(sinNbsp(camara!.textContent)).toContain("US$ 32,00");
-    expect(within(camara!).getByRole("link")).toHaveAttribute("href", "/inventario/productos/10/editar");
+    const texto = sinNbsp(camara!.textContent);
+    expect(texto).toContain("US$ 20,00");
+    expect(texto).toContain("US$ 80,00");
+    expect(texto).toContain("$ 320.000");
+    expect(within(camara!).getByRole("link")).toHaveAttribute("href", "/inventario/productos/10");
     expect(cable).toHaveTextContent("120,5 m");
     expect(cable).toHaveTextContent("Inactivo");
-    expect(screen.getByText("25 productos")).toBeVisible();
+    expect(sinNbsp(screen.getByText(/25 productos/).textContent)).toContain(
+      "Valor del inventario: US$ 80,00 · $ 320.000",
+    );
+    expect(screen.getByText("No hay tasa del bolívar para hoy.")).toBeVisible();
   });
 
   it("filtra por estado, categoría y búsqueda, y lo guarda en la URL", async () => {
@@ -83,11 +102,11 @@ describe("Inventario · listado de productos (3.3)", () => {
       expect(consultas.at(-1)?.get("categoriaId")).toBe("1");
     });
 
-    await usuario.type(screen.getByRole("searchbox", { name: /Buscar por nombre/ }), "domo");
+    await usuario.type(screen.getByRole("searchbox", { name: /Buscar por nombre/ }), "SN-01");
     await waitFor(() => {
-      expect(consultas.at(-1)?.get("buscar")).toBe("domo");
+      expect(consultas.at(-1)?.get("buscar")).toBe("SN-01");
     });
-    expect(router.state.location.search).toBe("?estado=todos&categoria=1&buscar=domo");
+    expect(router.state.location.search).toBe("?estado=todos&categoria=1&buscar=SN-01");
   });
 
   it("pagina el listado", async () => {

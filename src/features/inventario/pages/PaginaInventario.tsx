@@ -1,11 +1,14 @@
-import { Package, Plus } from "lucide-react";
+import { ClipboardList, FileSpreadsheet, Package, Plus, Truck } from "lucide-react";
 import { Link } from "react-router";
 
 import { $api } from "@/api/cliente";
+import type { components } from "@/api/esquema";
 import { errorDeConsultas } from "@/api/problema";
+import { Alerta } from "@/components/ui/Alerta";
 import { Buscador } from "@/components/ui/Buscador";
 import { CargandoLista } from "@/components/ui/CargandoLista";
 import { EncabezadoPagina } from "@/components/ui/EncabezadoPagina";
+import { EnlaceBoton } from "@/components/ui/EnlaceBoton";
 import { EstadoError } from "@/components/ui/EstadoError";
 import { EstadoVacio } from "@/components/ui/EstadoVacio";
 import { Etiqueta } from "@/components/ui/Etiqueta";
@@ -14,12 +17,14 @@ import { Paginacion } from "@/components/ui/Paginacion";
 import { Segmentado } from "@/components/ui/Segmentado";
 import { cx } from "@/lib/clases";
 import { useFiltrosUrl } from "@/lib/filtrosUrl";
-import { formatearCantidad, formatearDineroDe } from "@/lib/formato";
+import { formatearCantidad, formatearDineroDe, formatearEnMonedas } from "@/lib/formato";
 
-import type { Producto } from "../hooks/productos";
 import { TEXTOS_PRODUCTOS } from "../textos";
+import { TEXTOS_INVENTARIO } from "../textosInventario";
 
+type ProductoInventario = components["schemas"]["InventarioVistaProducto"];
 const T = TEXTOS_PRODUCTOS;
+const L = TEXTOS_INVENTARIO.listado;
 type Estado = "activos" | "inactivos" | "todos";
 const ESTADOS = [
   { valor: "activos", etiqueta: T.estados.activos },
@@ -28,10 +33,9 @@ const ESTADOS = [
 ] as const;
 const ACTIVO: Record<Estado, boolean | undefined> = { activos: true, inactivos: false, todos: undefined };
 
-function FilaProducto({ p }: { p: Producto }) {
-  const unidad = p.unidadMedida?.abreviatura ?? "";
+function FilaProducto({ p }: { p: ProductoInventario }) {
   return (
-    <FilaEnlace a={`/inventario/productos/${String(p.id)}/editar`} etiqueta={p.nombre ?? ""}>
+    <FilaEnlace a={`/inventario/productos/${String(p.id)}`} etiqueta={p.nombre ?? ""}>
       <div className="flex min-w-[220px] flex-[2] items-center gap-3">
         <div className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-md bg-superficie">
           {p.fotoUrl ? (
@@ -43,7 +47,7 @@ function FilaProducto({ p }: { p: Producto }) {
         <div className="min-w-0">
           <div className="font-medium">{p.nombre}</div>
           <div className="text-xs text-neutro-700">
-            {[p.codigo, p.categoria?.nombre, p.controlaSerial ? T.conSerial : T.sinSerial]
+            {[p.codigo, p.categoria, p.marca, p.controlaSerial ? T.conSerial : null]
               .filter(Boolean)
               .join(" · ")}
           </div>
@@ -52,34 +56,40 @@ function FilaProducto({ p }: { p: Producto }) {
       <div className="flex min-w-[90px] flex-col">
         <span className="text-[11px] text-neutro-700">{T.stock}</span>
         <span className="flex items-center gap-1.5 font-medium">
-          {formatearCantidad(p.stock ?? "0")} {unidad}
+          {formatearCantidad(p.stock ?? "0")} {p.abreviatura}
           {p.bajoMinimo && <Etiqueta tono="peligro">{T.bajo}</Etiqueta>}
         </span>
       </div>
-      <div className="flex min-w-[110px] flex-col">
-        <span className="text-[11px] text-neutro-700">{T.instalador}</span>
-        <span>{p.precioInstalador ? formatearDineroDe(p.precioInstalador) : "—"}</span>
+      <div className="flex min-w-[100px] flex-col">
+        <span className="text-[11px] text-neutro-700">{L.costo}</span>
+        <span>{p.costoActualUsd ? formatearDineroDe(p.costoActualUsd) : "—"}</span>
       </div>
-      <div className="flex min-w-[110px] flex-col">
-        <span className="text-[11px] text-neutro-700">{T.clienteFinal}</span>
-        <span>{p.precioClienteFinal ? formatearDineroDe(p.precioClienteFinal) : "—"}</span>
+      <div className="flex min-w-[160px] flex-[1.5] flex-col">
+        <span className="text-[11px] text-neutro-700">{L.valor}</span>
+        <span className="font-medium">
+          {p.valorEnBodega?.usd ? formatearDineroDe(p.valorEnBodega.usd) : "—"}
+        </span>
+        <span className="text-xs text-neutro-700">
+          {[p.valorEnBodega?.cop, p.valorEnBodega?.ves]
+            .flatMap((d) => (d ? [formatearDineroDe(d)] : []))
+            .join(" · ")}
+        </span>
       </div>
       {p.activo === false && <Etiqueta>{T.inactivo}</Etiqueta>}
     </FilaEnlace>
   );
 }
 
-/** Inventario · catálogo de productos (3.3). En la Fase 2 se suman el valor en bodega y el kárdex. */
+/** Inventario valorizado (RF-49 a RF-52): stock, costo en USD y valor en bodega en las tres monedas. */
 export function Component() {
   const filtros = useFiltrosUrl();
   const buscar = filtros.leer("buscar");
   const categoria = filtros.leer("categoria");
-  const estado = (ESTADOS.find((e) => e.valor === filtros.leer("estado"))?.valor ??
-    "activos") satisfies Estado;
+  const estado: Estado = ESTADOS.find((e) => e.valor === filtros.leer("estado"))?.valor ?? "activos";
   const activo = ACTIVO[estado];
 
   const categorias = $api.useQuery("get", "/api/v1/categorias");
-  const consulta = $api.useQuery("get", "/api/v1/productos", {
+  const consulta = $api.useQuery("get", "/api/v1/inventario", {
     params: {
       query: {
         page: filtros.paginaApi,
@@ -91,30 +101,47 @@ export function Component() {
     },
   });
   const error = errorDeConsultas(consulta);
-  const pagina = consulta.data;
-  const productos = pagina?.contenido ?? [];
+  const datos = consulta.data;
+  const productos = datos?.productos?.contenido ?? [];
   const hayFiltros = Boolean(buscar || categoria || estado !== "activos");
 
   return (
     <>
       <EncabezadoPagina
         titulo={T.titulo}
-        subtitulo={pagina ? T.resumen(pagina.totalElementos ?? 0) : undefined}
+        subtitulo={
+          datos
+            ? `${T.resumen(datos.totalProductos ?? 0)} · ${L.valorTotal}: ${formatearEnMonedas(datos.valorTotal)}`
+            : undefined
+        }
         acciones={
-          <Link
-            to="/inventario/productos/nuevo"
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-md bg-acento-700 px-4 font-titulo text-[15px] font-semibold text-fondo no-underline hover:bg-acento-800 hover:text-fondo"
-          >
-            <Plus aria-hidden size={16} />
-            {T.nuevo}
-          </Link>
+          <>
+            <EnlaceBoton a="/inventario/ajustes" icono={<ClipboardList aria-hidden size={16} />}>
+              {L.ajustes}
+            </EnlaceBoton>
+            <EnlaceBoton a="/compras/nueva" icono={<Truck aria-hidden size={16} />}>
+              {L.registrarCompra}
+            </EnlaceBoton>
+            <EnlaceBoton
+              a="/inventario/productos/nuevo"
+              variante="primario"
+              icono={<Plus aria-hidden size={16} />}
+            >
+              {T.nuevo}
+            </EnlaceBoton>
+          </>
         }
       />
+      {(datos?.avisos ?? []).map((aviso) => (
+        <Alerta key={aviso} tono="aviso">
+          {aviso}
+        </Alerta>
+      ))}
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <Buscador
-            etiqueta={T.buscar}
-            placeholder={T.buscar}
+            etiqueta={L.buscar}
+            placeholder={L.buscar}
             valor={buscar}
             alBuscar={(texto) => {
               filtros.cambiar({ buscar: texto });
@@ -159,8 +186,15 @@ export function Component() {
       ) : productos.length === 0 ? (
         <EstadoVacio
           icono={<Package aria-hidden size={28} />}
-          titulo={hayFiltros ? T.vacio : T.vacioSinFiltros}
-        />
+          titulo={hayFiltros ? T.vacio : L.vacioSinFiltros}
+        >
+          {!hayFiltros && (
+            <Link to="/configuracion?pestana=carga" className="inline-flex items-center gap-1.5">
+              <FileSpreadsheet aria-hidden size={16} />
+              {L.cargaInicial}
+            </Link>
+          )}
+        </EstadoVacio>
       ) : (
         <>
           <ListaFilas etiqueta={T.titulo}>
@@ -170,7 +204,7 @@ export function Component() {
           </ListaFilas>
           <Paginacion
             pagina={filtros.pagina}
-            totalPaginas={pagina?.totalPaginas ?? 1}
+            totalPaginas={datos?.productos?.totalPaginas ?? 1}
             alCambiar={filtros.cambiarPagina}
           />
         </>

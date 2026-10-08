@@ -146,3 +146,76 @@ export function proveedor(cambios: Partial<S["ProveedorVista"]> = {}): S["Provee
     ...cambios,
   };
 }
+
+export function productoInventario(
+  cambios: Partial<S["InventarioVistaProducto"]> = {},
+): S["InventarioVistaProducto"] {
+  return {
+    id: 10,
+    codigo: "CAM-D2",
+    nombre: "Cámara domo 2MP",
+    marca: "Hikvision",
+    categoria: "Cámaras",
+    abreviatura: "und",
+    controlaSerial: true,
+    stock: "4",
+    stockMinimo: "5",
+    bajoMinimo: true,
+    activo: true,
+    costoActualUsd: { monto: "20.0000", moneda: "USD" },
+    valorEnBodega: {
+      usd: { monto: "80.0000", moneda: "USD" },
+      cop: { monto: "320000.0000", moneda: "COP" },
+      ves: { monto: "4000.0000", moneda: "VES" },
+    },
+    ...cambios,
+  };
+}
+
+export function productoDetalle(
+  cambios: Partial<S["ProductoInventarioVista"]> = {},
+): S["ProductoInventarioVista"] {
+  return {
+    id: 10,
+    codigo: "CAM-D2",
+    nombre: "Cámara domo 2MP",
+    marca: "Hikvision",
+    modelo: "DS-2CE56D0T",
+    categoria: "Cámaras",
+    abreviatura: "und",
+    controlaSerial: true,
+    stock: "4",
+    stockMinimo: "5",
+    bajoMinimo: true,
+    activo: true,
+    avisos: [],
+    costoActual: {
+      usd: { monto: "20.0000", moneda: "USD" },
+      cop: { monto: "80000.0000", moneda: "COP" },
+    },
+    valorEnBodega: { usd: { monto: "80.0000", moneda: "USD" } },
+    precioInstalador: { usd: { monto: "25.5000", moneda: "USD" } },
+    precioClienteFinal: { usd: { monto: "32.0000", moneda: "USD" } },
+    seriales: { enBodega: 4, vendidos: 1, instalados: 0, dadosDeBaja: 0, anulados: 0 },
+    ...cambios,
+  };
+}
+
+export function serial(cambios: Partial<S["SerialVista"]> = {}): S["SerialVista"] {
+  return {
+    id: 500,
+    numero: "SN-0001",
+    estado: "EN_BODEGA",
+    fechaEntrada: "2026-10-01",
+    producto: { id: 10, codigo: "CAM-D2", nombre: "Cámara domo 2MP" },
+    documentoEntrada: { tipo: "COMPRA", id: 40, consecutivo: "COM-0001" },
+    ...cambios,
+  };
+}
+
+/** El backend omite los campos vacíos; con exactOptionalPropertyTypes no se pueden poner en undefined. */
+export function sinCampos<T extends object>(objeto: T, ...campos: (keyof T & string)[]): T {
+  return Object.fromEntries(
+    Object.entries(objeto).filter(([clave]) => !(campos as string[]).includes(clave)),
+  ) as T;
+}
