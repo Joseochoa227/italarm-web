@@ -28,6 +28,15 @@ export const rutas: RouteObject[] = [
                 lazy: () => import("@/features/inventario/pages/PaginaProducto"),
               },
               {
+                path: "inventario/productos/:id/ajuste",
+                lazy: () => import("@/features/inventario/pages/PaginaAjuste"),
+              },
+              { path: "inventario/ajustes", lazy: () => import("@/features/inventario/pages/PaginaAjustes") },
+              {
+                path: "inventario/ajustes/:id",
+                lazy: () => import("@/features/inventario/pages/PaginaDetalleAjuste"),
+              },
+              {
                 path: "inventario/productos/:id/editar",
                 lazy: () => import("@/features/inventario/pages/PaginaEditarProducto"),
               },
