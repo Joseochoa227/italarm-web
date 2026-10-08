@@ -78,6 +78,7 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
     historialCosto: [] as Registro[],
     compras: [] as Registro[],
     ajustes: [] as Registro[],
+    ventas: [] as Registro[],
     cargas: [] as Registro[],
     claves: new Map<string, Registro>(),
     clientes: [] as Registro[],
@@ -200,13 +201,76 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
       fecha: HOY,
       tipo: documento.tipo,
       tipoEtiqueta:
-        documento.tipo === "COMPRA" ? "Compra" : cantidad > 0 ? "Ajuste (entrada)" : "Ajuste (salida)",
+        documento.tipo === "COMPRA"
+          ? "Compra"
+          : documento.tipo === "VENTA"
+            ? cantidad > 0
+              ? "Anulación de venta"
+              : "Venta"
+            : cantidad > 0
+              ? "Ajuste (entrada)"
+              : "Ajuste (salida)",
       ...(detalle ? { detalle } : {}),
       documento,
       ...(cantidad > 0 ? { entrada: cantidadTexto(cantidad) } : { salida: cantidadTexto(-cantidad) }),
       saldo: cantidadTexto(stockDe(p)),
       usuario: USUARIO.nombre,
     });
+  };
+
+  // Ventas simuladas (Fase 3): precio por tipo de cliente, stock, seriales y utilidad en USD.
+  const desdeUsd = (monto: number, moneda: string) =>
+    moneda === "COP" ? monto * TRM : moneda === "VES" ? monto * Number(estado.bolivar.valor) : monto;
+  const enMonedas = (montoUsd: number) => ({
+    usd: usd(montoUsd),
+    cop: { monto: (montoUsd * TRM).toFixed(4), moneda: "COP" },
+    ves: { monto: (montoUsd * Number(estado.bolivar.valor)).toFixed(4), moneda: "VES" },
+  });
+  const calcularVenta = (c: Record<string, unknown>) => {
+    const cliente = estado.clientes.find((r) => r.id === c.clienteId);
+    const moneda = c.moneda as string;
+    const lineas = (
+      c.lineas as { productoId: number; cantidad?: string; seriales?: string[]; precioUnitario?: string }[]
+    ).map((l) => {
+      const p = estado.productos.find((r) => r.id === l.productoId) ?? { id: 0 };
+      const cantidad = l.cantidad ? Number(l.cantidad) : (l.seriales?.length ?? 0);
+      const base = Number(cliente?.tipo === "INSTALADOR" ? p.precioInstalador : p.precioClienteFinal);
+      const sugerido = desdeUsd(base, moneda);
+      const precio = l.precioUnitario === undefined ? sugerido : Number(l.precioUnitario);
+      const costo = costoDe(p) ?? 0;
+      return { l, p, cantidad, sugerido, precio, costo, subtotalUsd: aUsd(precio * cantidad, moneda) };
+    });
+    const subtotalUsd = lineas.reduce((t, x) => t + x.subtotalUsd, 0);
+    const valor = Number(c.descuentoValor ?? 0);
+    const descuentoUsd =
+      c.descuentoTipo === "PORCENTAJE"
+        ? (subtotalUsd * valor) / 100
+        : c.descuentoTipo === "VALOR"
+          ? aUsd(valor, moneda)
+          : 0;
+    const totalUsd = subtotalUsd - descuentoUsd;
+    const costoUsd = lineas.reduce((t, x) => t + x.costo * x.cantidad, 0);
+    const resumen = {
+      material: enMonedas(subtotalUsd),
+      subtotal: enMonedas(subtotalUsd),
+      descuento: enMonedas(descuentoUsd),
+      total: enMonedas(totalUsd),
+      costo: enMonedas(costoUsd),
+      utilidad: enMonedas(totalUsd - costoUsd),
+      porcentajeUtilidad: totalUsd > 0 ? (((totalUsd - costoUsd) / totalUsd) * 100).toFixed(2) : "0",
+    };
+    const clienteVista = {
+      id: cliente?.id,
+      tipo: cliente?.tipo,
+      nombre: cliente?.nombre,
+      telefono: cliente?.telefono,
+      precioAplicado: cliente?.precioAplicadoDescripcion,
+    };
+    return { moneda, lineas, resumen, totalUsd, costoUsd, clienteVista };
+  };
+  const tresMeses = () => {
+    const [a, m, d] = HOY.split("-").map(Number);
+    return new Date(Date.UTC(a ?? 2026, (m ?? 1) + 2, d ?? 1)).toISOString().slice(0, 10);
   };
 
   await page.route(`${API}/**`, async (route) => {
@@ -549,6 +613,152 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
         const a = porId(estado.ajustes);
         return a ? json(route, 200, a) : problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
       }
+      case "POST /ventas/vista-previa": {
+        const v = calcularVenta(cuerpo());
+        return json(route, 200, {
+          fecha: HOY,
+          moneda: v.moneda,
+          cliente: v.clienteVista,
+          tasas: tasasCompra(),
+          avisos: [],
+          puedeGuardar: v.lineas.every((x) => x.cantidad <= stockDe(x.p)),
+          lineas: v.lineas.map((x) => ({
+            productoId: x.p.id,
+            codigo: x.p.codigo,
+            nombre: x.p.nombre,
+            abreviatura: unidadDe(x.p),
+            controlaSerial: x.p.controlaSerial,
+            cantidad: cantidadTexto(x.cantidad),
+            disponible: cantidadTexto(stockDe(x.p)),
+            ...(x.cantidad > stockDe(x.p)
+              ? { avisoStock: `Stock insuficiente · quedan ${cantidadTexto(stockDe(x.p))} ${unidadDe(x.p)}` }
+              : {}),
+            precioSugerido: { monto: x.sugerido.toFixed(4), moneda: v.moneda },
+            precioUnitario: { monto: x.precio.toFixed(4), moneda: v.moneda },
+            subtotal: enMonedas(x.subtotalUsd),
+            costoUnitarioHoy: enMonedas(x.costo),
+          })),
+          resumen: v.resumen,
+        });
+      }
+      case "POST /ventas": {
+        const clave = (await peticion.headerValue("idempotency-key")) ?? "";
+        const repetida = estado.claves.get(clave);
+        if (repetida) return json(route, 201, repetida);
+        const c = cuerpo();
+        const v = calcularVenta(c);
+        const sinStock = v.lineas.find((x) => x.cantidad > stockDe(x.p));
+        if (sinStock) {
+          return problema(
+            route,
+            422,
+            "STOCK_INSUFICIENTE",
+            `Stock insuficiente · quedan ${cantidadTexto(stockDe(sinStock.p))}`,
+          );
+        }
+        const id = estado.id++;
+        const documento = {
+          tipo: "VENTA",
+          id,
+          consecutivo: `V-${String(estado.ventas.length + 1).padStart(4, "0")}`,
+        };
+        const vence = tresMeses();
+        const lineas = v.lineas.map((x) => {
+          moverStock(x.p, documento, -x.cantidad);
+          const seriales = (x.l.seriales ?? []).map((numero) => {
+            const s = estado.seriales.find((r) => r.productoId === x.p.id && r.numero === numero);
+            if (s) Object.assign(s, { estado: "VENDIDO", documentoSalida: documento });
+            return { id: s?.id, numero, vencimientoGarantia: vence };
+          });
+          return {
+            productoId: x.p.id,
+            codigo: x.p.codigo,
+            descripcion: x.p.nombre,
+            unidad: unidadDe(x.p),
+            cantidad: cantidadTexto(x.cantidad),
+            precioSugerido: { monto: x.sugerido.toFixed(4), moneda: v.moneda },
+            precioUnitario: { monto: x.precio.toFixed(4), moneda: v.moneda },
+            subtotal: { monto: (x.precio * x.cantidad).toFixed(4), moneda: v.moneda },
+            costoUnitarioUsd: usd(x.costo),
+            seriales,
+          };
+        });
+        const nueva: Registro = {
+          ...documento,
+          estado: "ACTIVA",
+          fecha: HOY,
+          moneda: v.moneda,
+          cliente: v.clienteVista,
+          tasas: tasasCompra(),
+          lineas,
+          resumen: v.resumen,
+          total: { monto: desdeUsd(v.totalUsd, v.moneda).toFixed(4), moneda: v.moneda },
+          utilidad: usd(v.totalUsd - v.costoUsd),
+          porcentajeUtilidad: v.resumen.porcentajeUtilidad,
+          ...(c.descuentoTipo ? { descuentoTipo: c.descuentoTipo, descuentoValor: c.descuentoValor } : {}),
+          monedasComprobante: c.monedasComprobante ?? [],
+          registradaPor: USUARIO.nombre,
+          registradaEn: new Date().toISOString(),
+          version: 0,
+        };
+        estado.ventas.push(nueva);
+        estado.claves.set(clave, nueva);
+        return json(route, 201, nueva);
+      }
+      case "GET /ventas/{id}": {
+        const v = porId(estado.ventas);
+        return v ? json(route, 200, v) : problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+      }
+      case "GET /ventas":
+        return json(route, 200, {
+          desde: HOY,
+          hasta: HOY,
+          totalesPorMoneda: [],
+          ventas: pagina(
+            [...estado.ventas].reverse().map((v) => ({
+              ...v,
+              cliente: (v.cliente as { nombre?: string } | undefined)?.nombre,
+            })),
+          ),
+        });
+      case "POST /ventas/{id}/anular": {
+        const v = estado.ventas.find((r) => ruta.includes(`/${String(r.id)}/`));
+        if (!v) return problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+        const documento = { tipo: "VENTA", id: v.id, consecutivo: String(v.consecutivo) };
+        for (const l of v.lineas as {
+          productoId: number;
+          cantidad: string;
+          seriales: { numero: string }[];
+        }[]) {
+          const p = estado.productos.find((r) => r.id === l.productoId);
+          if (p) moverStock(p, documento, Number(l.cantidad));
+          for (const { numero } of l.seriales) {
+            const s = estado.seriales.find((r) => r.productoId === l.productoId && r.numero === numero);
+            if (s) {
+              s.estado = "EN_BODEGA";
+              delete s.documentoSalida;
+            }
+          }
+        }
+        Object.assign(v, {
+          estado: "ANULADA",
+          anulacion: { motivo: cuerpo().motivo, usuario: USUARIO.nombre, fecha: new Date().toISOString() },
+        });
+        return json(route, 200, v);
+      }
+      case "GET /ventas/{id}/comprobante":
+        return route.fulfill({
+          status: 200,
+          contentType: "application/pdf",
+          headers: { ...CORS, "Content-Disposition": 'attachment; filename="V-0001.pdf"' },
+          body: "%PDF-1.4 e2e",
+        });
+      case "POST /ventas/{id}/enlace":
+        return json(route, 200, {
+          url: `${API}/comprobantes/e2e`,
+          whatsappUrl: "https://wa.me/573001234567?text=Comprobante",
+          venceEn: new Date().toISOString(),
+        });
       case "GET /carga-inicial":
         return json(route, 200, estado.cargas);
       case "POST /carga-inicial/validar":
