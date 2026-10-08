@@ -253,3 +253,102 @@ export function compra(cambios: Partial<S["CompraVista"]> = {}): S["CompraVista"
     ...cambios,
   };
 }
+
+const usd = (monto: string) => ({ monto, moneda: "USD" as const });
+const cop = (monto: string) => ({ monto, moneda: "COP" as const });
+
+export function venta(cambios: Partial<S["VentaVista"]> = {}): S["VentaVista"] {
+  return {
+    id: 60,
+    consecutivo: "V-0001",
+    estado: "ACTIVA",
+    fecha: "2026-10-06",
+    moneda: "USD",
+    cliente: {
+      id: 20,
+      tipo: "INSTALADOR",
+      nombre: "Ferretería El Tornillo",
+      documento: "NIT 900111222-3",
+      telefono: "+573001234567",
+      direccion: "Calle 10 # 5-20",
+      ciudad: "Cúcuta",
+    },
+    tasas: { trm: "4000", fechaTrm: "2026-10-06", tasaVes: "50", fechaTasaVes: "2026-10-06" },
+    lineas: [
+      {
+        productoId: 10,
+        codigo: "CAM-D2",
+        descripcion: "Cámara domo 2MP",
+        unidad: "und",
+        cantidad: "1",
+        precioSugerido: usd("25.5000"),
+        precioUnitario: usd("25.5000"),
+        subtotal: usd("25.5000"),
+        costoUnitarioUsd: usd("17.5000"),
+        seriales: [{ id: 500, numero: "SN-0001", vencimientoGarantia: "2027-01-06" }],
+      },
+    ],
+    resumen: {
+      material: { usd: usd("25.5000") },
+      subtotal: { usd: usd("25.5000"), cop: cop("102000.0000") },
+      descuento: { usd: usd("0.0000") },
+      total: { usd: usd("25.5000"), cop: cop("102000.0000") },
+      costo: { usd: usd("17.5000") },
+      utilidad: { usd: usd("8.0000") },
+      porcentajeUtilidad: "31.37",
+    },
+    total: usd("25.5000"),
+    utilidad: usd("8.0000"),
+    porcentajeUtilidad: "31.37",
+    monedasComprobante: [],
+    registradaPor: "Jose Ochoa",
+    registradaEn: "2026-10-06T15:00:00Z",
+    version: 0,
+    ...cambios,
+  };
+}
+
+/** Vista previa de una venta: responde a las líneas pedidas con precio, disponible y resumen. */
+export function vistaPreviaVenta(
+  cuerpo: {
+    moneda: "USD" | "COP" | "VES";
+    lineas: { productoId: number; cantidad?: string; seriales?: string[]; precioUnitario?: string }[];
+  },
+  cambios: Partial<S["VistaPreviaVentaVista"]> = {},
+): S["VistaPreviaVentaVista"] {
+  return {
+    fecha: HOY,
+    moneda: cuerpo.moneda,
+    cliente: {
+      id: 20,
+      tipo: "INSTALADOR",
+      nombre: "Ferretería El Tornillo",
+      precioAplicado: "Se le aplicará el precio instalador",
+    },
+    tasas: { trm: "4000", fechaTrm: HOY, tasaVes: "50", fechaTasaVes: HOY },
+    avisos: [],
+    puedeGuardar: true,
+    lineas: cuerpo.lineas.map((l) => ({
+      productoId: l.productoId,
+      nombre: l.productoId === 10 ? "Cámara domo 2MP" : "Cable UTP",
+      abreviatura: l.productoId === 10 ? "und" : "m",
+      cantidad: l.cantidad ?? String(l.seriales?.length ?? 0),
+      disponible: "4",
+      precioSugerido: { monto: "25.5000", moneda: cuerpo.moneda },
+      precioUnitario: { monto: l.precioUnitario ?? "25.5000", moneda: cuerpo.moneda },
+      subtotal: { usd: usd("25.5000"), cop: cop("102000.0000") },
+      costoUnitarioHoy: { usd: usd("17.5000"), cop: cop("70000.0000") },
+      costoUnitarioUltimaCompra: { usd: usd("17.5000"), cop: cop("68000.0000") },
+      ultimaCompra: { consecutivo: "C-0001", fecha: "2026-10-01", trm: "3885.7143" },
+    })),
+    resumen: {
+      subtotal: { usd: usd("100.0000") },
+      descuento: { usd: usd("7.0000") },
+      total: { usd: usd("93.0000"), cop: cop("372000.0000") },
+      costo: { usd: usd("70.0000") },
+      utilidad: { usd: usd("23.0000") },
+      porcentajeUtilidad: "24.73",
+    },
+    ...cambios,
+  };
+}

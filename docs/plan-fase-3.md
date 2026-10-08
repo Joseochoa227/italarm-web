@@ -1,6 +1,6 @@
 # Plan de la Fase 3 — Ventas, comprobantes y anulaciones (italarm-web)
 
-> Estado: **propuesto el 08/10/2026**, pendiente de aprobación de ITALARM (AG-02).
+> Estado: **aprobado por ITALARM el 08/10/2026** con la propuesta de W-09. En implementación.
 > Base: `docs/requerimientos.md` (3.9, 3.12, 3.14, 3.15 y 12.5), `italarm-api/docs/preguntas.md` (P-27 a P-36), `italarm-api/docs/guia-frontend.md` (§4, §9 y §14), el prototipo `docs/Italarm v2.html` (pantallas Nueva venta y Documentos) y el contrato `contrato/openapi.json` (`dev` @ `26aa62c`).
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado; no se necesitan endpoints nuevos.
 
@@ -130,9 +130,9 @@ Todos existen en el contrato.
 
 ## 8. Preguntas para ITALARM
 
-| #    | Tema                    | Pregunta                                                                                                              | Propuesta                                                                                                                                                                                                                                                                                                                    | Respuesta de ITALARM |
-| ---- | ----------------------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| W-09 | Dónde se ven las ventas | El menú (RF-01, RF-03) tiene **Nueva venta**, pero no un listado de ventas (RF-105). ¿Desde dónde se abre el listado? | Sin cambiar el menú: en **Nueva venta**, un enlace **Ver ventas** en el encabezado; en el listado, el botón **Nueva venta**. También se llega desde el historial del cliente, el kárdex y el historial de un serial. Lo mismo valdrá para las instalaciones (Fase 4). El acceso desde Inicio se revisa en la Fase 6 (F6-01). |                      |
+| #    | Tema                    | Pregunta                                                                                                              | Propuesta                                                                                                                                                                                                                                                                                                                    | Respuesta de ITALARM         |
+| ---- | ----------------------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| W-09 | Dónde se ven las ventas | El menú (RF-01, RF-03) tiene **Nueva venta**, pero no un listado de ventas (RF-105). ¿Desde dónde se abre el listado? | Sin cambiar el menú: en **Nueva venta**, un enlace **Ver ventas** en el encabezado; en el listado, el botón **Nueva venta**. También se llega desde el historial del cliente, el kárdex y el historial de un serial. Lo mismo valdrá para las instalaciones (Fase 4). El acceso desde Inicio se revisa en la Fase 6 (F6-01). | De acuerdo con la propuesta. |
 
 ## 9. Riesgos y dependencias
 

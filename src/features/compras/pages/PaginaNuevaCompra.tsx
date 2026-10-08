@@ -21,7 +21,7 @@ import { useSesion } from "@/features/auth/hooks/contextoSesion";
 import { SelectorProducto } from "@/features/inventario/components/SelectorProducto";
 import { aplicarErroresDeCampo, mensajeDeError } from "@/lib/errores";
 import { hoyBogota } from "@/lib/fechas";
-import { formatearDecimal, formatearDineroDe, formatearFecha } from "@/lib/formato";
+import { formatearDecimal, formatearFecha, separarMonedas } from "@/lib/formato";
 import { useClaveIdempotencia } from "@/lib/idempotencia";
 import { ErrorImagen } from "@/lib/imagen";
 
@@ -44,7 +44,6 @@ const MONEDAS = [
   { valor: "COP", etiqueta: "COP" },
   { valor: "VES", etiqueta: "VES" },
 ] as const;
-const CLAVE_MONEDA = { USD: "usd", COP: "cop", VES: "ves" } as const;
 
 function Seccion({ numero, titulo, children }: { numero: string; titulo: string; children: ReactNode }) {
   return (
@@ -149,11 +148,7 @@ export function Component() {
     }
   }
 
-  const total = datosPrevia?.total;
-  const principal = total?.[CLAVE_MONEDA[moneda]];
-  const equivalentes = (["usd", "cop", "ves"] as const)
-    .filter((c) => c !== CLAVE_MONEDA[moneda])
-    .flatMap((c) => (total?.[c] ? [formatearDineroDe(total[c])] : []));
+  const { principal, otros: equivalentes } = separarMonedas(datosPrevia?.total, moneda);
   const tasas = datosPrevia?.tasas;
 
   return (
@@ -296,10 +291,10 @@ export function Component() {
             <h2 className="m-0 text-[22px]">{N.total}</h2>
             <output aria-live="polite" aria-busy={pendiente || previa.isFetching} className="flex flex-col">
               <span className="font-titulo text-[36px] leading-tight font-semibold">
-                {hayLineas && principal ? formatearDineroDe(principal) : "—"}
+                {hayLineas ? principal : "—"}
               </span>
-              {hayLineas && equivalentes.length > 0 && (
-                <span className="text-[13px] text-acento-700">{equivalentes.join(" · ")}</span>
+              {hayLineas && equivalentes && (
+                <span className="text-[13px] text-acento-700">{equivalentes}</span>
               )}
             </output>
             {hayLineas && errorPrevia ? (

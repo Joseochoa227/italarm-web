@@ -7,7 +7,7 @@ import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { TEXTOS_INVENTARIO } from "@/features/inventario/textosInventario";
-import { formatearCantidad, formatearDineroDe, type Moneda } from "@/lib/formato";
+import { formatearCantidad, formatearDineroDe, type Moneda, separarMonedas } from "@/lib/formato";
 import { ajustarSeriales, unidadesDe } from "@/lib/seriales";
 
 import { type DatosCompra, type EntradaCompra, leerCantidad } from "../schemas/compra";
@@ -19,16 +19,11 @@ type Errores = FieldErrors<EntradaCompra>;
 
 /** Monto en la moneda de la factura en grande y los equivalentes debajo. */
 function Subtotal({ previa, moneda }: { previa: Previa | undefined; moneda: Moneda }) {
-  const montos = previa?.subtotal;
-  const clave = moneda === "USD" ? "usd" : moneda === "COP" ? "cop" : "ves";
-  const principal = montos?.[clave];
-  const otros = (["usd", "cop", "ves"] as const)
-    .filter((c) => c !== clave)
-    .flatMap((c) => (montos?.[c] ? [formatearDineroDe(montos[c])] : []));
+  const { principal, otros } = separarMonedas(previa?.subtotal, moneda);
   return (
     <div className="min-w-[120px] text-right">
-      <div className="font-semibold">{principal ? formatearDineroDe(principal) : "—"}</div>
-      {otros.length > 0 && <div className="text-[11px] text-acento-700">{otros.join(" · ")}</div>}
+      <div className="font-semibold">{principal}</div>
+      {otros && <div className="text-[11px] text-acento-700">{otros}</div>}
     </div>
   );
 }

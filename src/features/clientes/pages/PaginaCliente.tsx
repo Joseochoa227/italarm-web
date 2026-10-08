@@ -2,6 +2,8 @@ import { FileText, MessageCircle, Pencil, ShoppingCart, Wrench } from "lucide-re
 import type { ReactNode } from "react";
 import { Link, useParams } from "react-router";
 
+import { EnlaceDocumento } from "@/features/inventario/components/EnlaceDocumento";
+
 import { $api } from "@/api/cliente";
 import { errorDeConsultas } from "@/api/problema";
 import { CargandoLista } from "@/components/ui/CargandoLista";
@@ -144,7 +146,15 @@ export function Component() {
                   m.estado === "ANULADA" && "opacity-70",
                 )}
               >
-                <span className="min-w-[90px] font-medium">{m.consecutivo}</span>
+                <span className="min-w-[90px] font-medium">
+                  <EnlaceDocumento
+                    documento={{
+                      ...(m.id === undefined ? {} : { id: m.id }),
+                      ...(m.consecutivo === undefined ? {} : { consecutivo: m.consecutivo }),
+                      ...(m.tipo === "VENTA" || m.tipo === "INSTALACION" ? { tipo: m.tipo } : {}),
+                    }}
+                  />
+                </span>
                 <span className="min-w-[200px] flex-1">
                   {m.tipo ? (D.tiposDocumento[m.tipo] ?? m.tipo) : ""}
                   {m.descripcion ? ` · ${m.descripcion}` : ""}

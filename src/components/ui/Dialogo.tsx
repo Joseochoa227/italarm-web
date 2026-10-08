@@ -12,6 +12,8 @@ interface PropiedadesDialogo {
   children: ReactNode;
   /** "centro": diálogo del prototipo; "inferior": hoja que sube desde abajo en el celular. */
   posicion?: "centro" | "inferior";
+  /** Diálogo más ancho para formularios completos (por ejemplo, crear un cliente). */
+  amplio?: boolean;
 }
 
 /** Diálogo accesible (foco atrapado, Escape para cerrar) sobre Radix. */
@@ -22,6 +24,7 @@ export function Dialogo({
   descripcion,
   children,
   posicion = "centro",
+  amplio = false,
 }: PropiedadesDialogo) {
   return (
     <RadixDialog.Root open={abierto} onOpenChange={alCambiar}>
@@ -32,7 +35,10 @@ export function Dialogo({
           className={cx(
             "fixed z-30 flex flex-col gap-4 bg-fondo shadow-lg",
             posicion === "centro"
-              ? "top-1/2 left-1/2 w-[min(460px,calc(100%-32px))] -translate-x-1/2 -translate-y-1/2 rounded-lg p-6"
+              ? cx(
+                  "top-1/2 left-1/2 max-h-[calc(100dvh-32px)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg p-6",
+                  amplio ? "w-[min(760px,calc(100%-32px))]" : "w-[min(460px,calc(100%-32px))]",
+                )
               : "inset-x-0 bottom-0 rounded-t-lg px-4 pt-6 pb-[calc(20px+env(safe-area-inset-bottom))]",
           )}
         >

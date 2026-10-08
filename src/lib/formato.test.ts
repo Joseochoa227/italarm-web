@@ -1,4 +1,5 @@
 import {
+  separarMonedas,
   formatearCantidad,
   formatearDinero,
   formatearDecimal,
@@ -96,5 +97,17 @@ describe("fechas", () => {
 
   it("fecha larga con el día de la semana en mayúscula", () => {
     expect(formatearFechaLarga(new Date("2026-10-06T15:00:00Z"))).toBe("Martes 06/10/2026");
+  });
+});
+
+describe("separarMonedas", () => {
+  it("separa el monto en la moneda del documento de sus equivalentes", () => {
+    const r = separarMonedas(
+      { usd: { monto: "38.0000", moneda: "USD" }, cop: { monto: "152000.0000", moneda: "COP" } },
+      "COP",
+    );
+    expect(r.principal.replace(/\s/g, " ")).toBe("$ 152.000");
+    expect(r.otros.replace(/\s/g, " ")).toBe("US$ 38,00");
+    expect(separarMonedas(undefined, "USD")).toEqual({ principal: "—", otros: "" });
   });
 });

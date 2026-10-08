@@ -1,8 +1,8 @@
 import { keepPreviousData } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 
 import { $api } from "@/api/cliente";
 import type { components } from "@/api/esquema";
+import { useValorDiferido } from "@/lib/diferido";
 
 import { type EntradaLinea, lineaParaVistaPrevia } from "../schemas/compra";
 
@@ -35,23 +35,12 @@ export function useVistaPreviaCompra({
       return lista ? [lista] : [];
     }),
   };
-  const clave = JSON.stringify(solicitud);
-  const [diferida, setDiferida] = useState(clave);
-  useEffect(() => {
-    const espera = setTimeout(() => {
-      setDiferida(clave);
-    }, ESPERA_VISTA_PREVIA);
-    return () => {
-      clearTimeout(espera);
-    };
-  }, [clave]);
-
-  const cuerpo = JSON.parse(diferida) as Solicitud;
+  const { valor: cuerpo, pendiente } = useValorDiferido(solicitud, ESPERA_VISTA_PREVIA);
   const consulta = $api.useQuery(
     "post",
     "/api/v1/compras/vista-previa",
     { body: cuerpo },
     { enabled: cuerpo.lineas.length > 0, placeholderData: keepPreviousData, retry: false },
   );
-  return { consulta, hayLineas: cuerpo.lineas.length > 0, pendiente: diferida !== clave };
+  return { consulta, hayLineas: cuerpo.lineas.length > 0, pendiente };
 }

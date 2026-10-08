@@ -52,3 +52,6 @@ Object.assign(Element.prototype, {
   hasPointerCapture: () => false,
   releasePointerCapture: sinOperacion,
 });
+
+// jsdom no desplaza la página: se ignora (la confirmación de un documento vuelve arriba).
+window.scrollTo = () => undefined;

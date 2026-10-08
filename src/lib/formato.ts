@@ -64,6 +64,24 @@ export function formatearEnMonedas(montos: MontoEnMonedas | undefined): string {
   return partes.length ? partes.join(" · ") : "—";
 }
 
+const CLAVES: Record<Moneda, "usd" | "cop" | "ves"> = { USD: "usd", COP: "cop", VES: "ves" };
+
+/**
+ * El valor en la moneda del documento, en grande, y aparte sus equivalentes en las otras:
+ * { principal: "$ 152.000", otros: "US$ 38,00 · Bs 1.900,00" }.
+ */
+export function separarMonedas(
+  montos: MontoEnMonedas | undefined,
+  moneda: Moneda,
+): { principal: string; otros: string } {
+  const clave = CLAVES[moneda];
+  const principal = montos?.[clave];
+  const otros = (["usd", "cop", "ves"] as const)
+    .filter((c) => c !== clave)
+    .flatMap((c) => (montos?.[c] ? [formatearDineroDe(montos[c])] : []));
+  return { principal: principal ? formatearDineroDe(principal) : "—", otros: otros.join(" · ") };
+}
+
 const formatoCantidad = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 });
 
 /** "12.5" → "12,5"; "1500" → "1.500". Las cantidades llegan sin ceros sobrantes. */
