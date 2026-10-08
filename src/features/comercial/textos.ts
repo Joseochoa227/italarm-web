@@ -12,6 +12,7 @@ export const TEXTOS_COMERCIAL = {
     tituloNuevo: "Nuevo cliente",
     creado: "Cliente creado",
     sinElegir: "Todavía no has elegido el cliente.",
+    quitarFiltro: (nombre: string) => `Cliente: ${nombre}. Quitar filtro`,
   },
   seriales: {
     titulo: "Seriales que salen",

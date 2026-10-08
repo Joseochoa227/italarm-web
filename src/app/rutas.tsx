@@ -41,7 +41,9 @@ export const rutas: RouteObject[] = [
                 lazy: () => import("@/features/inventario/pages/PaginaEditarProducto"),
               },
               { path: "seriales/:id", lazy: () => import("@/features/inventario/pages/PaginaSerial") },
+              { path: "ventas", lazy: () => import("@/features/ventas/pages/PaginaVentas") },
               { path: "ventas/nueva", lazy: () => import("@/features/ventas/pages/PaginaNuevaVenta") },
+              { path: "ventas/:id", lazy: () => import("@/features/ventas/pages/PaginaVenta") },
               {
                 path: "instalaciones/nueva",
                 lazy: () => import("@/features/instalaciones/pages/PaginaNuevaInstalacion"),

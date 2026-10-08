@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, UserRound } from "lucide-react";
-import { useState } from "react";
+import { Plus, UserRound, X } from "lucide-react";
+import { type ReactNode, useState } from "react";
 
 import { $api, api } from "@/api/cliente";
 import type { components } from "@/api/esquema";
@@ -70,6 +70,68 @@ function NuevoCliente({ alCrear }: { alCrear: (cliente: Cliente) => void }) {
   );
 }
 
+/** Búsqueda de clientes en un diálogo; `pie` agrega acciones debajo de la lista. */
+export function DialogoClientes({
+  abierto,
+  alCambiar,
+  alElegir,
+  pie,
+}: {
+  abierto: boolean;
+  alCambiar: (abierto: boolean) => void;
+  alElegir: (cliente: Cliente) => void;
+  pie?: ReactNode;
+}) {
+  const [buscar, setBuscar] = useState("");
+  const consulta = $api.useQuery(
+    "get",
+    "/api/v1/clientes",
+    { params: { query: { size: 10, page: 0, ...(buscar ? { buscar } : {}) } } },
+    { enabled: abierto },
+  );
+  const falla = errorDeConsultas(consulta);
+  const clientes = consulta.data?.contenido ?? [];
+  return (
+    <Dialogo abierto={abierto} alCambiar={alCambiar} titulo={T.titulo}>
+      <Buscador etiqueta={T.buscar} placeholder={T.buscar} valor={buscar} alBuscar={setBuscar} />
+      {falla ? (
+        <EstadoError error={falla} alReintentar={() => void consulta.refetch()} />
+      ) : consulta.isPending ? (
+        <CargandoLista filas={3} />
+      ) : clientes.length === 0 ? (
+        <p className="m-0 text-sm text-neutro-700">{T.vacio}</p>
+      ) : (
+        <ul
+          aria-label={T.resultados}
+          className="m-0 flex max-h-[50dvh] list-none flex-col gap-1 overflow-y-auto p-0"
+        >
+          {clientes.map((c) => (
+            <li key={c.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  alElegir(c);
+                  alCambiar(false);
+                  setBuscar("");
+                }}
+                className="flex min-h-[48px] w-full cursor-pointer flex-col justify-center rounded-md px-2 text-left hover:bg-tenue"
+              >
+                <span className="font-medium">{c.nombre}</span>
+                <span className="text-xs text-neutro-700">
+                  {[c.tipo ? TEXTOS_CLIENTES.tipos[c.tipo] : null, c.numeroDocumento, c.ciudad]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {pie}
+    </Dialogo>
+  );
+}
+
 /**
  * Cliente de un documento (RF-98): se busca o se crea sin salir del formulario (RF-79), y se muestra
  * su tipo y el precio que se le aplicará (RF-78).
@@ -84,19 +146,9 @@ export function SelectorCliente({
   error?: string | undefined;
 }) {
   const [abierto, setAbierto] = useState(false);
-  const [buscar, setBuscar] = useState("");
-  const consulta = $api.useQuery(
-    "get",
-    "/api/v1/clientes",
-    { params: { query: { size: 10, page: 0, ...(buscar ? { buscar } : {}) } } },
-    { enabled: abierto },
-  );
-  const falla = errorDeConsultas(consulta);
-  const clientes = consulta.data?.contenido ?? [];
   const elegir = (c: Cliente) => {
     alElegir(c);
     setAbierto(false);
-    setBuscar("");
   };
 
   return (
@@ -137,45 +189,49 @@ export function SelectorCliente({
           {error}
         </p>
       )}
-      <Dialogo abierto={abierto} alCambiar={setAbierto} titulo={T.titulo}>
-        <Buscador etiqueta={T.buscar} placeholder={T.buscar} valor={buscar} alBuscar={setBuscar} />
-        {falla ? (
-          <EstadoError error={falla} alReintentar={() => void consulta.refetch()} />
-        ) : consulta.isPending ? (
-          <CargandoLista filas={3} />
-        ) : clientes.length === 0 ? (
-          <p className="m-0 text-sm text-neutro-700">{T.vacio}</p>
-        ) : (
-          <ul
-            aria-label={T.resultados}
-            className="m-0 flex max-h-[50dvh] list-none flex-col gap-1 overflow-y-auto p-0"
-          >
-            {clientes.map((c) => (
-              <li key={c.id}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    elegir(c);
-                  }}
-                  className="flex min-h-[48px] w-full cursor-pointer flex-col justify-center rounded-md px-2 text-left hover:bg-tenue"
-                >
-                  <span className="font-medium">{c.nombre}</span>
-                  <span className="text-xs text-neutro-700">
-                    {[c.tipo ? TEXTOS_CLIENTES.tipos[c.tipo] : null, c.numeroDocumento, c.ciudad]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-        {cliente && (
-          <div>
-            <NuevoCliente alCrear={elegir} />
-          </div>
-        )}
-      </Dialogo>
+      <DialogoClientes
+        abierto={abierto}
+        alCambiar={setAbierto}
+        alElegir={alElegir}
+        pie={
+          cliente && (
+            <div>
+              <NuevoCliente alCrear={elegir} />
+            </div>
+          )
+        }
+      />
     </div>
+  );
+}
+
+/** Filtro de un listado por cliente: el botón abre la búsqueda; elegido, se quita con un toque. */
+export function FiltroCliente({
+  nombre,
+  alElegir,
+  alQuitar,
+}: {
+  nombre: string | null;
+  alElegir: (cliente: Cliente) => void;
+  alQuitar: () => void;
+}) {
+  const [abierto, setAbierto] = useState(false);
+  return nombre ? (
+    <Boton aria-label={T.quitarFiltro(nombre)} onClick={alQuitar}>
+      {T.etiqueta}: {nombre}
+      <X aria-hidden size={16} />
+    </Boton>
+  ) : (
+    <>
+      <Boton
+        onClick={() => {
+          setAbierto(true);
+        }}
+      >
+        <UserRound aria-hidden size={16} />
+        {T.etiqueta}
+      </Boton>
+      <DialogoClientes abierto={abierto} alCambiar={setAbierto} alElegir={alElegir} />
+    </>
   );
 }
