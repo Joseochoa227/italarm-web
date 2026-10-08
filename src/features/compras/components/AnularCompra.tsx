@@ -42,7 +42,8 @@ export function AnularCompra({
           {D.anular}
         </Boton>
         <span id="motivo-no-anulable" className="flex-[1_1_200px]">
-          {compra.motivoNoAnulable} {D.noAnulableAyuda}
+          {/* El backend ya indica cómo corregirla (P-23); solo si no trae motivo se agrega. */}
+          {compra.motivoNoAnulable ?? D.noAnulableAyuda}
         </span>
       </div>
     );

@@ -4,6 +4,22 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [Sin publicar]
 
+### Fase 2 — Compras, inventario, costo y carga inicial
+
+#### Agregado
+
+- **Inventario valorizado** sobre `GET /inventario`: stock, costo en USD y valor en bodega en las tres monedas, valor total y avisos; el buscador también encuentra por serial.
+- **Detalle del producto:** indicadores, seriales por estado, kárdex con enlaces a los documentos e historial de costo con su regla.
+- **Búsqueda de seriales** desde el menú (lupa en el menú lateral y en la barra superior del celular, W-06), escrita o con la cámara, e historial del serial en `/seriales/:id`.
+- **Compras:** listado del período con totales por moneda y en USD; registro con la vista previa del backend (costo antes y después, regla, tasas y avisos), seriales por unidad (CP-13), `Idempotency-Key` y factura adjunta (foto comprimida o PDF); detalle con anulación (CP-16) o el motivo por el que no se puede anular (CP-17); enlace «Ver compras» en el proveedor.
+- **Ajustes de inventario:** entrada o salida con motivo, vista previa del nuevo stock, costo en USD solo si el producto no tiene costo (P-25, CP-19), seriales nuevos o elegidos de la bodega; listado y detalle.
+- **Carga inicial** en Configuración: plantilla, validación con errores por hoja y fila (CP-29) y confirmación (CP-28), con el historial de cargas.
+- Captura de seriales con la cámara (`@zxing/browser`, cargado solo al usarla).
+
+#### Corregido
+
+- Crear, editar o eliminar un producto también refresca el inventario.
+
 ### Contrato con nombres únicos (D-05)
 
 #### Cambiado

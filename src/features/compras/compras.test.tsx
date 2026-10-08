@@ -391,7 +391,8 @@ describe("Detalle y anulación de la compra (RF-48, RF-71)", () => {
         response(200).json(
           compra({
             anulable: false,
-            motivoNoAnulable: "Cámara domo 2MP tiene movimientos posteriores a la compra.",
+            motivoNoAnulable:
+              "Cámara domo 2MP tuvo movimientos después de esta compra. Corrige con un ajuste de inventario.",
           }),
         ),
       ),
@@ -401,7 +402,7 @@ describe("Detalle y anulación de la compra (RF-48, RF-71)", () => {
     const boton = await screen.findByRole("button", { name: "Anular" });
     expect(boton).toBeDisabled();
     expect(boton).toHaveAccessibleDescription(
-      "Cámara domo 2MP tiene movimientos posteriores a la compra. Para corregirla, registra un ajuste de inventario.",
+      "Cámara domo 2MP tuvo movimientos después de esta compra. Corrige con un ajuste de inventario.",
     );
   });
 

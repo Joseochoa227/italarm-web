@@ -64,6 +64,7 @@ Las páginas exportan `Component`, porque React Router las carga con `lazy`.
 - **Formularios con datos del servidor:** `defaultValues` (nunca `values`) y `key={registro.version}` en el componente del formulario: al guardar o recargar por conflicto se vuelve a montar con los datos actuales.
 - **Errores de consultas:** `errorDeConsultas(consulta, …)` (en `api/problema.ts`), porque el tipo de `error` de openapi-react-query no corresponde al `ErrorApi` real.
 - **Archivos:** `api.PUT(ruta, { body: { archivo }, bodySerializer: comoFormulario })`, después de `comprimirImagen()` (BF-14).
+- **Documentos con inventario** (compras, ajustes, carga inicial): `useClaveIdempotencia()` al abrir el formulario y, al guardar, `invalidateQueries()` para que el inventario, el kárdex y los totales se vuelvan a pedir.
 - **Pruebas:**
   - se prueba lo que ve el usuario (roles y textos);
   - la API se simula con `http` de `@/test/servidor`, tipado con el contrato;
@@ -89,6 +90,9 @@ Las páginas exportan `Component`, porque React Router las carga con `lazy`.
 | Decimales: coma o punto, uno solo, sin separador de miles (`lib/decimal.ts`)      | W-04. Debajo del campo se muestra cómo quedó el valor.                                                                                                                                                                      |
 | TypeScript 5.9                                                                    | typescript-eslint y openapi-typescript todavía no admiten TypeScript 7.                                                                                                                                                     |
 | Service worker solo con los archivos de la app                                    | BF-13: no se trabaja sin conexión y las respuestas de la API nunca se guardan en caché.                                                                                                                                     |
+| Vistas previas con `POST …/vista-previa` 400 ms después del último cambio         | BF-06: el costo, la regla y los subtotales los calcula el backend. Solo el nuevo stock del ajuste se calcula en el navegador (BigInt).                                                                                      |
+| Seriales escritos o con la cámara (`@zxing/browser`, import diferido)             | W-07: no se usa lector de códigos. La librería solo se descarga al abrir el escáner (BF-12).                                                                                                                                |
+| Errores de negocio sin campo (compras) en un aviso general                        | El backend no indica la línea; los que sí corresponden a un campo se mapean por `codigo` (`COMPRA_FECHA_FUTURA` → fecha, `STOCK_INSUFICIENTE` → cantidad…).                                                                 |
 
 ## Pendientes para la Fase 6
 

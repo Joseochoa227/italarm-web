@@ -1,6 +1,6 @@
 # Plan de la Fase 2 — Compras, inventario, costo y carga inicial (italarm-web)
 
-> Estado: **aprobado por ITALARM el 08/10/2026** con la propuesta de W-06; W-07 y W-08 rechazadas (ver sección 8). En implementación.
+> Estado: **aprobado por ITALARM el 08/10/2026** con la propuesta de W-06; W-07 y W-08 rechazadas (ver sección 8). **Implementado el 08/10/2026.** Falta la CI en GitHub y el despliegue (F6-02).
 > Base: `docs/requerimientos.md` (3.4, 3.6, 3.7, 3.8, 3.9, 3.18 y 12.4), `italarm-api/docs/preguntas.md` (P-19 a P-26), `italarm-api/docs/guia-frontend.md` (§9 a §13), `italarm-api/docs/plan-fase-2.md`, el prototipo (pantallas Inventario, Producto · Kárdex y Nueva compra) y el contrato `contrato/openapi.json` (rama de trabajo de italarm-api @ `26aa62c`, con D-05 corregido).
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado; no se necesitan endpoints nuevos.
 
@@ -180,10 +180,10 @@ Todos existen en el contrato.
 ## 7. Definición de terminado (12.1)
 
 - [ ] Pull Request con la CI en verde.
-- [ ] Pruebas de la sección 6 escritas y pasando, incluidos CP-13, CP-16, CP-17, CP-19, CP-28 y CP-29.
-- [ ] Cliente generado desde el contrato vigente.
+- [x] Pruebas de la sección 6 escritas y pasando, incluidos CP-13, CP-16, CP-17, CP-19, CP-28 y CP-29: 223 de componentes (cobertura 93,9 % de líneas) y 9 escenarios extremo a extremo, cada uno en celular y computador. Además, el recorrido completo (CP-01 a CP-07, CP-13, CP-16, CP-17, CP-19, CP-28 y CP-29) se probó en el navegador contra el backend real de `dev` en local.
+- [x] Cliente generado desde el contrato vigente (`dev` @ `26aa62c`).
 - [ ] Desplegado en pruebas. _(Pasa a la Fase 6: F6-02.)_
-- [ ] `CHANGELOG.md` actualizado y lista para ITALARM:
+- [x] `CHANGELOG.md` actualizado y lista para ITALARM:
   1. Descargar la plantilla, llenarla con el inventario real y cargarla (primero con un error a propósito, para ver el mensaje por fila).
   2. Revisar el inventario valorizado y el detalle de un producto: kárdex con II-001 y seriales en bodega.
   3. Registrar una compra en COP de un producto con serial, revisar la vista previa del costo y la regla, adjuntar la foto de la factura y guardar.
