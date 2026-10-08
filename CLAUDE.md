@@ -18,7 +18,7 @@ npm test                   # Vitest + Testing Library + MSW
 npm run test:cobertura     # mínimo 80 % de líneas
 npm run e2e                # Playwright, celular (390×844) y computador (1280×800)
 npm run api:sincronizar    # copia el contrato de ../italarm-api y regenera src/api/esquema.ts
-npm run api:sincronizar -- --ref origin/dev   # lo toma de esa rama de italarm-api
+npm run api:sincronizar -- --ref origin/dev   # lo toma de esa rama de italarm-api (y regenera los tipos)
 ```
 
 En el entorno del agente, Playwright necesita `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/opt/pw-browsers/chromium`.
@@ -92,7 +92,7 @@ Las páginas exportan `Component`, porque React Router las carga con `lazy`.
 
 ## Pendientes para la Fase 6
 
-Ver `docs/plan-fase-0.md`, sección 10: acceso a los listados de Compras y Cotizaciones en el celular (F6-01), despliegue a pruebas (F6-02), ajustes del contrato (F6-03), logo (F6-04) y CI en GitHub (F6-05).
+Ver `docs/plan-fase-0.md`, sección 10: acceso a los listados de Compras y Cotizaciones en el celular (F6-01), despliegue a pruebas (F6-02), ajustes del contrato (F6-03), logo (F6-04), CI en GitHub (F6-05) e indicador de bajo mínimo en el menú (F6-06).
 
 ## Dependencias abiertas con el backend
 

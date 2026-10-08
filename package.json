@@ -20,7 +20,7 @@
     "e2e": "playwright test",
     "api:generar": "node scripts/generar-api.mjs",
     "api:verificar": "npm run api:generar && git diff --exit-code -- src/api/esquema.ts",
-    "api:sincronizar": "node scripts/sincronizar-contrato.mjs && npm run api:generar",
+    "api:sincronizar": "node scripts/sincronizar-contrato.mjs",
     "prepare": "husky",
     "iconos:generar": "node scripts/generar-iconos.mjs"
   },

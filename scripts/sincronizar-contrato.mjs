@@ -41,3 +41,7 @@ writeFileSync(
 );
 writeFileSync(resolve(raiz, "contrato/ORIGEN"), `${origen}\n`);
 console.log(`Contrato copiado desde ${origen}`);
+
+// Regenera los tipos aquí mismo: con "npm run x -- --ref dev", npm pasaría los argumentos al último
+// comando de una cadena con &&, no a este script.
+execFileSync(process.execPath, [resolve(raiz, "scripts/generar-api.mjs")], { stdio: "inherit" });

@@ -1,6 +1,6 @@
 # Plan de la Fase 2 — Compras, inventario, costo y carga inicial (italarm-web)
 
-> Estado: **propuesto, en espera de aprobación de ITALARM** (AG-02). No se escribe código hasta que se apruebe.
+> Estado: **aprobado por ITALARM el 08/10/2026** con la propuesta de W-06; W-07 y W-08 rechazadas (ver sección 8). En implementación.
 > Base: `docs/requerimientos.md` (3.4, 3.6, 3.7, 3.8, 3.9, 3.18 y 12.4), `italarm-api/docs/preguntas.md` (P-19 a P-26), `italarm-api/docs/guia-frontend.md` (§9 a §13), `italarm-api/docs/plan-fase-2.md`, el prototipo (pantallas Inventario, Producto · Kárdex y Nueva compra) y el contrato `contrato/openapi.json` (rama de trabajo de italarm-api @ `26aa62c`, con D-05 corregido).
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado; no se necesitan endpoints nuevos.
 
@@ -24,7 +24,7 @@ Entregable: el inventario valorizado, el detalle de cada producto con su kárdex
 - **Idempotency-Key** (RT-07, BF-10, guía §9): un hook genera la clave con `crypto.randomUUID()` al abrir el formulario y la conserva mientras esté abierto. Se envía en la cabecera al crear compras, ajustes y la carga inicial. Después de guardar, el siguiente documento recibe una clave nueva.
 - **Cantidades decimales sin `number`** (`lib/decimal.ts`): suma, resta y comparación de textos decimales con enteros grandes (`BigInt`). Solo para vistas previas del frontend (el nuevo stock de un ajuste, contar seriales); los valores oficiales los da el backend (BF-06).
 - **Captura de seriales** (RF-20, RF-43, BF-14), un componente para compras y ajustes de entrada:
-  - una casilla por unidad (cantidad = número de casillas), que se llena con el teclado o con un lector de códigos USB (escribe y envía Enter, que salta a la siguiente);
+  - una casilla por unidad (cantidad = número de casillas), que se llena con el teclado (W-07: no se usa lector de códigos);
   - botón **Escanear** con la cámara del celular, usando `@zxing/browser` (BF-14);
   - los seriales se guardan sin espacios y en mayúsculas (P-22); los repetidos se marcan antes de enviar;
   - indicador "Seriales · 3 de 5" y "Completos", como el prototipo.
@@ -41,7 +41,7 @@ La pantalla `/inventario` pasa a usar `GET /inventario`:
 - **Botones**: Registrar compra y Nuevo producto (RF-50; Excel en la Fase 6).
 - **Filtros**: categoría, estado y buscador por nombre, código, marca **o serial** (RF-51).
 - **Cada producto** (RF-52): nombre, código, categoría, marca, stock con su unidad, etiqueta **Bajo**, costo actual en USD y valor en bodega en las tres monedas. Lleva al detalle.
-- **Indicador del menú** (RF-02, RF-63): la cantidad de productos bajo el mínimo junto a Inventario. Ver la pregunta W-08.
+- **Indicador del menú** (RF-02): pasa a la Fase 6, con el endpoint de Inicio (W-08, F6-06).
 
 ### T3. Detalle del producto (RF-53 a RF-57) — `feat:`
 
@@ -55,7 +55,7 @@ La pantalla `/inventario` pasa a usar `GET /inventario`:
 
 ### T4. Seriales (RF-22, RF-24) — `feat:`
 
-- **Buscar un serial desde cualquier pantalla** (RF-24): ver la pregunta W-06.
+- **Buscar un serial desde cualquier pantalla** (RF-24, W-06): botón de lupa en la barra superior del celular y en el menú lateral del computador. Abre un diálogo con el campo, el botón **Escanear** y los resultados; cada resultado lleva al historial del serial.
 - **Historial del serial** (`/seriales/:id`): producto, estado, entrada (proveedor y compra), salidas, vencimiento de la garantía (desde la Fase 3) y reclamos (desde la Fase 4).
 
 ### T5. Compras (RF-39 a RF-48) — `feat:`
@@ -167,7 +167,7 @@ Todos existen en el contrato.
   - Otro exige descripción.
 - **Inventario y detalle**: valor total en tres monedas con avisos; búsqueda por serial; kárdex con enlaces; historial de costo con su regla; seriales por estado.
 - **Carga inicial**: **CP-29**, error en la hoja de inventario, fila 8, sin poder confirmar; **CP-28**, carga válida → II-001; `CARGA_INICIAL_CON_ERRORES` al confirmar.
-- **Utilidades**: aritmética decimal y captura de seriales (teclado, lector USB con Enter, repetidos).
+- **Utilidades**: aritmética decimal y captura de seriales (teclado, mayúsculas, repetidos).
 
 **Extremo a extremo** (Playwright, celular y computador, con la API simulada):
 
@@ -194,11 +194,11 @@ Todos existen en el contrato.
 
 ## 8. Preguntas para ITALARM
 
-| #    | Tema                                                | Pregunta                                                                                                                 | Propuesta                                                                                                                                                                                                                                                                               |
-| ---- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| W-06 | Buscar un serial "desde cualquier pantalla" (RF-24) | ¿Dónde va el buscador de seriales?                                                                                       | Un botón de lupa en la barra superior del celular y en el menú lateral del computador. Abre un diálogo con un campo (también con **Escanear**) y los resultados. Cada resultado lleva al historial del serial. Además, el buscador del inventario también encuentra por serial (RF-51). |
-| W-07 | Lector de códigos de barras                         | ¿Usan o piensan usar un lector de códigos USB o Bluetooth en el computador?                                              | Funciona sin configurar nada: el lector escribe el serial y envía Enter, que salta a la casilla siguiente. En el celular se usa la cámara con **Escanear**.                                                                                                                             |
-| W-08 | Indicador "bajo mínimo" en el menú (RF-02)          | No hay un endpoint que cuente los productos bajo el mínimo. ¿Lo mostramos ya o esperamos el endpoint de Inicio (Fase 6)? | Mostrarlo ya: se cuentan con `GET /inventario` (productos activos, hasta 100 por consulta, actualizado cada 5 minutos y al guardar compras o ajustes). Con más de 100 productos se mostraría "100+". En la Fase 6 se cambia al endpoint de Inicio.                                      |
+| #    | Tema                                                | Pregunta                                                                                                                 | Propuesta                                                                                                                                                                                                                                                                               | Respuesta de ITALARM                                                               |
+| ---- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| W-06 | Buscar un serial "desde cualquier pantalla" (RF-24) | ¿Dónde va el buscador de seriales?                                                                                       | Un botón de lupa en la barra superior del celular y en el menú lateral del computador. Abre un diálogo con un campo (también con **Escanear**) y los resultados. Cada resultado lleva al historial del serial. Además, el buscador del inventario también encuentra por serial (RF-51). | De acuerdo con la propuesta.                                                       |
+| W-07 | Lector de códigos de barras                         | ¿Usan o piensan usar un lector de códigos USB o Bluetooth en el computador?                                              | Funciona sin configurar nada: el lector escribe el serial y envía Enter, que salta a la casilla siguiente. En el celular se usa la cámara con **Escanear**.                                                                                                                             | Rechazada: no se usa lector. Los seriales se escriben o se escanean con la cámara. |
+| W-08 | Indicador "bajo mínimo" en el menú (RF-02)          | No hay un endpoint que cuente los productos bajo el mínimo. ¿Lo mostramos ya o esperamos el endpoint de Inicio (Fase 6)? | Mostrarlo ya: se cuentan con `GET /inventario` (productos activos, hasta 100 por consulta, actualizado cada 5 minutos y al guardar compras o ajustes). Con más de 100 productos se mostraría "100+". En la Fase 6 se cambia al endpoint de Inicio.                                      | Rechazada: el indicador espera el endpoint de Inicio (Fase 6, F6-06).              |
 
 **Decisiones de diseño (no requieren respuesta salvo que no estés de acuerdo):**
 
@@ -208,7 +208,7 @@ Todos existen en el contrato.
 
 ## 9. Riesgos y dependencias
 
-- **D-05 resuelto**: la Fase 2 depende de los esquemas de líneas y totales de compras, que ya tienen nombre propio. **Antes de empezar a implementar hay que pasar la corrección del backend a `dev`**, para que el contrato de la rama principal coincida con el del frontend.
+- **D-05 resuelto** y ya en `dev` de los dos repositorios (08/10/2026): los esquemas de líneas y totales de compras tienen nombre propio.
 - **D-02** (pasa a la Fase 6): todos los campos de respuesta siguen siendo opcionales en TypeScript.
 - **Cámara**: `@zxing/browser` necesita permiso de cámara y HTTPS. En local funciona en `localhost`; en el celular, con el ambiente de pruebas (F6-02). Si no hay cámara o se niega el permiso, la captura sigue por teclado.
 - **Tasas faltantes**: una compra en COP o VES sin ninguna tasa responde `TASA_NO_DISPONIBLE`. La pantalla lo explica y ofrece registrar la tasa (diálogo de la Fase 1).
