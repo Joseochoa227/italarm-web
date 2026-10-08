@@ -3,7 +3,7 @@ import { screen, within } from "@testing-library/react";
 import { renderizarApp } from "@/test/renderizar";
 import { HttpResponse } from "msw";
 
-import { http, servidor } from "@/test/servidor";
+import { http, problema, servidor } from "@/test/servidor";
 
 const xlsx = (nombre = "carga.xlsx") =>
   new File(["PK"], nombre, { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
@@ -108,15 +108,9 @@ describe("Carga inicial desde Excel (3.18)", () => {
         response(200).json({ valido: true, errores: [], resumen: { productos: 1 } }),
       ),
       http.post("/api/v1/carga-inicial", () =>
-        HttpResponse.json(
-          {
-            status: 400,
-            codigo: "CARGA_INICIAL_CON_ERRORES",
-            detail: "El archivo tiene errores.",
-            errores: [{ hoja: "Productos", fila: 4, mensaje: "El código CAM-9 ya existe." }],
-          },
-          { status: 400, headers: { "Content-Type": "application/problem+json" } },
-        ),
+        problema(400, "CARGA_INICIAL_CON_ERRORES", "El archivo tiene errores.", {
+          errores: [{ hoja: "Productos", fila: 4, mensaje: "El código CAM-9 ya existe." }],
+        }),
       ),
     );
     const { usuario } = renderizarApp({ ruta: "/configuracion?pestana=carga" });
