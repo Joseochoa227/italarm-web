@@ -208,7 +208,7 @@ export function Component() {
 
       <Tarjeta aria-label={D.resumen} role="region" className="gap-2 escritorio:ml-auto escritorio:w-[420px]">
         <FilaResumen titulo={TEXTOS_VENTAS.nueva.subtotal} montos={resumen?.subtotal} moneda={moneda} />
-        {v.descuentoTipo && (
+        {(v.descuentoTipo === "PORCENTAJE" || v.descuentoTipo === "VALOR") && (
           <FilaResumen
             titulo={
               v.descuentoTipo === "PORCENTAJE" && v.descuentoValor
@@ -220,7 +220,7 @@ export function Component() {
           />
         )}
         <FilaResumen titulo={TEXTOS_VENTAS.nueva.total} montos={resumen?.total} moneda={moneda} fuerte />
-        <FilaResumen titulo={TEXTOS_VENTAS.nueva.costoMaterial} montos={resumen?.costo} moneda={moneda} />
+        <FilaResumen titulo={D.costoMaterial} montos={resumen?.costo} moneda={moneda} />
         <FilaResumen
           titulo={`${TEXTOS_VENTAS.nueva.utilidad}${v.porcentajeUtilidad ? ` · ${formatearDecimal(v.porcentajeUtilidad)} %` : ""}`}
           montos={resumen?.utilidad}

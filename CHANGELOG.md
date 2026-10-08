@@ -4,6 +4,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [Sin publicar]
 
+### Fase 3 — Ventas, comprobantes y anulaciones
+
+#### Agregado
+
+- **Nueva venta:** cliente con el precio que se le aplica (y creación de un cliente sin salir, RF-79), moneda con las tasas del día, productos con precio sugerido editable, disponibilidad, costo a la tasa de hoy y a la de la última compra, seriales elegidos entre los que están en bodega (CP-14) o con la cámara, descuento en porcentaje o valor, y resumen con total, costo y utilidad calculados por el backend. Sin stock no deja guardar (RF-101).
+- **Confirmación** con Enviar comprobante por WhatsApp (compartir del celular con el PDF adjunto o enlace de 30 días en el computador), Descargar PDF, Ver la venta y Registrar otra venta.
+- **Ventas:** listado del período con totales y utilidad, filtros por cliente, producto y fechas, y enlace «Ver ventas» desde Nueva venta (W-09). Detalle con lo guardado (precio sugerido y cobrado, costo, seriales con su garantía), comprobante, observaciones y monedas del comprobante editables, y anulación con motivo (CP-18).
+- Las ventas tienen enlace en el kárdex, en el historial del serial y en el del cliente.
+
 ### Fase 2 — Compras, inventario, costo y carga inicial
 
 #### Agregado

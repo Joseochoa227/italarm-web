@@ -1,6 +1,6 @@
 # Plan de la Fase 3 — Ventas, comprobantes y anulaciones (italarm-web)
 
-> Estado: **aprobado por ITALARM el 08/10/2026** con la propuesta de W-09. En implementación.
+> Estado: **aprobado por ITALARM el 08/10/2026** con la propuesta de W-09. **Implementado el 08/10/2026.** Falta la CI en GitHub y el despliegue (F6-02).
 > Base: `docs/requerimientos.md` (3.9, 3.12, 3.14, 3.15 y 12.5), `italarm-api/docs/preguntas.md` (P-27 a P-36), `italarm-api/docs/guia-frontend.md` (§4, §9 y §14), el prototipo `docs/Italarm v2.html` (pantallas Nueva venta y Documentos) y el contrato `contrato/openapi.json` (`dev` @ `26aa62c`).
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado; no se necesitan endpoints nuevos.
 
@@ -117,10 +117,10 @@ Todos existen en el contrato.
 ## 7. Definición de terminado (12.1)
 
 - [ ] Pull Request con la CI en verde.
-- [ ] Pruebas de la sección 6 escritas y pasando, incluidos CP-08, CP-14, CP-18, CP-25, CP-27 y la venta sin stock.
-- [ ] Cliente generado desde el contrato vigente.
+- [x] Pruebas de la sección 6 escritas y pasando, incluidos CP-08, CP-14, CP-18, CP-25, CP-27 y la venta sin stock: 238 de componentes (cobertura 93,4 % de líneas) y 11 escenarios extremo a extremo, cada uno en celular y computador. Además, el recorrido se probó contra el backend real de `dev` en local, incluidos el PDF descargado, el mensaje de WhatsApp y el enlace público sin sesión.
+- [x] Cliente generado desde el contrato vigente (`dev` @ `26aa62c`).
 - [ ] Desplegado en pruebas. _(Pasa a la Fase 6: F6-02.)_
-- [ ] `CHANGELOG.md` actualizado y lista para ITALARM:
+- [x] `CHANGELOG.md` actualizado y lista para ITALARM:
   1. Registrar una venta a un instalador en COP con una cámara con serial y cable por metro; revisar el precio sugerido, el costo a la tasa de hoy y a la de compra, y la utilidad.
   2. Aplicar un descuento y ver cómo cambian el total y la utilidad.
   3. Intentar vender más de lo que hay (no deja guardar).

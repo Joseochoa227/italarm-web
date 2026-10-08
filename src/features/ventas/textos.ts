@@ -89,6 +89,7 @@ export const TEXTOS_VENTAS = {
     sugerido: (valor: string) => `Sugerido ${valor}`,
     garantia: (fecha: string) => `garantía hasta ${fecha}`,
     resumen: "Resumen",
+    costoMaterial: "Costo del material (guardado al vender)",
     descuentoPorcentaje: (valor: string) => `Descuento (${valor} %)`,
     anuladaTitulo: "Venta anulada",
     anuladaDetalle: (usuario: string, fecha: string) => `Por ${usuario} el ${fecha}`,

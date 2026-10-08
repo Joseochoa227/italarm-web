@@ -99,6 +99,8 @@ describe("Detalle de la venta", () => {
     const resumen = screen.getByRole("region", { name: "Resumen" });
     expect(sinNbsp(resumen.textContent)).toContain("Utilidad · 31,37 %US$ 8,00");
     expect(sinNbsp(resumen.textContent)).toContain("Total de contadoUS$ 25,50$ 102.000");
+    expect(resumen).toHaveTextContent("Costo del material (guardado al vender)");
+    expect(resumen).not.toHaveTextContent("Descuento");
     expect(screen.getByRole("link", { name: "Ferretería El Tornillo" })).toHaveAttribute(
       "href",
       "/clientes/20",
