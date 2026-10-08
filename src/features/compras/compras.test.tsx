@@ -258,6 +258,42 @@ describe("Registrar compra (RF-39 a RF-45)", () => {
     expect(factura).not.toBeNull();
   });
 
+  it("un reintento usa la misma Idempotency-Key y el botón se deshabilita mientras guarda", async () => {
+    servirFormulario();
+    const claves: (string | null)[] = [];
+    let soltar: () => void = () => undefined;
+    servidor.use(
+      http.post("/api/v1/compras", async ({ request, response }) => {
+        claves.push(request.headers.get("Idempotency-Key"));
+        if (claves.length === 1) return problema(500, "ERROR_INTERNO", "Error interno.");
+        await new Promise<void>((resolver) => {
+          soltar = resolver;
+        });
+        return response(201).json(compra({ id: 77, consecutivo: "C-0007" }));
+      }),
+      http.get("/api/v1/compras/{id}", ({ response }) => response(200).json(compra({ id: 77 }))),
+    );
+    const { usuario } = renderizarApp({ ruta: "/compras/nueva" });
+
+    await screen.findByRole("option", { name: "Importadora Andina" });
+    await usuario.selectOptions(screen.getByLabelText("Proveedor"), "Importadora Andina");
+    await usuario.type(screen.getByLabelText("N.º de factura del proveedor"), "FE-9");
+    await agregar(usuario, /Cable UTP/);
+    await usuario.type(screen.getByLabelText("Costo unitario de Cable UTP"), "3");
+    const guardar = screen.getByRole("button", { name: "Guardar y sumar al inventario" });
+    await usuario.click(guardar);
+    expect(await screen.findByText(/Algo salió mal/)).toBeVisible();
+
+    await usuario.click(guardar);
+    await waitFor(() => {
+      expect(guardar).toBeDisabled();
+    });
+    soltar();
+    expect(await screen.findByText("Compra C-0007 registrada")).toBeVisible();
+    expect(claves).toHaveLength(2);
+    expect(claves[1]).toBe(claves[0]);
+  });
+
   it("valida los datos y no admite decimales en unidades enteras (P-09)", async () => {
     servirFormulario();
     const { usuario } = renderizarApp({ ruta: "/compras/nueva" });

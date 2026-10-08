@@ -9,7 +9,7 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { sinIndefinidos } from "@/lib/objetos";
 
 import { FormularioProducto } from "../components/FormularioProducto";
-import { CLAVE_PRODUCTOS, PRODUCTO_VACIO } from "../hooks/productos";
+import { CONSULTAS_PRODUCTOS, PRODUCTO_VACIO } from "../hooks/productos";
 import type { DatosProducto } from "../schemas/producto";
 import { TEXTOS_PRODUCTOS } from "../textos";
 
@@ -25,7 +25,7 @@ export function Component() {
     mutationFn: async (datos: DatosProducto) =>
       (await api.POST("/api/v1/productos", { body: { ...sinIndefinidos(datos), version: 0 } })).data,
     onSuccess: async (producto) => {
-      await clienteConsultas.invalidateQueries({ queryKey: CLAVE_PRODUCTOS });
+      await clienteConsultas.invalidateQueries(CONSULTAS_PRODUCTOS);
       avisar({ titulo: F.creado, descripcion: F.creadoDetalle });
       void navegar(
         producto?.id === undefined ? "/inventario" : `/inventario/productos/${String(producto.id)}/editar`,

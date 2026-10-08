@@ -20,7 +20,7 @@ import { formatearCantidad, formatearDineroDe } from "@/lib/formato";
 import { sinIndefinidos } from "@/lib/objetos";
 
 import { FormularioProducto } from "../components/FormularioProducto";
-import { CLAVE_PRODUCTOS, type Producto, valoresDeProducto } from "../hooks/productos";
+import { CONSULTAS_PRODUCTOS, type Producto, valoresDeProducto } from "../hooks/productos";
 import type { DatosProducto } from "../schemas/producto";
 import { TEXTOS_PRODUCTOS } from "../textos";
 
@@ -41,11 +41,7 @@ export function Component() {
       const { queryKey } = $api.queryOptions("get", "/api/v1/productos/{id}", { params: { path: { id } } });
       clienteConsultas.setQueryData(queryKey, producto);
     }
-    await clienteConsultas.invalidateQueries({
-      queryKey: CLAVE_PRODUCTOS,
-      exact: false,
-      refetchType: "none",
-    });
+    await clienteConsultas.invalidateQueries({ ...CONSULTAS_PRODUCTOS, refetchType: "none" });
   };
 
   const guardado = useMutation({
@@ -93,7 +89,8 @@ export function Component() {
       await api.DELETE("/api/v1/productos/{id}", { params: { path: { id } } });
     },
     onSuccess: async () => {
-      await clienteConsultas.invalidateQueries({ queryKey: CLAVE_PRODUCTOS, exact: false });
+      // Sin volver a pedir el producto eliminado: el inventario se pide al abrirlo.
+      await clienteConsultas.invalidateQueries({ ...CONSULTAS_PRODUCTOS, refetchType: "none" });
       avisar({ titulo: F.eliminado });
       void navegar("/inventario", { replace: true });
     },

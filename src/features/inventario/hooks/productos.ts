@@ -1,3 +1,5 @@
+import type { Query } from "@tanstack/react-query";
+
 import type { components } from "@/api/esquema";
 import { decimalAEdicion } from "@/lib/decimal";
 
@@ -5,7 +7,16 @@ import type { EntradaProducto } from "../schemas/producto";
 
 export type Producto = components["schemas"]["ProductoVista"];
 
-export const CLAVE_PRODUCTOS = ["get", "/api/v1/productos"];
+/**
+ * Consultas que cambian al crear, editar o eliminar un producto: el catálogo y el inventario
+ * (GET /inventario y el detalle del producto).
+ */
+export const CONSULTAS_PRODUCTOS = {
+  predicate: (consulta: Query) => {
+    const ruta = consulta.queryKey[1];
+    return typeof ruta === "string" && /^\/api\/v1\/(productos|inventario)/.test(ruta);
+  },
+};
 
 export const PRODUCTO_VACIO: EntradaProducto = {
   codigo: "",
