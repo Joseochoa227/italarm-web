@@ -4,6 +4,19 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [Sin publicar]
 
+### Fase 4 — Instalaciones, fotos y garantías
+
+#### Agregado
+
+- **Nueva instalación** en cuatro pasos con el panel de cobro: cliente, dirección propuesta, fecha (también anterior, P-38), técnicos y descripción; material como en las ventas (sin stock no deja guardar, CP-15); fotos Antes, Durante y Después tomadas con la cámara o elegidas de la galería, comprimidas en el navegador y subidas al guardar; garantía de mano de obra de 1 a 3 meses con su vencimiento y condiciones de Configuración; mano de obra, descuento, total, costo y utilidad del backend. Se puede registrar solo mano de obra (P-41).
+- **Confirmación** con el vencimiento de la garantía, el avance de las fotos, WhatsApp y PDF.
+- **Instalaciones:** listado con filtros por cliente, técnico, fechas y estado de la garantía, y «Ver instalaciones» desde Nueva instalación; detalle con material, garantías, cobro, fotos (agregar y quitar), reclamos, edición de lo descriptivo y anulación.
+- **Garantías:** consulta por estado, tipo, cliente y serial; reclamos dentro o fuera de garantía, con la solución escrita después. Se llega desde instalaciones, ventas, el cliente y el historial del serial (W-10).
+
+#### Cambiado
+
+- La línea de material, el resumen del cobro y la confirmación pasan al módulo común `comercial` y los usan ventas e instalaciones.
+
 ### Fase 3 — Ventas, comprobantes y anulaciones
 
 #### Agregado

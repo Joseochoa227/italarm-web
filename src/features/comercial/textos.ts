@@ -59,9 +59,6 @@ export const TEXTOS_COMERCIAL = {
     porcentaje: "El porcentaje va de 0 a 100.",
     largo: (n: number) => `Máximo ${String(n)} caracteres.`,
   },
-  confirmacion: {
-    otra: (documento: string) => `Registrar otra ${documento}`,
-  },
   comprobante: {
     descargar: "Descargar PDF",
     whatsapp: "Enviar por WhatsApp",

@@ -1,6 +1,6 @@
 # Plan de la Fase 4 — Instalaciones, fotos y garantías (italarm-web)
 
-> Estado: **aprobado por ITALARM el 09/10/2026** con la propuesta de W-10. En implementación.
+> Estado: **aprobado por ITALARM el 09/10/2026** con la propuesta de W-10. **Implementado el 09/10/2026.** Falta la CI en GitHub y el despliegue (F6-02).
 > Base: `docs/requerimientos.md` (3.9, 3.13, 3.14, 3.15 y 12.6), `italarm-api/docs/preguntas.md` (P-37 a P-45), `italarm-api/docs/guia-frontend.md` (§4, §9, §15 y §16), el prototipo `docs/Italarm v2.html` (pantalla Nueva instalación) y el contrato `contrato/openapi.json` (`dev` @ `26aa62c`).
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado; no se necesitan endpoints nuevos.
 
@@ -132,10 +132,10 @@ Todos existen en el contrato.
 ## 7. Definición de terminado (12.1)
 
 - [ ] Pull Request con la CI en verde.
-- [ ] Pruebas de la sección 6 escritas y pasando, incluidos CP-15, CP-20 y la subida de fotos.
-- [ ] Cliente generado desde el contrato vigente.
+- [x] Pruebas de la sección 6 escritas y pasando, incluidos CP-15, CP-20 y la subida de fotos: 253 de componentes (cobertura 92,1 % de líneas) y 14 escenarios extremo a extremo, cada uno en celular y computador. Además, el recorrido se probó contra el backend real de `dev` en local: CP-15, CP-20 (instalación del 1 de octubre → 01/01/2027), fotos comprimidas y servidas por el backend, rechazo de una foto de 6 MB y de un PDF, PDF y WhatsApp del comprobante, edición, reclamo con solución y anulación.
+- [x] Cliente generado desde el contrato vigente (`dev` @ `26aa62c`).
 - [ ] Desplegado en pruebas. _(Pasa a la Fase 6: F6-02.)_
-- [ ] `CHANGELOG.md` actualizado y lista para ITALARM:
+- [x] `CHANGELOG.md` actualizado y lista para ITALARM:
   1. Registrar una instalación real desde el celular: cliente, técnicos, material con seriales, mano de obra y fotos tomadas con la cámara.
   2. Revisar el cobro: total, costo y utilidad.
   3. Enviar el comprobante por WhatsApp y descargar el PDF.

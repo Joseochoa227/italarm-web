@@ -33,8 +33,8 @@ src/
 ├── api/            esquema.ts (GENERADO, no se edita), cliente.ts, problema.ts y token.ts
 ├── components/     PaginaPendiente y ui/ (sistema de diseño)
 ├── features/<f>/   components/, hooks/, pages/, schemas/, textos.ts y sus pruebas
-│                   (comercial/: cliente, seriales que salen, comprobante y anulación, comunes a
-│                   ventas, instalaciones y cotizaciones)
+│                   (comercial/: cliente, material, cobro, seriales que salen, comprobante,
+│                   confirmación y anulación, comunes a ventas, instalaciones y cotizaciones)
 ├── lib/            formato, errores, entorno, medios y utilidades
 ├── styles/         tokens.css (tokens del prototipo) y global.css
 └── test/           servidor MSW tipado, configuración y renderizarApp()
@@ -95,6 +95,7 @@ Las páginas exportan `Component`, porque React Router las carga con `lazy`.
 | Vistas previas con `POST …/vista-previa` 400 ms después del último cambio              | BF-06: el costo, la regla y los subtotales los calcula el backend. Solo el nuevo stock del ajuste se calcula en el navegador (BigInt).                                                                                      |
 | Seriales escritos o con la cámara (`@zxing/browser`, import diferido)                  | W-07: no se usa lector de códigos. La librería solo se descarga al abrir el escáner (BF-12).                                                                                                                                |
 | Comprobante por WhatsApp: compartir del sistema en el celular, enlace en el computador | RF-134. El PDF se pide al abrir la pantalla en el celular, porque `navigator.share` exige el toque reciente; la ventana de WhatsApp se abre con el toque y luego recibe el enlace, para que no la bloquee el navegador.     |
+| Fotos de la instalación subidas después de guardarla, una por una                      | La API solo recibe fotos de una instalación registrada. Se comprimen al elegirlas y se suben con su avance; las que fallan se agregan desde el detalle.                                                                     |
 | Errores de negocio sin campo (compras) en un aviso general                             | El backend no indica la línea; los que sí corresponden a un campo se mapean por `codigo` (`COMPRA_FECHA_FUTURA` → fecha, `STOCK_INSUFICIENTE` → cantidad…).                                                                 |
 
 ## Pendientes para la Fase 6
