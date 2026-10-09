@@ -79,6 +79,8 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
     compras: [] as Registro[],
     ajustes: [] as Registro[],
     ventas: [] as Registro[],
+    instalaciones: [] as Registro[],
+    reclamos: [] as Registro[],
     cargas: [] as Registro[],
     claves: new Map<string, Registro>(),
     clientes: [] as Registro[],
@@ -268,9 +270,49 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
     };
     return { moneda, lineas, resumen, totalUsd, costoUsd, clienteVista };
   };
-  const tresMeses = () => {
-    const [a, m, d] = HOY.split("-").map(Number);
-    return new Date(Date.UTC(a ?? 2026, (m ?? 1) + 2, d ?? 1)).toISOString().slice(0, 10);
+  const masMeses = (fecha: string, meses: number) => {
+    const [a, m, d] = fecha.split("-").map(Number);
+    return new Date(Date.UTC(a ?? 2026, (m ?? 1) - 1 + meses, d ?? 1)).toISOString().slice(0, 10);
+  };
+  const tresMeses = () => masMeses(HOY, 3);
+  const fotoSvg = (texto: string) =>
+    `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#5980a6"/><title>${texto}</title></svg>`)}`;
+  // Instalaciones simuladas (Fase 4): material como en ventas, más mano de obra y garantías.
+  const calcularInstalacion = (c: Record<string, unknown>) => {
+    const v = calcularVenta({ ...c, descuentoTipo: undefined });
+    const moneda = c.moneda as string;
+    const fecha = (c.fecha as string | undefined) ?? HOY;
+    const meses = Number(c.garantiaManoObraMeses ?? 3);
+    const materialUsd = v.lineas.reduce((t, x) => t + x.subtotalUsd, 0);
+    const manoUsd = aUsd(Number(c.manoDeObra ?? 0), moneda);
+    const subtotalUsd = materialUsd + manoUsd;
+    const valor = Number(c.descuentoValor ?? 0);
+    const descuentoUsd =
+      c.descuentoTipo === "PORCENTAJE"
+        ? (subtotalUsd * valor) / 100
+        : c.descuentoTipo === "VALOR"
+          ? aUsd(valor, moneda)
+          : 0;
+    const totalUsd = subtotalUsd - descuentoUsd;
+    const resumen = {
+      ...v.resumen,
+      material: enMonedas(materialUsd),
+      manoDeObra: enMonedas(manoUsd),
+      subtotal: enMonedas(subtotalUsd),
+      descuento: enMonedas(descuentoUsd),
+      total: enMonedas(totalUsd),
+      utilidad: enMonedas(totalUsd - v.costoUsd),
+      porcentajeUtilidad: totalUsd > 0 ? (((totalUsd - v.costoUsd) / totalUsd) * 100).toFixed(2) : "0",
+    };
+    const garantias = {
+      manoObraMeses: meses,
+      venceManoObra: masMeses(fecha, meses),
+      estadoManoObra: "VIGENTE",
+      ...(v.lineas.length > 0 ? { venceEquipos: masMeses(fecha, 3), estadoEquipos: "VIGENTE" } : {}),
+      condiciones:
+        (c.condicionesGarantia as string | undefined) ?? "No cubre daños por descargas eléctricas.",
+    };
+    return { ...v, fecha, resumen, totalUsd, garantias };
   };
 
   await page.route(`${API}/**`, async (route) => {
@@ -332,7 +374,15 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
       case "GET /tasas":
         return json(route, 200, pagina([]));
       case "GET /configuracion":
-        return json(route, 200, { empresaNombre: "ITALARM", limiteVariacionTasa: "5.00", version: 0 });
+        return json(route, 200, {
+          empresaNombre: "ITALARM",
+          limiteVariacionTasa: "5.00",
+          garantiaManoObraMeses: 3,
+          condicionesGarantia: "No cubre daños por descargas eléctricas.",
+          version: 0,
+        });
+      case "GET /usuarios/tecnicos":
+        return json(route, 200, [{ id: USUARIO.id, nombre: USUARIO.nombre }]);
       case "GET /categorias":
         return json(route, 200, categorias);
       case "GET /unidades-medida":
@@ -745,6 +795,184 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
           anulacion: { motivo: cuerpo().motivo, usuario: USUARIO.nombre, fecha: new Date().toISOString() },
         });
         return json(route, 200, v);
+      }
+      case "POST /instalaciones/vista-previa": {
+        const v = calcularInstalacion(cuerpo());
+        return json(route, 200, {
+          fecha: v.fecha,
+          moneda: v.moneda,
+          cliente: v.clienteVista,
+          tasas: tasasCompra(),
+          avisos: [],
+          puedeGuardar: v.lineas.every((x) => x.cantidad <= stockDe(x.p)),
+          lineas: v.lineas.map((x) => ({
+            productoId: x.p.id,
+            nombre: x.p.nombre,
+            abreviatura: unidadDe(x.p),
+            cantidad: cantidadTexto(x.cantidad),
+            disponible: cantidadTexto(stockDe(x.p)),
+            ...(x.cantidad > stockDe(x.p)
+              ? { avisoStock: `Stock insuficiente · quedan ${cantidadTexto(stockDe(x.p))} ${unidadDe(x.p)}` }
+              : {}),
+            precioSugerido: { monto: x.sugerido.toFixed(4), moneda: v.moneda },
+            precioUnitario: { monto: x.precio.toFixed(4), moneda: v.moneda },
+            subtotal: enMonedas(x.subtotalUsd),
+            costoUnitarioHoy: enMonedas(x.costo),
+          })),
+          resumen: v.resumen,
+          garantias: v.garantias,
+        });
+      }
+      case "POST /instalaciones": {
+        const clave = (await peticion.headerValue("idempotency-key")) ?? "";
+        const repetida = estado.claves.get(clave);
+        if (repetida) return json(route, 201, repetida);
+        const c = cuerpo();
+        const v = calcularInstalacion(c);
+        const sinStock = v.lineas.find((x) => x.cantidad > stockDe(x.p));
+        if (sinStock) return problema(route, 422, "STOCK_INSUFICIENTE", "Stock insuficiente");
+        const id = estado.id++;
+        const documento = {
+          tipo: "INSTALACION",
+          id,
+          consecutivo: `I-${String(estado.instalaciones.length + 1).padStart(4, "0")}`,
+        };
+        const lineas = v.lineas.map((x) => {
+          moverStock(x.p, documento, -x.cantidad);
+          const seriales = (x.l.seriales ?? []).map((numero) => {
+            const s = estado.seriales.find((r) => r.productoId === x.p.id && r.numero === numero);
+            if (s) Object.assign(s, { estado: "INSTALADO", documentoSalida: documento });
+            return { id: s?.id, numero, vencimientoGarantia: v.garantias.venceEquipos };
+          });
+          return {
+            productoId: x.p.id,
+            codigo: x.p.codigo,
+            descripcion: x.p.nombre,
+            unidad: unidadDe(x.p),
+            cantidad: cantidadTexto(x.cantidad),
+            precioSugerido: { monto: x.sugerido.toFixed(4), moneda: v.moneda },
+            precioUnitario: { monto: x.precio.toFixed(4), moneda: v.moneda },
+            subtotal: { monto: (x.precio * x.cantidad).toFixed(4), moneda: v.moneda },
+            costoUnitarioUsd: usd(x.costo),
+            seriales,
+          };
+        });
+        const nueva: Registro = {
+          ...documento,
+          estado: "ACTIVA",
+          fecha: v.fecha,
+          moneda: v.moneda,
+          cliente: v.clienteVista,
+          direccion: c.direccion ?? (v.clienteVista.id ? "Dirección del cliente" : ""),
+          descripcion: c.descripcion,
+          tecnicos: [{ id: USUARIO.id, nombre: USUARIO.nombre }],
+          tasas: tasasCompra(),
+          lineas,
+          resumen: v.resumen,
+          garantias: v.garantias,
+          fotos: { antes: [], durante: [], despues: [] },
+          total: { monto: desdeUsd(v.totalUsd, v.moneda).toFixed(4), moneda: v.moneda },
+          utilidad: usd(v.totalUsd - v.costoUsd),
+          porcentajeUtilidad: v.resumen.porcentajeUtilidad,
+          monedasComprobante: c.monedasComprobante ?? [],
+          registradaPor: USUARIO.nombre,
+          registradaEn: new Date().toISOString(),
+          version: 0,
+        };
+        estado.instalaciones.push(nueva);
+        estado.claves.set(clave, nueva);
+        return json(route, 201, nueva);
+      }
+      case "GET /instalaciones/{id}": {
+        const i = porId(estado.instalaciones);
+        return i ? json(route, 200, i) : problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+      }
+      case "GET /instalaciones":
+        return json(route, 200, {
+          desde: HOY,
+          hasta: HOY,
+          totalesPorMoneda: [],
+          instalaciones: pagina(
+            [...estado.instalaciones].reverse().map((i) => ({
+              ...i,
+              cliente: (i.cliente as { nombre?: string } | undefined)?.nombre,
+              tecnicos: USUARIO.nombre,
+              estadoGarantia: "VIGENTE",
+            })),
+          ),
+        });
+      case "POST /instalaciones/{id}/fotos": {
+        const i = estado.instalaciones.find((r) => ruta.includes(`/${String(r.id)}/`));
+        if (!i) return problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+        const grupo = (url.searchParams.get("grupo") ?? "ANTES").toLowerCase() as
+          "antes" | "durante" | "despues";
+        const fotos = i.fotos as Record<string, { id: number; url: string }[]>;
+        const fotoId = estado.id++;
+        fotos[grupo]?.push({ id: fotoId, url: fotoSvg(`${grupo}-${String(fotoId)}`) });
+        return json(route, 200, i);
+      }
+      case "DELETE /instalaciones/{id}/fotos/{id}": {
+        const i = estado.instalaciones.find((r) => ruta.includes(`/${String(r.id)}/`));
+        if (!i) return problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+        const fotoId = Number(ruta.split("/").pop());
+        const fotos = i.fotos as Record<string, { id: number; url: string }[]>;
+        for (const g of Object.keys(fotos)) fotos[g] = (fotos[g] ?? []).filter((f) => f.id !== fotoId);
+        return json(route, 200, i);
+      }
+      case "POST /instalaciones/{id}/enlace":
+        return json(route, 200, {
+          url: `${API}/comprobantes/e2e`,
+          whatsappUrl: "https://wa.me/573001234567?text=Comprobante",
+          venceEn: new Date().toISOString(),
+        });
+      case "GET /garantias": {
+        const filtroSerial = (url.searchParams.get("serial") ?? "").toUpperCase();
+        const garantias = [
+          ...estado.instalaciones.map((i) => ({
+            clase: "MANO_OBRA",
+            tipo: "INSTALACION",
+            estado: "VIGENTE",
+            vencimiento: (i.garantias as { venceManoObra: string }).venceManoObra,
+            diasRestantes: 90,
+            cliente: (i.cliente as { nombre?: string } | undefined)?.nombre,
+            documento: { tipo: "INSTALACION", id: i.id, consecutivo: i.consecutivo },
+          })),
+          ...estado.seriales
+            .filter((x) => x.documentoSalida)
+            .map((x) => ({
+              clase: "EQUIPO",
+              tipo: x.documentoSalida?.tipo,
+              estado: "VIGENTE",
+              vencimiento: tresMeses(),
+              diasRestantes: 90,
+              producto: estado.productos.find((p) => p.id === x.productoId)?.nombre,
+              serial: x.numero,
+              serialId: x.id,
+              documento: x.documentoSalida,
+            })),
+        ].filter((g) => !filtroSerial || (g as { serial?: string }).serial?.includes(filtroSerial));
+        return json(route, 200, pagina(garantias));
+      }
+      case "GET /garantias/reclamos":
+        return json(route, 200, estado.reclamos);
+      case "POST /garantias/reclamos": {
+        const c = cuerpo();
+        const serial = estado.seriales.find((x) => x.id === c.serialId);
+        const reclamo = {
+          id: estado.id++,
+          fecha: c.fecha ?? HOY,
+          problema: c.problema,
+          solucion: c.solucion,
+          enGarantia: true,
+          serial: serial?.numero,
+          serialId: serial?.id,
+          instalacionId: c.instalacionId,
+          registradoPor: USUARIO.nombre,
+          registradoEn: new Date().toISOString(),
+          version: 0,
+        };
+        estado.reclamos.push(reclamo);
+        return json(route, 201, reclamo);
       }
       case "GET /ventas/{id}/comprobante":
         return route.fulfill({
