@@ -8,9 +8,9 @@ import { Boton } from "@/components/ui/Boton";
 import { Casilla } from "@/components/ui/Casilla";
 import { useAvisar } from "@/components/ui/contextoAvisos";
 import { Tarjeta } from "@/components/ui/Tarjeta";
+import { MONEDAS } from "@/features/comercial/schemas/material";
 import { esConflictoDeVersion, MENSAJES_ERROR, mensajeDeError } from "@/lib/errores";
 
-import { MONEDAS } from "../schemas/venta";
 import { TEXTOS_VENTAS } from "../textos";
 
 const D = TEXTOS_VENTAS.detalle;

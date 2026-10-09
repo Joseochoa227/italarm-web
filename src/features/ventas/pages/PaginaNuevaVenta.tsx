@@ -16,6 +16,10 @@ import { Segmentado } from "@/components/ui/Segmentado";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { useSesion } from "@/features/auth/hooks/contextoSesion";
 import { type Cliente, SelectorCliente } from "@/features/comercial/components/SelectorCliente";
+import { LineaMaterial } from "@/features/comercial/components/LineaMaterial";
+import { ResumenCobro } from "@/features/comercial/components/ResumenCobro";
+import { lineaDeProducto, MONEDAS } from "@/features/comercial/schemas/material";
+import { TEXTOS_COMERCIAL } from "@/features/comercial/textos";
 import { SelectorProducto } from "@/features/inventario/components/SelectorProducto";
 import { aplicarErroresDeCampo, mensajeDeError } from "@/lib/errores";
 import { hoyBogota } from "@/lib/fechas";
@@ -23,10 +27,8 @@ import { formatearDecimal, formatearFecha } from "@/lib/formato";
 import { useClaveIdempotencia } from "@/lib/idempotencia";
 
 import { ConfirmacionVenta } from "../components/ConfirmacionVenta";
-import { LineaVenta } from "../components/LineaVenta";
-import { ResumenVenta } from "../components/ResumenVenta";
 import { useVistaPreviaVenta } from "../hooks/vistaPrevia";
-import { type DatosVenta, type EntradaVenta, esquemaVenta, MONEDAS } from "../schemas/venta";
+import { type DatosVenta, type EntradaVenta, esquemaVenta } from "../schemas/venta";
 import { TEXTOS_VENTAS } from "../textos";
 
 const N = TEXTOS_VENTAS.nueva;
@@ -185,7 +187,7 @@ function FormularioVenta({
             </div>
             {monedaCambiada && (
               <Alerta tono="aviso" rol="status">
-                {N.monedaCambiada}
+                {TEXTOS_COMERCIAL.material.monedaCambiada}
               </Alerta>
             )}
           </Seccion>
@@ -195,22 +197,14 @@ function FormularioVenta({
               <SelectorProducto
                 excluir={new Set(entrada.lineas.map((l) => l.productoId))}
                 alElegir={(p) => {
-                  if (p.id === undefined) return;
-                  append({
-                    productoId: p.id,
-                    nombre: p.nombre ?? "",
-                    codigo: p.codigo ?? "",
-                    abreviatura: p.unidadMedida?.abreviatura ?? "",
-                    admiteDecimales: p.unidadMedida?.admiteDecimales ?? false,
-                    controlaSerial: p.controlaSerial ?? false,
-                    cantidad: p.controlaSerial ? "" : "1",
-                    precio: "",
-                    seriales: [],
-                  });
+                  const linea = lineaDeProducto(p);
+                  if (linea) append(linea);
                 }}
               />
             </div>
-            {fields.length > 0 && !cliente && <p className="m-0 text-sm text-neutro-700">{N.sinCliente}</p>}
+            {fields.length > 0 && !cliente && (
+              <p className="m-0 text-sm text-neutro-700">{TEXTOS_COMERCIAL.material.sinCliente}</p>
+            )}
             {fields.length === 0 ? (
               <p
                 className={
@@ -224,14 +218,25 @@ function FormularioVenta({
             ) : (
               <ul aria-label={N.seccionProductos} className="m-0 flex list-none flex-col p-0">
                 {fields.map((f, i) => (
-                  <LineaVenta
+                  <LineaMaterial
                     key={f.id}
-                    indice={i}
-                    control={control}
-                    register={register}
-                    errores={errors.lineas}
+                    linea={entrada.lineas[i] ?? f}
                     previa={datos?.lineas?.find((l) => l.productoId === f.productoId)}
                     moneda={moneda}
+                    registroCantidad={register(`lineas.${i}.cantidad`)}
+                    registroPrecio={register(`lineas.${i}.precio`)}
+                    seriales={{
+                      valor: entrada.lineas[i]?.seriales ?? [],
+                      alCambiar: (seriales) => {
+                        setValue(`lineas.${i}.seriales`, seriales);
+                        clearErrors(`lineas.${i}.seriales`);
+                      },
+                    }}
+                    errores={{
+                      cantidad: errors.lineas?.[i]?.cantidad?.message,
+                      precio: errors.lineas?.[i]?.precio?.message,
+                      seriales: errors.lineas?.[i]?.seriales?.message,
+                    }}
                     alQuitar={() => {
                       remove(i);
                     }}
@@ -248,12 +253,25 @@ function FormularioVenta({
         >
           <Tarjeta className="gap-3 shadow-md" aria-busy={pendiente || previa.isFetching}>
             <h2 className="m-0 text-[22px]">{cliente?.nombre ? N.resumenDe(cliente.nombre) : N.resumen}</h2>
-            <ResumenVenta
+            <ResumenCobro
               resumen={datos?.resumen}
               moneda={moneda}
-              control={control}
-              register={register}
-              errores={errors}
+              descuento={{
+                tipo: entrada.descuentoTipo,
+                alCambiarTipo: (tipo) => {
+                  setValue("descuentoTipo", tipo);
+                },
+                registroValor: register("descuentoValor"),
+                error: errors.descuentoValor?.message,
+              }}
+              monedasComprobante={{
+                valor: entrada.monedasComprobante,
+                alCambiar: (monedas) => {
+                  setValue("monedasComprobante", monedas);
+                },
+              }}
+              registroObservaciones={register("observaciones")}
+              errorObservaciones={errors.observaciones?.message}
             />
             {errorPrevia ? (
               <Alerta tono="peligro" rol="alert">
@@ -267,7 +285,7 @@ function FormularioVenta({
             ))}
             {sinStock && (
               <Alerta tono="peligro" rol="alert">
-                {N.sinStock}
+                {TEXTOS_COMERCIAL.cobro.sinStock}
               </Alerta>
             )}
             {errorGeneral && (

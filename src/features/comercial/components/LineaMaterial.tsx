@@ -1,20 +1,21 @@
 import { X } from "lucide-react";
-import { type Control, Controller, type FieldErrors, type UseFormRegister, useWatch } from "react-hook-form";
+import type { UseFormRegisterReturn } from "react-hook-form";
 
 import type { components } from "@/api/esquema";
 import { Alerta } from "@/components/ui/Alerta";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
-import { SerialesQueSalen } from "@/features/comercial/components/SerialesQueSalen";
 import { decimalAEdicion } from "@/lib/decimal";
 import { formatearCantidad, formatearDineroDe, formatearFecha, separarMonedas } from "@/lib/formato";
 
-import type { DatosVenta, EntradaVenta, Moneda } from "../schemas/venta";
-import { TEXTOS_VENTAS } from "../textos";
+import type { EntradaLineaMaterial, Moneda } from "../schemas/material";
+import { TEXTOS_COMERCIAL } from "../textos";
+import { SerialesQueSalen } from "./SerialesQueSalen";
 
-const N = TEXTOS_VENTAS.nueva;
+const N = TEXTOS_COMERCIAL.material;
 type Previa = components["schemas"]["LineaVistaPrevia"];
 type Montos = components["schemas"]["MontoEnMonedas"] | undefined;
+
 /** Equivalentes en pesos y bolívares (el costo en USD se muestra aparte). */
 const sinUsd = (montos: Montos) =>
   [montos?.cop, montos?.ves].flatMap((d) => (d ? [formatearDineroDe(d)] : [])).join(" · ");
@@ -46,26 +47,31 @@ function CostoLinea({ previa }: { previa: Previa }) {
   );
 }
 
-/** Una línea de la venta (RF-99): precio, disponibilidad, costo, cantidad o seriales y subtotal. */
-export function LineaVenta({
-  indice,
-  control,
-  register,
-  errores,
+/**
+ * Una línea de material de una venta, instalación o cotización (RF-99, RF-108): precio sugerido
+ * editable, disponibilidad, costo, cantidad o seriales que salen, subtotal y avisos, tal como los
+ * da la vista previa del backend.
+ */
+export function LineaMaterial({
+  linea,
   previa,
   moneda,
+  registroCantidad,
+  registroPrecio,
+  seriales,
+  errores,
   alQuitar,
 }: {
-  indice: number;
-  control: Control<EntradaVenta, unknown, DatosVenta>;
-  register: UseFormRegister<EntradaVenta>;
-  errores: FieldErrors<EntradaVenta>["lineas"];
+  linea: EntradaLineaMaterial;
   previa: Previa | undefined;
   moneda: Moneda;
+  registroCantidad: UseFormRegisterReturn;
+  registroPrecio: UseFormRegisterReturn;
+  seriales: { valor: string[]; alCambiar: (seriales: string[]) => void };
+  errores:
+    { cantidad?: string | undefined; precio?: string | undefined; seriales?: string | undefined } | undefined;
   alQuitar: () => void;
 }) {
-  const linea = useWatch({ control, name: `lineas.${indice}` });
-  const error = errores?.[indice];
   const subtotal = separarMonedas(previa?.subtotal, moneda);
   const sugerido = previa?.precioSugerido;
   const unidad = linea.abreviatura;
@@ -94,9 +100,9 @@ export function LineaVenta({
             inputMode={linea.admiteDecimales ? "decimal" : "numeric"}
             autoComplete="off"
             ayuda={unidad}
-            error={error?.cantidad?.message}
+            error={errores?.cantidad}
             className="w-[110px]"
-            {...register(`lineas.${indice}.cantidad`)}
+            {...registroCantidad}
           />
         )}
         <Campo
@@ -106,9 +112,9 @@ export function LineaVenta({
           autoComplete="off"
           placeholder={sugerido?.monto ? decimalAEdicion(sugerido.monto) : ""}
           ayuda={sugerido ? N.precioAyuda(formatearDineroDe(sugerido)) : moneda}
-          error={error?.precio?.message}
+          error={errores?.precio}
           className="w-[150px]"
-          {...register(`lineas.${indice}.precio`)}
+          {...registroPrecio}
         />
         <div className="min-w-[120px] text-right">
           <div className="font-semibold">{subtotal.principal}</div>
@@ -119,18 +125,12 @@ export function LineaVenta({
         </Boton>
       </div>
       {linea.controlaSerial && (
-        <Controller
-          control={control}
-          name={`lineas.${indice}.seriales`}
-          render={({ field }) => (
-            <SerialesQueSalen
-              productoId={linea.productoId}
-              producto={linea.nombre}
-              seleccionados={field.value}
-              alCambiar={field.onChange}
-              error={error?.seriales?.message}
-            />
-          )}
+        <SerialesQueSalen
+          productoId={linea.productoId}
+          producto={linea.nombre}
+          seleccionados={seriales.valor}
+          alCambiar={seriales.alCambiar}
+          error={errores?.seriales}
         />
       )}
       {previa?.avisoStock && (

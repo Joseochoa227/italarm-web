@@ -5,7 +5,9 @@ import type { components } from "@/api/esquema";
 import { ESPERA_VISTA_PREVIA } from "@/features/compras/hooks/vistaPrevia";
 import { useValorDiferido } from "@/lib/diferido";
 
-import { type EntradaVenta, leerDescuento, lineaParaEnviar } from "../schemas/venta";
+import { leerDescuento, lineasParaVistaPrevia } from "@/features/comercial/schemas/material";
+
+import type { EntradaVenta } from "../schemas/venta";
 
 type Solicitud = components["schemas"]["SolicitudVenta"];
 
@@ -22,10 +24,7 @@ export function useVistaPreviaVenta(entrada: EntradaVenta) {
       : {
           clienteId: entrada.clienteId,
           moneda: entrada.moneda,
-          lineas: entrada.lineas.flatMap((l) => {
-            const r = lineaParaEnviar(l);
-            return "error" in r ? [] : [r];
-          }),
+          lineas: lineasParaVistaPrevia(entrada.lineas),
           ...("error" in descuento ? {} : descuento),
         };
   const { valor: cuerpo, pendiente } = useValorDiferido(solicitud, ESPERA_VISTA_PREVIA);

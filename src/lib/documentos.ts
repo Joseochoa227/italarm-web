@@ -4,7 +4,7 @@ type DocumentoRef = components["schemas"]["DocumentoRef"];
 
 /**
  * Ruta del detalle de un documento referenciado (`documento: { tipo, id, consecutivo }`, guía §9).
- * Instalaciones y cotizaciones no tienen pantalla hasta sus fases: devuelven null.
+ * Las cotizaciones no tienen pantalla hasta la Fase 5: devuelven null.
  */
 export function rutaDocumento(documento: DocumentoRef | undefined): string | null {
   if (documento?.id === undefined) return null;
@@ -15,6 +15,8 @@ export function rutaDocumento(documento: DocumentoRef | undefined): string | nul
       return `/inventario/ajustes/${String(documento.id)}`;
     case "VENTA":
       return `/ventas/${String(documento.id)}`;
+    case "INSTALACION":
+      return `/instalaciones/${String(documento.id)}`;
     case "INVENTARIO_INICIAL":
       return "/configuracion?pestana=carga";
     default:

@@ -10,9 +10,10 @@ describe("rutaDocumento", () => {
     );
   });
 
-  it("instalaciones y documentos sin id no tienen enlace todavía; las ventas sí", () => {
+  it("ventas e instalaciones tienen enlace; cotizaciones y documentos sin id, todavía no", () => {
     expect(rutaDocumento({ tipo: "VENTA", id: 1 })).toBe("/ventas/1");
-    expect(rutaDocumento({ tipo: "INSTALACION", id: 1 })).toBeNull();
+    expect(rutaDocumento({ tipo: "INSTALACION", id: 1 })).toBe("/instalaciones/1");
+    expect(rutaDocumento({ tipo: "COTIZACION", id: 1 })).toBeNull();
     expect(rutaDocumento({ tipo: "COMPRA" })).toBeNull();
     expect(rutaDocumento(undefined)).toBeNull();
   });

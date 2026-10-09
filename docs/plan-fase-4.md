@@ -1,6 +1,6 @@
 # Plan de la Fase 4 — Instalaciones, fotos y garantías (italarm-web)
 
-> Estado: **propuesto el 08/10/2026**, pendiente de aprobación de ITALARM (AG-02).
+> Estado: **aprobado por ITALARM el 09/10/2026** con la propuesta de W-10. En implementación.
 > Base: `docs/requerimientos.md` (3.9, 3.13, 3.14, 3.15 y 12.6), `italarm-api/docs/preguntas.md` (P-37 a P-45), `italarm-api/docs/guia-frontend.md` (§4, §9, §15 y §16), el prototipo `docs/Italarm v2.html` (pantalla Nueva instalación) y el contrato `contrato/openapi.json` (`dev` @ `26aa62c`).
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado; no se necesitan endpoints nuevos.
 
@@ -146,9 +146,9 @@ Todos existen en el contrato.
 
 ## 8. Preguntas para ITALARM
 
-| #    | Tema                             | Pregunta                                                                                                                   | Propuesta                                                                                                                                                                                                                                                                         | Respuesta de ITALARM |
-| ---- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| W-10 | Dónde se consultan las garantías | El menú (RF-01, RF-03) no tiene **Garantías**. ¿Desde dónde se abre la consulta de garantías y reclamos (RF-123 a RF-125)? | Sin cambiar el menú: un botón **Garantías** en los listados de instalaciones y de ventas, **Ver garantías** en el detalle del cliente (filtrado por ese cliente) y en el historial de un serial. En la Fase 6, Inicio mostrará "Garantías por vencer" con enlace a esta pantalla. |                      |
+| #    | Tema                             | Pregunta                                                                                                                   | Propuesta                                                                                                                                                                                                                                                                         | Respuesta de ITALARM         |
+| ---- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| W-10 | Dónde se consultan las garantías | El menú (RF-01, RF-03) no tiene **Garantías**. ¿Desde dónde se abre la consulta de garantías y reclamos (RF-123 a RF-125)? | Sin cambiar el menú: un botón **Garantías** en los listados de instalaciones y de ventas, **Ver garantías** en el detalle del cliente (filtrado por ese cliente) y en el historial de un serial. En la Fase 6, Inicio mostrará "Garantías por vencer" con enlace a esta pantalla. | De acuerdo con la propuesta. |
 
 ## 9. Riesgos y dependencias
 
