@@ -106,7 +106,6 @@ describe("Navegación en celular (RF-03, RF-04)", () => {
 
 describe("Secciones pendientes (entregable de la Fase 0: menú vacío)", () => {
   it.each([
-    ["/instalaciones/nueva", "Nueva instalación", 4],
     ["/cotizaciones", "Cotizaciones", 5],
     ["/cotizaciones/nueva", "Nueva cotización", 5],
     ["/reportes", "Reportes", 6],

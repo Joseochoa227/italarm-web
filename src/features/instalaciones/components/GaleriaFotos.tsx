@@ -1,9 +1,9 @@
 import { Camera, ImagePlus, X } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 
 import { Alerta } from "@/components/ui/Alerta";
-import { Boton } from "@/components/ui/Boton";
 import { Dialogo } from "@/components/ui/Dialogo";
+import { cx } from "@/lib/clases";
 import { mensajeDeError } from "@/lib/errores";
 import { comprimirImagen, ErrorImagen, TIPOS_IMAGEN } from "@/lib/imagen";
 
@@ -25,8 +25,6 @@ function Grupo({
   alVer: (indice: number) => void;
 }) {
   const id = useId();
-  const camara = useRef<HTMLInputElement>(null);
-  const galeria = useRef<HTMLInputElement>(null);
   const [ocupado, setOcupado] = useState(false);
   const [errores, setErrores] = useState<string[]>([]);
   const nombre = TEXTOS_INSTALACIONES.grupos[grupo];
@@ -68,43 +66,37 @@ function Grupo({
           {T.contador(nombre, fotos.length)}
         </h3>
         {[
-          { ref: camara, icono: <Camera aria-hidden size={16} />, etiqueta: T.tomar(nombre), captura: true },
-          {
-            ref: galeria,
-            icono: <ImagePlus aria-hidden size={16} />,
-            etiqueta: T.elegir(nombre),
-            captura: false,
-          },
-        ].map((b) => (
-          <span key={b.etiqueta}>
-            <input
-              ref={b.ref}
-              type="file"
-              accept={b.captura ? "image/*" : TIPOS_IMAGEN.join(",")}
-              {...(b.captura ? { capture: "environment" as const } : { multiple: true })}
-              className="sr-only"
-              tabIndex={-1}
-              aria-label={b.etiqueta}
-              onChange={(e) => {
-                const lista = e.target.files;
-                void agregar(lista).finally(() => {
-                  e.target.value = "";
-                });
-              }}
-            />
-            <Boton
-              variante="fantasma"
-              icono
-              aria-label={b.etiqueta}
+          { icono: <Camera aria-hidden size={18} />, etiqueta: T.tomar(nombre), captura: true },
+          { icono: <ImagePlus aria-hidden size={18} />, etiqueta: T.elegir(nombre), captura: false },
+        ].map((b) => {
+          const deshabilitado = ocupado || fotos.length >= MAXIMO_POR_GRUPO;
+          return (
+            <label
+              key={b.etiqueta}
               title={b.etiqueta}
-              ocupado={ocupado && b.captura}
-              disabled={ocupado || fotos.length >= MAXIMO_POR_GRUPO}
-              onClick={() => b.ref.current?.click()}
+              className={cx(
+                "grid size-[44px] place-items-center rounded-md text-acento-700 focus-within:outline-2 focus-within:outline-acento",
+                deshabilitado ? "cursor-not-allowed opacity-45" : "cursor-pointer hover:bg-acento/10",
+              )}
             >
               {b.icono}
-            </Boton>
-          </span>
-        ))}
+              <input
+                type="file"
+                accept={b.captura ? "image/*" : TIPOS_IMAGEN.join(",")}
+                {...(b.captura ? { capture: "environment" as const } : { multiple: true })}
+                className="sr-only"
+                aria-label={b.etiqueta}
+                disabled={deshabilitado}
+                onChange={(e) => {
+                  const lista = e.target.files;
+                  void agregar(lista).finally(() => {
+                    e.target.value = "";
+                  });
+                }}
+              />
+            </label>
+          );
+        })}
       </div>
       {fotos.length > 0 && (
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-2 p-0">

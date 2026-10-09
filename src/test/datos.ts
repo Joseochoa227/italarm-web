@@ -352,3 +352,71 @@ export function vistaPreviaVenta(
     ...cambios,
   };
 }
+
+export function instalacion(cambios: Partial<S["InstalacionVista"]> = {}): S["InstalacionVista"] {
+  return {
+    id: 80,
+    consecutivo: "I-0001",
+    estado: "ACTIVA",
+    fecha: "2026-10-01",
+    moneda: "USD",
+    cliente: {
+      id: 20,
+      tipo: "INSTALADOR",
+      nombre: "Ferretería El Tornillo",
+      documento: "NIT 900111222-3",
+      telefono: "+573001234567",
+      direccion: "Calle 10 # 5-20",
+      ciudad: "Cúcuta",
+    },
+    direccion: "Carrera 5 # 1-10",
+    descripcion: "Instalación de 2 cámaras",
+    tecnicos: [{ id: 1, nombre: "Jose Ochoa" }],
+    tasas: { trm: "4000", fechaTrm: "2026-10-01", tasaVes: "50", fechaTasaVes: "2026-10-01" },
+    lineas: [
+      {
+        productoId: 10,
+        codigo: "CAM-D2",
+        descripcion: "Cámara domo 2MP",
+        unidad: "und",
+        cantidad: "1",
+        precioSugerido: usd("25.5000"),
+        precioUnitario: usd("25.5000"),
+        subtotal: usd("25.5000"),
+        costoUnitarioUsd: usd("17.5000"),
+        seriales: [{ id: 500, numero: "SN-0001", vencimientoGarantia: "2027-01-01" }],
+      },
+    ],
+    resumen: {
+      material: { usd: usd("25.5000") },
+      manoDeObra: { usd: usd("40.0000") },
+      subtotal: { usd: usd("65.5000") },
+      descuento: { usd: usd("0.0000") },
+      total: { usd: usd("65.5000"), cop: cop("262000.0000") },
+      costo: { usd: usd("17.5000") },
+      utilidad: { usd: usd("48.0000") },
+      porcentajeUtilidad: "73.28",
+    },
+    garantias: {
+      manoObraMeses: 3,
+      venceManoObra: "2027-01-01",
+      estadoManoObra: "VIGENTE",
+      venceEquipos: "2027-01-01",
+      estadoEquipos: "VIGENTE",
+      condiciones: "La garantía no cubre daños por mal uso.",
+    },
+    fotos: {
+      antes: [{ id: 1, url: "http://archivos.prueba/antes-1.webp" }],
+      durante: [],
+      despues: [],
+    },
+    total: usd("65.5000"),
+    utilidad: usd("48.0000"),
+    porcentajeUtilidad: "73.28",
+    monedasComprobante: [],
+    registradaPor: "Jose Ochoa",
+    registradaEn: "2026-10-01T15:00:00Z",
+    version: 0,
+    ...cambios,
+  };
+}
