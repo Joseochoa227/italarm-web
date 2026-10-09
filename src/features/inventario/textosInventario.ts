@@ -106,10 +106,7 @@ export const TEXTOS_INVENTARIO = {
     garantia: "Garantía hasta",
     movimientos: "Historial",
     reclamos: "Reclamos",
-    sinReclamos: "Sin reclamos.",
     sinMovimientos: "Sin movimientos.",
-    fueraDeGarantia: "Fuera de garantía",
-    solucion: (s: string) => `Solución: ${s}`,
     tipos: {
       ENTRADA: "Entrada",
       BAJA: "Baja",

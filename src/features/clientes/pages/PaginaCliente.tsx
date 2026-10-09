@@ -1,7 +1,8 @@
-import { FileText, MessageCircle, Pencil, ShoppingCart, Wrench } from "lucide-react";
+import { FileText, MessageCircle, Pencil, ShoppingCart, Wrench, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link, useParams } from "react-router";
 
+import { TEXTOS_GARANTIAS } from "@/features/garantias/textos";
 import { EnlaceDocumento } from "@/features/inventario/components/EnlaceDocumento";
 
 import { $api } from "@/api/cliente";
@@ -101,6 +102,12 @@ export function Component() {
         </Accion>
         <Accion a={`/cotizaciones/nueva${conCliente}`} icono={<FileText aria-hidden size={16} />}>
           {D.cotizacion}
+        </Accion>
+        <Accion
+          a={`/garantias?cliente=${String(id)}&clienteNombre=${encodeURIComponent(c.nombre ?? "")}`}
+          icono={<ShieldCheck aria-hidden size={16} />}
+        >
+          {TEXTOS_GARANTIAS.verGarantias}
         </Accion>
         <Accion a={`/clientes/${String(id)}/editar`} icono={<Pencil aria-hidden size={16} />}>
           {D.editar}

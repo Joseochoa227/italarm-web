@@ -127,6 +127,19 @@ describe("Historial del serial (RF-24)", () => {
           reclamos: [{ id: 1, fecha: "2026-10-05", problema: "No enciende", enGarantia: false }],
         }),
       ),
+      http.get("/api/v1/garantias/reclamos", ({ query, response }) => {
+        expect(query.get("serialId")).toBe("500");
+        return response(200).json([
+          {
+            id: 1,
+            fecha: "2026-10-05",
+            problema: "No enciende",
+            enGarantia: false,
+            serial: "SN-0001",
+            version: 0,
+          },
+        ]);
+      }),
     );
     renderizarApp({ ruta: "/seriales/500" });
 
@@ -145,7 +158,12 @@ describe("Historial del serial (RF-24)", () => {
     expect(venta).toHaveTextContent("VentaFerretería El Tornillo");
     expect(within(venta!).getByText("VEN-0001")).toBeVisible();
 
-    const reclamos = screen.getByRole("list", { name: "Reclamos" });
+    expect(screen.getByRole("button", { name: "Registrar reclamo" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Ver garantías" })).toHaveAttribute(
+      "href",
+      "/garantias?serial=SN-0001",
+    );
+    const reclamos = await screen.findByRole("list", { name: "Reclamos" });
     expect(within(reclamos).getByText("No enciende")).toBeVisible();
     expect(within(reclamos).getByText("Fuera de garantía")).toBeVisible();
   });

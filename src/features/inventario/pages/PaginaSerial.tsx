@@ -1,3 +1,4 @@
+import { ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
 import { useParams } from "react-router";
 
@@ -5,9 +6,12 @@ import { $api } from "@/api/cliente";
 import { errorDeConsultas } from "@/api/problema";
 import { CargandoLista } from "@/components/ui/CargandoLista";
 import { EncabezadoPagina } from "@/components/ui/EncabezadoPagina";
+import { EnlaceBoton } from "@/components/ui/EnlaceBoton";
 import { EstadoError } from "@/components/ui/EstadoError";
 import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Tarjeta } from "@/components/ui/Tarjeta";
+import { ListaReclamos, RegistrarReclamo } from "@/features/garantias/components/Reclamos";
+import { TEXTOS_GARANTIAS } from "@/features/garantias/textos";
 import { formatearFecha } from "@/lib/formato";
 
 import { EnlaceDocumento } from "../components/EnlaceDocumento";
@@ -31,7 +35,7 @@ export function Component() {
   const error = errorDeConsultas(consulta);
   if (error) return <EstadoError error={error} alReintentar={() => void consulta.refetch()} />;
   if (!consulta.data) return <CargandoLista filas={3} />;
-  const { serial, movimientos = [], reclamos = [] } = consulta.data;
+  const { serial, movimientos = [] } = consulta.data;
   const producto = serial?.producto;
 
   return (
@@ -99,25 +103,27 @@ export function Component() {
       </section>
 
       <section aria-labelledby="titulo-reclamos" className="flex flex-col gap-2">
-        <h2 id="titulo-reclamos" className="m-0 text-[22px]">
-          {T.reclamos}
-        </h2>
-        {reclamos.length === 0 ? (
-          <p className="m-0 text-sm text-neutro-700">{T.sinReclamos}</p>
-        ) : (
-          <ul aria-label={T.reclamos} className="m-0 flex list-none flex-col p-0">
-            {reclamos.map((r) => (
-              <li key={r.id} className="flex flex-col gap-0.5 border-b border-divisor py-2.5 text-sm">
-                <span className="flex flex-wrap items-center gap-2">
-                  <span className="text-neutro-700">{r.fecha ? formatearFecha(r.fecha) : ""}</span>
-                  {r.enGarantia === false && <Etiqueta tono="peligro">{T.fueraDeGarantia}</Etiqueta>}
-                </span>
-                <span>{r.problema}</span>
-                {r.solucion && <span className="text-neutro-700">{T.solucion(r.solucion)}</span>}
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 id="titulo-reclamos" className="m-0 flex-1 text-[22px]">
+            {T.reclamos}
+          </h2>
+          {serial?.numero && (
+            <EnlaceBoton
+              a={`/garantias?serial=${encodeURIComponent(serial.numero)}`}
+              icono={<ShieldCheck aria-hidden size={16} />}
+            >
+              {TEXTOS_GARANTIAS.verGarantias}
+            </EnlaceBoton>
+          )}
+          {serial?.documentoSalida && (
+            <RegistrarReclamo
+              sobre={T.titulo(serial.numero ?? "")}
+              objetivo={{ serialId: id }}
+              productoId={producto?.id}
+            />
+          )}
+        </div>
+        <ListaReclamos filtro={{ serialId: id }} />
       </section>
     </>
   );
