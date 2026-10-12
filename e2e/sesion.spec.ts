@@ -45,11 +45,11 @@ test("ingresar, recorrer el menú, cambiar la contraseña y cerrar sesión", asy
     await expect(menu.getByRole("link")).toHaveCount(8);
     await menu.getByRole("link", { name: "Reportes" }).click();
   }
-  await expect(page.getByText("Esta sección llega en la Fase 6")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Reportes" })).toBeVisible();
 
   // Recargar conserva la sesión (token en localStorage)
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Reportes" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Reportes" })).toBeVisible();
 
   // Cambiar la contraseña desde el menú de la cuenta
   await page.getByRole("button", { name: "Menú de tu cuenta" }).click();

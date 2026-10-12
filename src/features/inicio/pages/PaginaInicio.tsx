@@ -152,7 +152,7 @@ function Movimientos({ inicio }: { inicio: Inicio }) {
                 <span
                   className={cx(
                     "font-titulo text-lg font-semibold",
-                    m.anulado && "text-neutro-600 line-through",
+                    m.anulado && "text-neutro-700 line-through",
                   )}
                 >
                   {m.valor ? formatearDineroDe(m.valor) : ""}

@@ -45,7 +45,7 @@ function FilaVenta({ v }: { v: components["schemas"]["VentaResumenVista"] }) {
           {v.productos && <span className="text-xs text-neutro-700">{v.productos}</span>}
         </div>
         <div className="flex min-w-[140px] flex-col text-right">
-          <span className={anulada ? "font-medium text-neutro-600 line-through" : "font-medium"}>
+          <span className={anulada ? "font-medium text-neutro-700 line-through" : "font-medium"}>
             {v.total ? formatearDineroDe(v.total) : "—"}
           </span>
           {v.totalUsd && v.moneda !== "USD" && (

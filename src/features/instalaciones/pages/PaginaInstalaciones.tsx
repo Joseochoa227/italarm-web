@@ -60,7 +60,7 @@ function FilaInstalacion({ i }: { i: components["schemas"]["InstalacionResumenVi
           </span>
         </div>
         <div className="flex min-w-[140px] flex-col text-right">
-          <span className={anulada ? "font-medium text-neutro-600 line-through" : "font-medium"}>
+          <span className={anulada ? "font-medium text-neutro-700 line-through" : "font-medium"}>
             {i.total ? formatearDineroDe(i.total) : "—"}
           </span>
           {i.totalUsd && i.moneda !== "USD" && (

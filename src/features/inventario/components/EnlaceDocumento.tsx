@@ -9,7 +9,7 @@ export function EnlaceDocumento({
 }: {
   documento: components["schemas"]["DocumentoRef"] | undefined;
 }) {
-  if (!documento?.consecutivo) return <span className="text-neutro-500">—</span>;
+  if (!documento?.consecutivo) return <span className="text-neutro-700">—</span>;
   const ruta = rutaDocumento(documento);
   return ruta ? <Link to={ruta}>{documento.consecutivo}</Link> : <span>{documento.consecutivo}</span>;
 }

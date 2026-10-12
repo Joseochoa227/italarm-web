@@ -417,6 +417,16 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
     const cuerpo = () => peticion.postDataJSON() as Record<string, unknown>;
     const porId = (lista: Registro[]) => lista.find((r) => ruta.endsWith(`/${String(r.id)}`));
 
+    if (metodo === "GET" && ruta.endsWith("/excel")) {
+      const nombre = `${ruta.split("/").filter(Boolean).slice(0, -1).join("-")}-${HOY}.xlsx`;
+      return route.fulfill({
+        status: 200,
+        contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers: { ...CORS, "Content-Disposition": `attachment; filename="${nombre}"` },
+        body: "xlsx e2e",
+      });
+    }
+
     switch (`${metodo} ${ruta.replace(/\/\d+(?=\/|$)/g, "/{id}")}`) {
       case "GET /sesion":
         return json(route, 200, USUARIO);
@@ -1272,6 +1282,167 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
           contentType: "application/pdf",
           headers: { ...CORS, "Content-Disposition": 'attachment; filename="COT-0001.pdf"' },
           body: "%PDF-1.4 e2e",
+        });
+      case "GET /inicio": {
+        // Inicio simulado (Fase 6): indicadores del mes con las ventas e instalaciones registradas.
+        const activas = (lista: Registro[]) => lista.filter((r) => r.estado !== "ANULADA");
+        const totalUsd = (lista: Registro[]) =>
+          activas(lista).reduce(
+            (t, r) =>
+              t + Number((r.resumen as { total?: { usd?: Dinero } } | undefined)?.total?.usd?.monto ?? 0),
+            0,
+          );
+        const utilidadUsd = [...activas(estado.ventas), ...activas(estado.instalaciones)].reduce(
+          (t, r) => t + Number((r.utilidad as Dinero | undefined)?.monto ?? 0),
+          0,
+        );
+        const bajos = estado.productos.filter((p) => Number(p.stockMinimo ?? 0) > stockDe(p));
+        const valor = estado.productos.reduce((t, p) => t + (costoDe(p) ?? 0) * stockDe(p), 0);
+        const movimientos = [
+          ...estado.ventas.map((r) => ({ r, tipo: "VENTA" })),
+          ...estado.instalaciones.map((r) => ({ r, tipo: "INSTALACION" })),
+          ...estado.compras.map((r) => ({ r, tipo: "COMPRA" })),
+        ]
+          .reverse()
+          .slice(0, 10)
+          .map(({ r, tipo }) => ({
+            tipo,
+            id: r.id,
+            consecutivo: r.consecutivo,
+            detalle:
+              (r.cliente as { nombre?: string } | undefined)?.nombre ??
+              (r.proveedor as { nombre?: string } | undefined)?.nombre,
+            usuario: USUARIO.nombre,
+            registradoEn: r.registradaEn ?? new Date().toISOString(),
+            valor: r.total,
+            anulado: r.estado === "ANULADA",
+          }));
+        const enEvaluacion = estado.cotizaciones.filter((r) => r.estado === "EN_EVALUACION");
+        return json(route, 200, {
+          usuario: USUARIO.nombre,
+          hoy: HOY,
+          avisosTasas:
+            estado.bolivar.fecha === HOY
+              ? []
+              : [{ par: "USD_VES", mensaje: "No se ha registrado la tasa del bolívar de hoy." }],
+          tasas: vigentes(),
+          indicadores: {
+            ventas: {
+              cantidad: activas(estado.ventas).length,
+              total: enMonedas(totalUsd(estado.ventas)),
+              porMoneda: [],
+            },
+            instalaciones: {
+              cantidad: activas(estado.instalaciones).length,
+              total: enMonedas(totalUsd(estado.instalaciones)),
+              porMoneda: [],
+            },
+            utilidad: { total: enMonedas(utilidadUsd), porcentaje: "0" },
+            inventario: {
+              productos: estado.productos.filter((p) => stockDe(p) > 0).length,
+              valor: enMonedas(valor),
+              fecha: HOY,
+            },
+          },
+          stockBajo: bajos.map((p) => ({
+            productoId: p.id,
+            codigo: p.codigo,
+            nombre: p.nombre,
+            unidad: unidadDe(p),
+            stock: cantidadTexto(stockDe(p)),
+            minimo: String(p.stockMinimo),
+            nivel: String(Math.round((stockDe(p) / Number(p.stockMinimo)) * 100)),
+          })),
+          totalStockBajo: bajos.length,
+          garantiasPorVencer: [],
+          totalGarantiasPorVencer: 0,
+          cotizacionesEnEvaluacion: enEvaluacion.map((r) => ({
+            ...r,
+            cliente: (r.cliente as { nombre?: string } | undefined)?.nombre,
+          })),
+          totalCotizacionesEnEvaluacion: enEvaluacion.length,
+          ultimosMovimientos: movimientos,
+        });
+      }
+      case "GET /reportes/periodo": {
+        const tipo = url.searchParams.get("tipo") ?? "MES";
+        const fecha = url.searchParams.get("fecha") ?? HOY;
+        const [a, m] = fecha.split("-").map(Number);
+        const inicioMes = (anio: number, mes: number) =>
+          new Date(Date.UTC(anio, mes - 1, 1)).toISOString().slice(0, 10);
+        const finMes = (anio: number, mes: number) =>
+          new Date(Date.UTC(anio, mes, 0)).toISOString().slice(0, 10);
+        const anio = a ?? 2026;
+        const mes = m ?? 1;
+        const total = (lista: Registro[]) =>
+          lista
+            .filter((r) => r.estado !== "ANULADA")
+            .reduce(
+              (t, r) =>
+                t + Number((r.resumen as { total?: { usd?: Dinero } } | undefined)?.total?.usd?.monto ?? 0),
+              0,
+            );
+        return json(route, 200, {
+          tipo,
+          desde: tipo === "ANIO" ? `${String(anio)}-01-01` : inicioMes(anio, mes),
+          hasta: tipo === "ANIO" ? `${String(anio)}-12-31` : finMes(anio, mes),
+          anterior:
+            tipo === "ANIO"
+              ? { desde: `${String(anio - 1)}-01-01`, hasta: `${String(anio - 1)}-12-31` }
+              : {
+                  desde: inicioMes(mes === 1 ? anio - 1 : anio, mes === 1 ? 12 : mes - 1),
+                  hasta: finMes(mes === 1 ? anio - 1 : anio, mes === 1 ? 12 : mes - 1),
+                },
+          siguiente:
+            tipo === "ANIO"
+              ? { desde: `${String(anio + 1)}-01-01`, hasta: `${String(anio + 1)}-12-31` }
+              : {
+                  desde: inicioMes(mes === 12 ? anio + 1 : anio, mes === 12 ? 1 : mes + 1),
+                  hasta: finMes(mes === 12 ? anio + 1 : anio, mes === 12 ? 1 : mes + 1),
+                },
+          agrupacion: tipo === "ANIO" ? "MES" : "SEMANA",
+          indicadores: {
+            ventas: { cantidad: estado.ventas.length, total: enMonedas(total(estado.ventas)), porMoneda: [] },
+            instalaciones: {
+              cantidad: estado.instalaciones.length,
+              total: enMonedas(total(estado.instalaciones)),
+              porMoneda: [],
+            },
+            utilidad: { total: enMonedas(0), porcentaje: "0" },
+            inventario: { productos: estado.productos.length, valor: enMonedas(0), fecha: HOY },
+          },
+          serie: [
+            {
+              etiqueta: "Semana 1",
+              desde: inicioMes(anio, mes),
+              hasta: inicioMes(anio, mes),
+              ventas: estado.ventas.length,
+              totalVentas: usd(total(estado.ventas)),
+              instalaciones: estado.instalaciones.length,
+              totalInstalaciones: usd(total(estado.instalaciones)),
+            },
+          ],
+          masVendidos: [],
+          masInstalados: [],
+          comprasPorProveedor: [],
+          totalCompras: usd(0),
+          stockBajo: [],
+          cotizaciones: { total: estado.cotizaciones.length, porEstado: [], porcentajeAprobadas: "0" },
+        });
+      }
+      case "GET /reportes/utilidad":
+        return json(route, 200, {
+          documentos: pagina([]),
+          totalUsd: usd(0),
+          costoUsd: usd(0),
+          utilidadUsd: usd(0),
+        });
+      case "GET /reportes/seriales":
+        return json(route, 200, {
+          porEstado: [
+            { estado: "EN_BODEGA", cantidad: estado.seriales.filter((x) => x.estado === "EN_BODEGA").length },
+          ],
+          seriales: pagina(estado.seriales.map(serialVista)),
         });
       case "GET /carga-inicial":
         return json(route, 200, estado.cargas);
