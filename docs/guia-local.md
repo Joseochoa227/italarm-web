@@ -76,6 +76,8 @@ npm install        # solo la primera vez o después de un git pull
 npm run dev
 ```
 
+Si PowerShell dice que "la ejecución de scripts está deshabilitada", ejecuta una sola vez `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` (responde S) y repite el comando; o escribe `npm.cmd` en lugar de `npm`.
+
 Abre http://localhost:5173 e ingresa con tu correo y la contraseña inicial. Cámbiala después desde el menú de tu cuenta (Cambiar contraseña).
 
 Para apagar todo: `Ctrl + C` en cada ventana y `docker compose stop` en la carpeta `italarm-api`. Los datos quedan guardados para la próxima vez.
@@ -130,16 +132,17 @@ Antes de empezar las pruebas, y cuando quieras guardar un punto al que volver, h
 
 ## 7. Problemas comunes
 
-| Qué pasa                                                 | Qué hacer                                                                                                     |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `docker compose up` falla o dice que no encuentra Docker | Abre Docker Desktop y espera a que diga "Engine running".                                                     |
-| "Port 8080 (o 5173) is already in use"                   | Ya hay otra API o aplicación abierta: ciérrala (`Ctrl + C` en su ventana) o reinicia el computador.           |
-| La aplicación dice que no hay conexión con el servidor   | La API no está corriendo o no terminó de arrancar: revisa su ventana.                                         |
-| "Tu sesión terminó. Ingresa de nuevo."                   | Se cambió la contraseña o se cerró la sesión en otro equipo: vuelve a ingresar.                               |
-| Inicio avisa que no llegó la TRM                         | Sin internet, la API no consulta la TRM oficial. Regístrala a mano en **Tasas de cambio**.                    |
-| `.\mvnw.cmd` dice que no encuentra Java                  | Cierra y abre PowerShell después de instalar el JDK. Si sigue, reinstala Temurin 21 marcando "Set JAVA_HOME". |
-| `npm install` falla                                      | Comprueba `node --version` (v22) y vuelve a intentar.                                                         |
-| Desde el celular no abre                                 | Mismo Wi-Fi (no la red de invitados), la IP correcta y el firewall (paso 5.4).                                |
+| Qué pasa                                                                                     | Qué hacer                                                                                                                                                                        |
+| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docker compose up` falla o dice que no encuentra Docker                                     | Abre Docker Desktop y espera a que diga "Engine running".                                                                                                                        |
+| "Port 8080 (o 5173) is already in use"                                                       | Ya hay otra API o aplicación abierta: ciérrala (`Ctrl + C` en su ventana) o reinicia el computador.                                                                              |
+| La aplicación dice que no hay conexión con el servidor                                       | La API no está corriendo o no terminó de arrancar: revisa su ventana.                                                                                                            |
+| "Tu sesión terminó. Ingresa de nuevo."                                                       | Se cambió la contraseña o se cerró la sesión en otro equipo: vuelve a ingresar.                                                                                                  |
+| Inicio avisa que no llegó la TRM                                                             | Sin internet, la API no consulta la TRM oficial. Regístrala a mano en **Tasas de cambio**.                                                                                       |
+| `.\mvnw.cmd` dice que no encuentra Java                                                      | Cierra y abre PowerShell después de instalar el JDK. Si sigue, reinstala Temurin 21 marcando "Set JAVA_HOME".                                                                    |
+| "No se puede cargar el archivo …\\npm.ps1 porque la ejecución de scripts está deshabilitada" | Windows bloquea los scripts de PowerShell. Una sola vez: `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` (responde S). O usa `npm.cmd` en lugar de `npm`. |
+| `npm install` falla                                                                          | Comprueba `node --version` (v22) y vuelve a intentar.                                                                                                                            |
+| Desde el celular no abre                                                                     | Mismo Wi-Fi (no la red de invitados), la IP correcta y el firewall (paso 5.4).                                                                                                   |
 
 ## 8. Lista de verificación de la Fase 6
 
