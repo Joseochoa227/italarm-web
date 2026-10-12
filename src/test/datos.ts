@@ -704,3 +704,81 @@ export function inicio(cambios: Partial<S["InicioVista"]> = {}): S["InicioVista"
     ...cambios,
   });
 }
+
+/** Reporte de octubre de 2026 (mes), con su serie por semanas. */
+export function reportePeriodo(cambios: Partial<S["ReportePeriodoVista"]> = {}): S["ReportePeriodoVista"] {
+  return {
+    tipo: "MES",
+    desde: "2026-10-01",
+    hasta: "2026-10-31",
+    anterior: { desde: "2026-09-01", hasta: "2026-09-30" },
+    siguiente: { desde: "2026-11-01", hasta: "2026-11-30" },
+    agrupacion: "SEMANA",
+    indicadores: INDICADORES,
+    serie: [
+      {
+        etiqueta: "1–4 oct",
+        desde: "2026-10-01",
+        hasta: "2026-10-04",
+        ventas: 5,
+        totalVentas: usd("500.0000"),
+        instalaciones: 1,
+        totalInstalaciones: usd("1000.0000"),
+      },
+      {
+        etiqueta: "5–11 oct",
+        desde: "2026-10-05",
+        hasta: "2026-10-11",
+        ventas: 18,
+        totalVentas: usd("1652.0000"),
+        instalaciones: 5,
+        totalInstalaciones: usd("1901.0000"),
+      },
+    ],
+    masVendidos: [
+      {
+        productoId: 10,
+        codigo: "CAM-D2",
+        nombre: "Cámara domo 2MP",
+        cantidad: "40",
+        unidad: "und",
+        valor: usd("1020.0000"),
+      },
+      {
+        productoId: 11,
+        codigo: "CAB-UTP",
+        nombre: "Cable UTP",
+        cantidad: "850.5",
+        unidad: "m",
+        valor: usd("425.2500"),
+      },
+    ],
+    masInstalados: [],
+    comprasPorProveedor: [
+      { proveedorId: 30, proveedor: "Distribuidora Andina", compras: 3, total: usd("3000.0000") },
+      { proveedorId: 31, proveedor: "Importadora Norte", compras: 1, total: usd("750.0000") },
+    ],
+    totalCompras: usd("3750.0000"),
+    stockBajo: [
+      {
+        productoId: 11,
+        codigo: "CAB-UTP",
+        nombre: "Cable UTP",
+        unidad: "m",
+        stock: "50",
+        minimo: "200",
+        nivel: "25",
+      },
+    ],
+    cotizaciones: {
+      total: 10,
+      porcentajeAprobadas: "60.00",
+      porEstado: [
+        { estado: "APROBADA", cantidad: 2 },
+        { estado: "CONVERTIDA", cantidad: 4 },
+        { estado: "RECHAZADA", cantidad: 4 },
+      ],
+    },
+    ...cambios,
+  };
+}
