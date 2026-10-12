@@ -251,6 +251,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/compras/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Listado de compras en Excel
+         * @description Mismos filtros del listado, sin paginar. Error: EXPORTACION_MUY_GRANDE (422).
+         */
+        get: operations["excel_5"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/compras/vista-previa": {
         parameters: {
             query?: never;
@@ -409,6 +429,26 @@ export interface paths {
          * @description La fecha es hoy y no toca el inventario (RN-11). Con la misma Idempotency-Key devuelve la cotización ya creada. Errores (400): COTIZACION_SIN_LINEAS, COTIZACION_VACIA, COTIZACION_SIN_DESCRIPCION, COTIZACION_MANO_OBRA_EN_VENTA, COTIZACION_VALIDEZ_INVALIDA, COTIZACION_PRODUCTO_REPETIDO, DESCUENTO_INVALIDO, PRECIO_INVALIDO, CLIENTE_NO_EXISTE, PRODUCTO_NO_EXISTE; (422) PRODUCTO_INACTIVO, TASA_NO_DISPONIBLE.
          */
         post: operations["registrar_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cotizaciones/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Listado de cotizaciones en Excel
+         * @description Mismos filtros del listado, sin paginar. Error: EXPORTACION_MUY_GRANDE (422).
+         */
+        get: operations["excel_4"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -633,6 +673,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/garantias/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Consulta de garantías en Excel
+         * @description Mismos filtros de la consulta. Error: EXPORTACION_MUY_GRANDE (422).
+         */
+        get: operations["excel_3"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/garantias/reclamos": {
         parameters: {
             query?: never;
@@ -674,6 +734,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inicio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Todo lo de la pantalla de Inicio en una petición
+         * @description Saludo, avisos de tasas, indicadores del mes en USD con sus equivalentes, stock bajo, garantías y cotizaciones por vencer y últimos movimientos. Cada bloque trae máximo 10 filas y su total.
+         */
+        get: operations["inicio"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/instalaciones": {
         parameters: {
             query?: never;
@@ -692,6 +772,26 @@ export interface paths {
          * @description Con la misma Idempotency-Key devuelve la instalación ya creada. Errores (400): INSTALACION_FECHA_FUTURA, INSTALACION_VACIA, INSTALACION_SIN_TECNICOS, INSTALACION_GARANTIA_INVALIDA, INSTALACION_PRODUCTO_REPETIDO, TECNICO_NO_EXISTE, CLIENTE_NO_EXISTE, PRODUCTO_NO_EXISTE, CANTIDAD_INVALIDA, SERIALES_NO_COINCIDEN, DESCUENTO_INVALIDO, PRECIO_INVALIDO; (422) STOCK_INSUFICIENTE, SERIAL_NO_DISPONIBLE, PRODUCTO_INACTIVO, TASA_NO_DISPONIBLE.
          */
         post: operations["registrar_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/instalaciones/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Listado de instalaciones en Excel
+         * @description Mismos filtros del listado, sin paginar. Error: EXPORTACION_MUY_GRANDE (422).
+         */
+        get: operations["excel_2"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -853,6 +953,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inventario/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Inventario valorizado en Excel
+         * @description Mismos filtros del listado, sin paginar. Error: EXPORTACION_MUY_GRANDE (422).
+         */
+        get: operations["excel_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inventario/productos/{id}": {
         parameters: {
             query?: never;
@@ -907,6 +1027,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inventario/productos/{id}/kardex/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Kárdex del producto en Excel, del movimiento más antiguo al más reciente */
+        get: operations["kardexExcel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inventario/productos/{id}/seriales": {
         parameters: {
             query?: never;
@@ -915,7 +1052,7 @@ export interface paths {
             cookie?: never;
         };
         /** Seriales del producto, todos o de un estado */
-        get: operations["seriales"];
+        get: operations["seriales_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1066,6 +1203,117 @@ export interface paths {
          * @description Además: MODIFICADO_POR_OTRO_USUARIO (409).
          */
         put: operations["actualizar_2"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/periodo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reporte del período
+         * @description tipo SEMANA (lunes a domingo), MES o ANIO alrededor de fecha (hoy si falta), o tipo=RANGO con desde y hasta. Sin parámetros, el mes en curso. Error: PERIODO_INVALIDO (400).
+         */
+        get: operations["periodo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/periodo/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reporte del período en Excel, una hoja por bloque */
+        get: operations["periodoExcel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/seriales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Seriales en bodega, vendidos e instalados
+         * @description Conteo por estado y listado paginado, del más reciente al más antiguo.
+         */
+        get: operations["seriales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/seriales/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Seriales en Excel */
+        get: operations["serialesExcel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/utilidad": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Utilidad por venta e instalación
+         * @description Mismo período que /periodo. tipo: VENTA o INSTALACION (vacío, ambas). Orden por fecha, o por utilidad con ordenarPorUtilidad=true.
+         */
+        get: operations["utilidad"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/utilidad/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Utilidad por documento en Excel */
+        get: operations["utilidadExcel"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1458,6 +1706,26 @@ export interface paths {
          * @description La fecha es hoy. Con la misma Idempotency-Key devuelve la venta ya creada. Errores (400): CANTIDAD_INVALIDA, SERIALES_NO_COINCIDEN, DESCUENTO_INVALIDO, VENTA_PRODUCTO_REPETIDO, PRECIO_INVALIDO, CLIENTE_NO_EXISTE, PRODUCTO_NO_EXISTE; (422) STOCK_INSUFICIENTE, SERIAL_NO_DISPONIBLE, PRODUCTO_INACTIVO, TASA_NO_DISPONIBLE.
          */
         post: operations["registrar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ventas/excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Listado de ventas en Excel
+         * @description Mismos filtros del listado, sin paginar. Error: EXPORTACION_MUY_GRANDE (422).
+         */
+        get: operations["excel"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2075,6 +2343,55 @@ export interface components {
             tipo?: string;
             usuario?: string;
         };
+        IndicadoresVista: {
+            instalaciones?: components["schemas"]["IndicadoresVistaDocumentos"];
+            inventario?: components["schemas"]["IndicadoresVistaInventarioValorizado"];
+            utilidad?: components["schemas"]["IndicadoresVistaUtilidad"];
+            ventas?: components["schemas"]["IndicadoresVistaDocumentos"];
+        };
+        IndicadoresVistaDocumentos: {
+            /** Format: int64 */
+            cantidad?: number;
+            porMoneda?: components["schemas"]["Dinero"][];
+            total?: components["schemas"]["MontoEnMonedas"];
+        };
+        IndicadoresVistaInventarioValorizado: {
+            /** Format: date */
+            fecha?: string;
+            /** Format: int64 */
+            productos?: number;
+            valor?: components["schemas"]["MontoEnMonedas"];
+        };
+        IndicadoresVistaUtilidad: {
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            porcentaje?: string;
+            total?: components["schemas"]["MontoEnMonedas"];
+        };
+        InicioVista: {
+            avisosTasas?: components["schemas"]["InicioVistaAvisoTasa"][];
+            cotizacionesEnEvaluacion?: components["schemas"]["CotizacionResumenVista"][];
+            garantiasPorVencer?: components["schemas"]["GarantiaVista"][];
+            /** Format: date */
+            hoy?: string;
+            indicadores?: components["schemas"]["IndicadoresVista"];
+            stockBajo?: components["schemas"]["StockBajoVista"][];
+            tasas?: components["schemas"]["TasasVigentesVista"];
+            /** Format: int64 */
+            totalCotizacionesEnEvaluacion?: number;
+            /** Format: int64 */
+            totalGarantiasPorVencer?: number;
+            /** Format: int64 */
+            totalStockBajo?: number;
+            ultimosMovimientos?: components["schemas"]["MovimientoRecienteVista"][];
+            usuario?: string;
+        };
+        InicioVistaAvisoTasa: {
+            mensaje?: string;
+            par?: string;
+        };
         InstalacionResumenVista: {
             cliente?: string;
             /** Format: int64 */
@@ -2341,6 +2658,18 @@ export interface components {
             tipoEtiqueta?: string;
             usuario?: string;
         };
+        MovimientoRecienteVista: {
+            anulado?: boolean;
+            consecutivo?: string;
+            detalle?: string;
+            /** Format: int64 */
+            id?: number;
+            /** Format: date-time */
+            registradoEn?: string;
+            tipo?: string;
+            usuario?: string;
+            valor?: components["schemas"]["Dinero"];
+        };
         MovimientosClienteMovimiento: {
             consecutivo?: string;
             descripcion?: string;
@@ -2462,8 +2791,30 @@ export interface components {
             /** Format: int32 */
             totalPaginas?: number;
         };
+        PaginaReporteSerialesVistaSerial: {
+            contenido?: components["schemas"]["ReporteSerialesVistaSerial"][];
+            /** Format: int32 */
+            pagina?: number;
+            /** Format: int32 */
+            tamano?: number;
+            /** Format: int64 */
+            totalElementos?: number;
+            /** Format: int32 */
+            totalPaginas?: number;
+        };
         PaginaTasaVista: {
             contenido?: components["schemas"]["TasaVista"][];
+            /** Format: int32 */
+            pagina?: number;
+            /** Format: int32 */
+            tamano?: number;
+            /** Format: int64 */
+            totalElementos?: number;
+            /** Format: int32 */
+            totalPaginas?: number;
+        };
+        PaginaUtilidadDocumentoVista: {
+            contenido?: components["schemas"]["UtilidadDocumentoVista"][];
             /** Format: int32 */
             pagina?: number;
             /** Format: int32 */
@@ -2627,6 +2978,122 @@ export interface components {
             id?: number;
             problema?: string;
             solucion?: string;
+        };
+        ReportePeriodoVista: {
+            agrupacion?: string;
+            anterior?: components["schemas"]["ReportePeriodoVistaPeriodoVista"];
+            comprasPorProveedor?: components["schemas"]["ReportePeriodoVistaCompraProveedor"][];
+            cotizaciones?: components["schemas"]["ReportePeriodoVistaCotizaciones"];
+            /** Format: date */
+            desde?: string;
+            /** Format: date */
+            hasta?: string;
+            indicadores?: components["schemas"]["IndicadoresVista"];
+            masInstalados?: components["schemas"]["ReportePeriodoVistaProductoTop"][];
+            masVendidos?: components["schemas"]["ReportePeriodoVistaProductoTop"][];
+            serie?: components["schemas"]["ReportePeriodoVistaBarra"][];
+            siguiente?: components["schemas"]["ReportePeriodoVistaPeriodoVista"];
+            stockBajo?: components["schemas"]["StockBajoVista"][];
+            tipo?: string;
+            totalCompras?: components["schemas"]["Dinero"];
+        };
+        ReportePeriodoVistaBarra: {
+            /** Format: date */
+            desde?: string;
+            etiqueta?: string;
+            /** Format: date */
+            hasta?: string;
+            /** Format: int64 */
+            instalaciones?: number;
+            totalInstalaciones?: components["schemas"]["Dinero"];
+            totalVentas?: components["schemas"]["Dinero"];
+            /** Format: int64 */
+            ventas?: number;
+        };
+        ReportePeriodoVistaCompraProveedor: {
+            /** Format: int64 */
+            compras?: number;
+            proveedor?: string;
+            /** Format: int64 */
+            proveedorId?: number;
+            total?: components["schemas"]["Dinero"];
+        };
+        ReportePeriodoVistaCotizaciones: {
+            porEstado?: components["schemas"]["ReportePeriodoVistaPorEstado"][];
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            porcentajeAprobadas?: string;
+            /** Format: int64 */
+            total?: number;
+        };
+        ReportePeriodoVistaPeriodoVista: {
+            /** Format: date */
+            desde?: string;
+            /** Format: date */
+            hasta?: string;
+        };
+        ReportePeriodoVistaPorEstado: {
+            /** Format: int64 */
+            cantidad?: number;
+            estado?: string;
+        };
+        ReportePeriodoVistaProductoTop: {
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            cantidad?: string;
+            codigo?: string;
+            nombre?: string;
+            /** Format: int64 */
+            productoId?: number;
+            unidad?: string;
+            valor?: components["schemas"]["Dinero"];
+        };
+        ReporteSerialesVista: {
+            porEstado?: components["schemas"]["ReporteSerialesVistaPorEstado"][];
+            seriales?: components["schemas"]["PaginaReporteSerialesVistaSerial"];
+        };
+        ReporteSerialesVistaPorEstado: {
+            /** Format: int64 */
+            cantidad?: number;
+            estado?: string;
+        };
+        ReporteSerialesVistaSerial: {
+            codigoProducto?: string;
+            entrada?: string;
+            estado?: string;
+            /** Format: date */
+            fechaEntrada?: string;
+            /** Format: int64 */
+            id?: number;
+            numero?: string;
+            producto?: string;
+            /** Format: int64 */
+            productoId?: number;
+            salida?: string;
+            /** Format: int64 */
+            salidaId?: number;
+            salidaTipo?: string;
+            /** Format: date */
+            vencimientoGarantia?: string;
+        };
+        ReporteUtilidadVista: {
+            costoUsd?: components["schemas"]["Dinero"];
+            /** Format: date */
+            desde?: string;
+            documentos?: components["schemas"]["PaginaUtilidadDocumentoVista"];
+            /** Format: date */
+            hasta?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            porcentajeUtilidad?: string;
+            totalUsd?: components["schemas"]["Dinero"];
+            utilidadUsd?: components["schemas"]["Dinero"];
         };
         RespuestaIngreso: {
             /** @description Token de sesión. Se entrega una sola vez. */
@@ -3061,6 +3528,28 @@ export interface components {
             /** @enum {string} */
             moneda: "USD" | "COP" | "VES";
         };
+        StockBajoVista: {
+            codigo?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            minimo?: string;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            nivel?: string;
+            nombre?: string;
+            /** Format: int64 */
+            productoId?: number;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            stock?: string;
+            unidad?: string;
+        };
         TasaVigenteVista: {
             aviso?: string;
             esDeHoy?: boolean;
@@ -3184,6 +3673,28 @@ export interface components {
             nombre?: string;
             /** Format: int64 */
             version?: number;
+        };
+        UtilidadDocumentoVista: {
+            cliente?: string;
+            /** Format: int64 */
+            clienteId?: number;
+            consecutivo?: string;
+            costo?: components["schemas"]["Dinero"];
+            costoUsd?: components["schemas"]["Dinero"];
+            /** Format: date */
+            fecha?: string;
+            /** Format: int64 */
+            id?: number;
+            /**
+             * Format: decimal
+             * @example 19.5000
+             */
+            porcentajeUtilidad?: string;
+            tipo?: string;
+            total?: components["schemas"]["Dinero"];
+            totalUsd?: components["schemas"]["Dinero"];
+            utilidad?: components["schemas"]["Dinero"];
+            utilidadUsd?: components["schemas"]["Dinero"];
         };
         VariacionVista: {
             /**
@@ -3410,6 +3921,12 @@ export type GarantiasInstalacionVista = components['schemas']['GarantiasInstalac
 export type HistorialClienteVista = components['schemas']['HistorialClienteVista'];
 export type HistorialSerialVista = components['schemas']['HistorialSerialVista'];
 export type HistorialSerialVistaMovimiento = components['schemas']['HistorialSerialVistaMovimiento'];
+export type IndicadoresVista = components['schemas']['IndicadoresVista'];
+export type IndicadoresVistaDocumentos = components['schemas']['IndicadoresVistaDocumentos'];
+export type IndicadoresVistaInventarioValorizado = components['schemas']['IndicadoresVistaInventarioValorizado'];
+export type IndicadoresVistaUtilidad = components['schemas']['IndicadoresVistaUtilidad'];
+export type InicioVista = components['schemas']['InicioVista'];
+export type InicioVistaAvisoTasa = components['schemas']['InicioVistaAvisoTasa'];
 export type InstalacionResumenVista = components['schemas']['InstalacionResumenVista'];
 export type InstalacionVista = components['schemas']['InstalacionVista'];
 export type InstalacionVistaAnulacion = components['schemas']['InstalacionVistaAnulacion'];
@@ -3429,6 +3946,7 @@ export type ListadoVentasVista = components['schemas']['ListadoVentasVista'];
 export type ListadoVentasVistaTotalMoneda = components['schemas']['ListadoVentasVistaTotalMoneda'];
 export type MontoEnMonedas = components['schemas']['MontoEnMonedas'];
 export type MovimientoKardexVista = components['schemas']['MovimientoKardexVista'];
+export type MovimientoRecienteVista = components['schemas']['MovimientoRecienteVista'];
 export type MovimientosClienteMovimiento = components['schemas']['MovimientosClienteMovimiento'];
 export type PaginaAjusteVista = components['schemas']['PaginaAjusteVista'];
 export type PaginaClienteVista = components['schemas']['PaginaClienteVista'];
@@ -3440,7 +3958,9 @@ export type PaginaInventarioVistaProducto = components['schemas']['PaginaInventa
 export type PaginaMovimientoKardexVista = components['schemas']['PaginaMovimientoKardexVista'];
 export type PaginaProductoVista = components['schemas']['PaginaProductoVista'];
 export type PaginaProveedorVista = components['schemas']['PaginaProveedorVista'];
+export type PaginaReporteSerialesVistaSerial = components['schemas']['PaginaReporteSerialesVistaSerial'];
 export type PaginaTasaVista = components['schemas']['PaginaTasaVista'];
+export type PaginaUtilidadDocumentoVista = components['schemas']['PaginaUtilidadDocumentoVista'];
 export type PaginaVentaResumenVista = components['schemas']['PaginaVentaResumenVista'];
 export type ProblemDetail = components['schemas']['ProblemDetail'];
 export type ProductoInventarioVista = components['schemas']['ProductoInventarioVista'];
@@ -3451,6 +3971,17 @@ export type ProductoVistaReferencia = components['schemas']['ProductoVistaRefere
 export type ProveedorVista = components['schemas']['ProveedorVista'];
 export type ReclamoVista = components['schemas']['ReclamoVista'];
 export type ReclamosSerialReclamo = components['schemas']['ReclamosSerialReclamo'];
+export type ReportePeriodoVista = components['schemas']['ReportePeriodoVista'];
+export type ReportePeriodoVistaBarra = components['schemas']['ReportePeriodoVistaBarra'];
+export type ReportePeriodoVistaCompraProveedor = components['schemas']['ReportePeriodoVistaCompraProveedor'];
+export type ReportePeriodoVistaCotizaciones = components['schemas']['ReportePeriodoVistaCotizaciones'];
+export type ReportePeriodoVistaPeriodoVista = components['schemas']['ReportePeriodoVistaPeriodoVista'];
+export type ReportePeriodoVistaPorEstado = components['schemas']['ReportePeriodoVistaPorEstado'];
+export type ReportePeriodoVistaProductoTop = components['schemas']['ReportePeriodoVistaProductoTop'];
+export type ReporteSerialesVista = components['schemas']['ReporteSerialesVista'];
+export type ReporteSerialesVistaPorEstado = components['schemas']['ReporteSerialesVistaPorEstado'];
+export type ReporteSerialesVistaSerial = components['schemas']['ReporteSerialesVistaSerial'];
+export type ReporteUtilidadVista = components['schemas']['ReporteUtilidadVista'];
 export type RespuestaIngreso = components['schemas']['RespuestaIngreso'];
 export type ResultadoCargaVista = components['schemas']['ResultadoCargaVista'];
 export type ResultadoCargaVistaResumen = components['schemas']['ResultadoCargaVistaResumen'];
@@ -3489,6 +4020,7 @@ export type SolicitudUnidadMedida = components['schemas']['SolicitudUnidadMedida
 export type SolicitudVenta = components['schemas']['SolicitudVenta'];
 export type SolicitudVistaPrevia = components['schemas']['SolicitudVistaPrevia'];
 export type SolicitudVistaPreviaCompra = components['schemas']['SolicitudVistaPreviaCompra'];
+export type StockBajoVista = components['schemas']['StockBajoVista'];
 export type TasaVigenteVista = components['schemas']['TasaVigenteVista'];
 export type TasaVista = components['schemas']['TasaVista'];
 export type TasaVistaCorreccionVista = components['schemas']['TasaVistaCorreccionVista'];
@@ -3499,6 +4031,7 @@ export type UnidadMedidaVista = components['schemas']['UnidadMedidaVista'];
 export type UsuarioActual = components['schemas']['UsuarioActual'];
 export type UsuarioReferencia = components['schemas']['UsuarioReferencia'];
 export type UsuarioVista = components['schemas']['UsuarioVista'];
+export type UtilidadDocumentoVista = components['schemas']['UtilidadDocumentoVista'];
 export type VariacionVista = components['schemas']['VariacionVista'];
 export type VentaResumenVista = components['schemas']['VentaResumenVista'];
 export type VentaVista = components['schemas']['VentaVista'];
@@ -3985,6 +4518,32 @@ export interface operations {
             };
         };
     };
+    excel_5: {
+        parameters: {
+            query?: {
+                proveedorId?: number;
+                productoId?: number;
+                desde?: string;
+                hasta?: string;
+                incluirAnuladas?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
     vistaPrevia_4: {
         parameters: {
             query?: never;
@@ -4281,6 +4840,33 @@ export interface operations {
             };
         };
     };
+    excel_4: {
+        parameters: {
+            query?: {
+                estado?: "BORRADOR" | "EN_EVALUACION" | "APROBADA" | "CONVERTIDA" | "RECHAZADA" | "VENCIDA";
+                clienteId?: number;
+                tipo?: "VENTA" | "INSTALACION";
+                desde?: string;
+                hasta?: string;
+                porVencer?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
     vistaPrevia_3: {
         parameters: {
             query?: never;
@@ -4569,6 +5155,32 @@ export interface operations {
             };
         };
     };
+    excel_3: {
+        parameters: {
+            query?: {
+                estado?: "VIGENTE" | "POR_VENCER" | "VENCIDA";
+                clienteId?: number;
+                /** @description INSTALACION o VENTA */
+                tipo?: string;
+                serial?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
     reclamos: {
         parameters: {
             query?: {
@@ -4643,6 +5255,26 @@ export interface operations {
             };
         };
     };
+    inicio: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InicioVista"];
+                };
+            };
+        };
+    };
     listar_3: {
         parameters: {
             query?: {
@@ -4701,6 +5333,33 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InstalacionVista"];
+                };
+            };
+        };
+    };
+    excel_2: {
+        parameters: {
+            query?: {
+                clienteId?: number;
+                tecnicoId?: number;
+                desde?: string;
+                hasta?: string;
+                estadoGarantia?: "VIGENTE" | "POR_VENCER" | "VENCIDA";
+                incluirAnuladas?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
                 };
             };
         };
@@ -4932,6 +5591,30 @@ export interface operations {
             };
         };
     };
+    excel_1: {
+        parameters: {
+            query?: {
+                categoriaId?: number;
+                activo?: boolean;
+                buscar?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
     detalle_7: {
         parameters: {
             query?: never;
@@ -5005,7 +5688,29 @@ export interface operations {
             };
         };
     };
-    seriales: {
+    kardexExcel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    seriales_1: {
         parameters: {
             query?: {
                 estado?: "EN_BODEGA" | "VENDIDO" | "INSTALADO" | "DADO_DE_BAJA" | "ANULADO";
@@ -5343,6 +6048,169 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProveedorVista"];
+                };
+            };
+        };
+    };
+    periodo: {
+        parameters: {
+            query?: {
+                tipo?: "SEMANA" | "MES" | "ANIO" | "RANGO";
+                fecha?: string;
+                desde?: string;
+                hasta?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportePeriodoVista"];
+                };
+            };
+        };
+    };
+    periodoExcel: {
+        parameters: {
+            query?: {
+                tipo?: "SEMANA" | "MES" | "ANIO" | "RANGO";
+                fecha?: string;
+                desde?: string;
+                hasta?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    seriales: {
+        parameters: {
+            query?: {
+                estado?: "EN_BODEGA" | "VENDIDO" | "INSTALADO" | "DADO_DE_BAJA" | "ANULADO";
+                productoId?: number;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReporteSerialesVista"];
+                };
+            };
+        };
+    };
+    serialesExcel: {
+        parameters: {
+            query?: {
+                estado?: "EN_BODEGA" | "VENDIDO" | "INSTALADO" | "DADO_DE_BAJA" | "ANULADO";
+                productoId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+        };
+    };
+    utilidad: {
+        parameters: {
+            query?: {
+                periodo?: "SEMANA" | "MES" | "ANIO" | "RANGO";
+                fecha?: string;
+                desde?: string;
+                hasta?: string;
+                /** @description VENTA o INSTALACION */
+                tipo?: "VENTA" | "INSTALACION";
+                ordenarPorUtilidad?: boolean;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReporteUtilidadVista"];
+                };
+            };
+        };
+    };
+    utilidadExcel: {
+        parameters: {
+            query?: {
+                periodo?: "SEMANA" | "MES" | "ANIO" | "RANGO";
+                fecha?: string;
+                desde?: string;
+                hasta?: string;
+                tipo?: "VENTA" | "INSTALACION";
+                ordenarPorUtilidad?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
                 };
             };
         };
@@ -5992,6 +6860,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["VentaVista"];
+                };
+            };
+        };
+    };
+    excel: {
+        parameters: {
+            query?: {
+                clienteId?: number;
+                productoId?: number;
+                desde?: string;
+                hasta?: string;
+                incluirAnuladas?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
                 };
             };
         };
