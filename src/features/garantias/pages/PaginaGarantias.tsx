@@ -1,7 +1,7 @@
 import { ShieldCheck } from "lucide-react";
 import { Link } from "react-router";
 
-import { $api } from "@/api/cliente";
+import { $api, api } from "@/api/cliente";
 import type { components } from "@/api/esquema";
 import { errorDeConsultas } from "@/api/problema";
 import { Buscador } from "@/components/ui/Buscador";
@@ -16,6 +16,7 @@ import { FiltroCliente } from "@/features/comercial/components/SelectorCliente";
 import { EnlaceDocumento } from "@/features/inventario/components/EnlaceDocumento";
 import { useFiltrosUrl } from "@/lib/filtrosUrl";
 import { formatearFecha } from "@/lib/formato";
+import { BotonExcel } from "@/features/reportes/components/BotonExcel";
 
 import { ListaReclamos, RegistrarReclamo } from "../components/Reclamos";
 import { TEXTOS_GARANTIAS } from "../textos";
@@ -96,24 +97,33 @@ export function Component() {
   const cliente = filtros.leer("cliente");
   const clienteNombre = filtros.leer("clienteNombre");
   const serial = filtros.leer("serial");
+  // Los mismos filtros de la pantalla, sin paginar, para el botón Excel (RF-144).
+  const filtrosExcel = {
+    ...(estado === "todos" ? {} : { estado }),
+    ...(tipo === "todos" ? {} : { tipo }),
+    ...(cliente ? { clienteId: Number(cliente) } : {}),
+    ...(serial ? { serial } : {}),
+  };
   const consulta = $api.useQuery("get", "/api/v1/garantias", {
-    params: {
-      query: {
-        page: filtros.paginaApi,
-        size: 20,
-        ...(estado === "todos" ? {} : { estado }),
-        ...(tipo === "todos" ? {} : { tipo }),
-        ...(cliente ? { clienteId: Number(cliente) } : {}),
-        ...(serial ? { serial } : {}),
-      },
-    },
+    params: { query: { page: filtros.paginaApi, size: 20, ...filtrosExcel } },
   });
   const error = errorDeConsultas(consulta);
   const garantias = consulta.data?.contenido ?? [];
 
   return (
     <>
-      <EncabezadoPagina titulo={T.titulo} subtitulo={T.subtitulo} />
+      <EncabezadoPagina
+        titulo={T.titulo}
+        subtitulo={T.subtitulo}
+        acciones={
+          <BotonExcel
+            nombre="garantias"
+            obtener={() =>
+              api.GET("/api/v1/garantias/excel", { params: { query: filtrosExcel }, parseAs: "blob" })
+            }
+          />
+        }
+      />
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
           <Buscador

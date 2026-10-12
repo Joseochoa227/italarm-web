@@ -1,6 +1,8 @@
 import { screen, within } from "@testing-library/react";
 
+import { reportePeriodo } from "@/test/datos";
 import { renderizarApp } from "@/test/renderizar";
+import { http, servidor } from "@/test/servidor";
 
 describe("Navegación en computador (RF-01)", () => {
   it("muestra el menú lateral con las opciones en orden y marca la activa", async () => {
@@ -23,13 +25,15 @@ describe("Navegación en computador (RF-01)", () => {
     expect(screen.queryByRole("button", { name: "Nuevo" })).not.toBeInTheDocument();
   });
 
-  it("lleva a cada sección, que muestra en qué fase llega", async () => {
+  it("lleva a cada sección", async () => {
+    servidor.use(
+      http.get("/api/v1/reportes/periodo", ({ response }) => response(200).json(reportePeriodo())),
+    );
     const { usuario, router } = renderizarApp();
 
     await usuario.click(await screen.findByRole("link", { name: "Reportes" }));
 
-    expect(await screen.findByRole("heading", { name: "Reportes" })).toBeInTheDocument();
-    expect(screen.getByText("Esta sección llega en la Fase 6")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Reportes" })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/reportes");
   });
 
@@ -102,16 +106,4 @@ describe("Navegación en celular (RF-03, RF-04)", () => {
 
     expect(await screen.findByRole("menuitem", { name: "Cerrar sesión" })).toBeInTheDocument();
   });
-});
-
-describe("Secciones pendientes (entregable de la Fase 0: menú vacío)", () => {
-  it.each([["/reportes", "Reportes", 6]])(
-    "%s muestra «%s» y la fase en que llega",
-    async (ruta, titulo, fase) => {
-      renderizarApp({ ruta });
-
-      expect(await screen.findByRole("heading", { level: 1, name: titulo })).toBeInTheDocument();
-      expect(screen.getByText(`Esta sección llega en la Fase ${fase}`)).toBeInTheDocument();
-    },
-  );
 });

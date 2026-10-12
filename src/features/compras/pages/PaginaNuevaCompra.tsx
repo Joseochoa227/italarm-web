@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { Coins, Paperclip, Trash2 } from "lucide-react";
+import { Coins, Paperclip, Trash2, List } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { Controller, type Path, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { useNavigate } from "react-router";
@@ -13,6 +13,7 @@ import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { useAvisar } from "@/components/ui/contextoAvisos";
 import { EncabezadoPagina } from "@/components/ui/EncabezadoPagina";
+import { EnlaceBoton } from "@/components/ui/EnlaceBoton";
 import { EstadoError } from "@/components/ui/EstadoError";
 import { Segmentado } from "@/components/ui/Segmentado";
 import { Selector } from "@/components/ui/Selector";
@@ -158,6 +159,11 @@ export function Component() {
         antetitulo={N.encabezado(formatearFecha(hoy), usuario?.nombre ?? "")}
         titulo={N.titulo}
         subtitulo={N.consecutivo}
+        acciones={
+          <EnlaceBoton a="/compras" icono={<List aria-hidden size={16} />}>
+            {N.verCompras}
+          </EnlaceBoton>
+        }
       />
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[2_1_460px] flex-col gap-6">

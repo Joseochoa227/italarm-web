@@ -31,7 +31,7 @@ Antes de cada commit, Husky corre ESLint y Prettier sobre los archivos cambiados
 src/
 ├── app/            arranque, rutas (todas diferidas), proveedores, layout, menú y textos de navegación
 ├── api/            esquema.ts (GENERADO, no se edita), cliente.ts, problema.ts y token.ts
-├── components/     PaginaPendiente y ui/ (sistema de diseño)
+├── components/     ui/ (sistema de diseño)
 ├── features/<f>/   components/, hooks/, pages/, schemas/, textos.ts y sus pruebas
 │                   (comercial/: cliente, material, cobro, seriales que salen, comprobante,
 │                   confirmación y anulación, comunes a ventas, instalaciones y cotizaciones)
