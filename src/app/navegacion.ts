@@ -68,4 +68,6 @@ export const TEXTOS_NAVEGACION = {
   nuevaVersion: "Hay una versión nueva de ITALARM",
   actualizar: "Actualizar",
   buscarSerial: "Buscar serial",
+  bajoMinimo: (n: number) =>
+    n === 1 ? ", 1 producto bajo el mínimo" : `, ${String(n)} productos bajo el mínimo`,
 } as const;

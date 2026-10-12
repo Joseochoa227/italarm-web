@@ -574,3 +574,133 @@ export function conversion(
     ...cambios,
   };
 }
+
+/** Inicio vacío (un día sin movimientos): lo usa el menú en todas las pantallas. */
+export function inicioVacio(cambios: Partial<S["InicioVista"]> = {}): S["InicioVista"] {
+  return {
+    usuario: "Jose Ochoa",
+    hoy: HOY,
+    avisosTasas: [],
+    tasas: tasasVigentes(),
+    indicadores: {
+      ventas: { cantidad: 0, total: { usd: usd("0.0000") }, porMoneda: [] },
+      instalaciones: { cantidad: 0, total: { usd: usd("0.0000") }, porMoneda: [] },
+      utilidad: { total: { usd: usd("0.0000") }, porcentaje: "0" },
+      inventario: { productos: 0, valor: { usd: usd("0.0000") }, fecha: HOY },
+    },
+    stockBajo: [],
+    totalStockBajo: 0,
+    garantiasPorVencer: [],
+    totalGarantiasPorVencer: 0,
+    cotizacionesEnEvaluacion: [],
+    totalCotizacionesEnEvaluacion: 0,
+    ultimosMovimientos: [],
+    ...cambios,
+  };
+}
+
+const enMonedas = (u: string, c: string, v: string) => ({
+  usd: usd(u),
+  cop: cop(c),
+  ves: { monto: v, moneda: "VES" as const },
+});
+
+/** Indicadores de un mes con movimiento (Inicio y Reportes). */
+export const INDICADORES: S["IndicadoresVista"] = {
+  ventas: {
+    cantidad: 23,
+    total: enMonedas("2152.0000", "8608000.0000", "107600.0000"),
+    porMoneda: [usd("1652.0000"), cop("2000000.0000")],
+  },
+  instalaciones: {
+    cantidad: 6,
+    total: enMonedas("2901.0000", "11604000.0000", "145050.0000"),
+    porMoneda: [usd("2901.0000")],
+  },
+  utilidad: { total: enMonedas("1774.0000", "7096000.0000", "88700.0000"), porcentaje: "35.11" },
+  inventario: { productos: 42, valor: enMonedas("15230.5000", "60922000.0000", "761525.0000"), fecha: HOY },
+};
+
+/** Inicio con todos sus bloques. */
+export function inicio(cambios: Partial<S["InicioVista"]> = {}): S["InicioVista"] {
+  return inicioVacio({
+    indicadores: INDICADORES,
+    stockBajo: [
+      {
+        productoId: 11,
+        codigo: "CAB-UTP",
+        nombre: "Cable UTP",
+        unidad: "m",
+        stock: "50",
+        minimo: "200",
+        nivel: "25",
+      },
+      {
+        productoId: 10,
+        codigo: "CAM-D2",
+        nombre: "Cámara domo 2MP",
+        unidad: "und",
+        stock: "2",
+        minimo: "5",
+        nivel: "40",
+      },
+    ],
+    totalStockBajo: 2,
+    garantiasPorVencer: [
+      {
+        clase: "MANO_OBRA",
+        cliente: "Ferretería El Tornillo",
+        clienteId: 20,
+        documento: { tipo: "INSTALACION", id: 80, consecutivo: "I-0001" },
+        vencimiento: "2026-10-20",
+        diasRestantes: 14,
+        estado: "POR_VENCER",
+      },
+    ],
+    totalGarantiasPorVencer: 1,
+    cotizacionesEnEvaluacion: [
+      {
+        id: 90,
+        consecutivo: "COT-0001",
+        cliente: "Ana Gómez",
+        estado: "EN_EVALUACION",
+        total: usd("142.0000"),
+        diasParaVencer: 2,
+        porVencer: true,
+      },
+      {
+        id: 91,
+        consecutivo: "COT-0002",
+        cliente: "Ferretería El Tornillo",
+        estado: "EN_EVALUACION",
+        total: usd("80.0000"),
+        diasParaVencer: 10,
+        porVencer: false,
+      },
+    ],
+    totalCotizacionesEnEvaluacion: 2,
+    ultimosMovimientos: [
+      {
+        tipo: "VENTA",
+        id: 60,
+        consecutivo: "V-0001",
+        detalle: "Ferretería El Tornillo",
+        usuario: "Jose Ochoa",
+        registradoEn: "2026-10-06T15:00:00Z",
+        valor: usd("25.5000"),
+        anulado: false,
+      },
+      {
+        tipo: "COMPRA",
+        id: 40,
+        consecutivo: "C-0001",
+        detalle: "Distribuidora Andina",
+        usuario: "Victor",
+        registradoEn: "2026-10-05T14:00:00Z",
+        valor: cop("1500000.0000"),
+        anulado: true,
+      },
+    ],
+    ...cambios,
+  });
+}

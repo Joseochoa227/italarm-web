@@ -4,7 +4,7 @@ import { createOpenApiHttp } from "openapi-msw";
 
 import type { paths } from "@/api/esquema";
 
-import { CATEGORIAS, configuracion, tasasVigentes, UNIDADES, USUARIOS } from "./datos";
+import { CATEGORIAS, configuracion, tasasVigentes, UNIDADES, USUARIOS, inicioVacio } from "./datos";
 
 export const API = "http://api.prueba";
 
@@ -45,6 +45,8 @@ export const manejadores = [
   http.get("/api/v1/categorias", ({ response }) => response(200).json(CATEGORIAS)),
   http.get("/api/v1/unidades-medida", ({ response }) => response(200).json(UNIDADES)),
   http.get("/api/v1/usuarios", ({ response }) => response(200).json(USUARIOS)),
+  // El menú pide Inicio en todas las pantallas para el indicador de stock bajo (W-13).
+  http.get("/api/v1/inicio", ({ response }) => response(200).json(inicioVacio())),
 ];
 
 export const servidor = setupServer(...manejadores);

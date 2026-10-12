@@ -25,10 +25,11 @@ export function renderizarApp({ ruta = "/", conToken = true, escritorio = true }
   if (conToken) guardarToken(TOKEN);
   const router = createMemoryRouter(rutas, { initialEntries: [ruta] });
   const usuario = userEvent.setup();
+  const clienteConsultas = crearClienteConsultas();
   const resultado = render(
-    <Proveedores clienteConsultas={crearClienteConsultas()}>
+    <Proveedores clienteConsultas={clienteConsultas}>
       <RouterProvider router={router} />
     </Proveedores>,
   );
-  return { ...resultado, router, usuario };
+  return { ...resultado, router, usuario, clienteConsultas };
 }
