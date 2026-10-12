@@ -26,6 +26,7 @@ import {
   cobroDeConversion,
   type Conversion,
   leerCotizacionId,
+  salvoConversion,
   useConversion,
 } from "@/features/cotizaciones/conversion";
 import { ConversionNoDisponible } from "@/features/cotizaciones/components/ConversionNoDisponible";
@@ -135,7 +136,7 @@ function FormularioVenta({
             ? valores
             : { ...valores, cotizacionId: conversion.cotizacionId },
       });
-      await clienteConsultas.invalidateQueries();
+      await clienteConsultas.invalidateQueries(salvoConversion);
       if (data) alGuardar(data);
     } catch (e) {
       const error = comoErrorApi(e);

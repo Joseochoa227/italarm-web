@@ -22,6 +22,15 @@ export function useConversion(cotizacionId: number | null) {
 }
 
 /**
+ * Consultas que se vuelven a pedir al guardar una venta o instalación: todas menos la conversión,
+ * que ya convertida respondería COTIZACION_NO_CONVERTIBLE.
+ */
+export const salvoConversion = {
+  predicate: (q: { queryKey: readonly unknown[] }) =>
+    q.queryKey[1] !== "/api/v1/cotizaciones/{id}/conversion",
+};
+
+/**
  * Líneas del formulario con lo cotizado: el precio queda escrito tal como se cotizó y los productos
  * con serial empiezan sin seriales (se eligen ahora). La unidad no dice si admite decimales: lo
  * valida el backend.

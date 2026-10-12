@@ -81,6 +81,7 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
     ventas: [] as Registro[],
     instalaciones: [] as Registro[],
     reclamos: [] as Registro[],
+    cotizaciones: [] as Registro[],
     cargas: [] as Registro[],
     claves: new Map<string, Registro>(),
     clientes: [] as Registro[],
@@ -313,6 +314,84 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
         (c.condicionesGarantia as string | undefined) ?? "No cubre daños por descargas eléctricas.",
     };
     return { ...v, fecha, resumen, totalUsd, garantias };
+  };
+
+  // Cotizaciones simuladas (Fase 5): el cobro como en ventas o instalaciones, sin mover inventario.
+  const calcularCotizacion = (c: Record<string, unknown>) => {
+    const lineas = (c.lineas as Record<string, unknown>[] | undefined) ?? [];
+    return c.tipo === "INSTALACION"
+      ? calcularInstalacion({ ...c, lineas })
+      : { ...calcularVenta({ ...c, lineas }), garantias: undefined };
+  };
+  const vence = (dias: number) =>
+    new Date(Date.parse(`${HOY}T12:00:00Z`) + dias * 86_400_000).toISOString().slice(0, 10);
+  const lineasPrevia = (v: ReturnType<typeof calcularVenta>) =>
+    v.lineas.map((x) => ({
+      productoId: x.p.id,
+      codigo: x.p.codigo,
+      nombre: x.p.nombre,
+      abreviatura: unidadDe(x.p),
+      controlaSerial: x.p.controlaSerial,
+      cantidad: cantidadTexto(x.cantidad),
+      disponible: cantidadTexto(stockDe(x.p)),
+      ...(x.cantidad > stockDe(x.p)
+        ? { avisoStock: `Stock insuficiente · quedan ${cantidadTexto(stockDe(x.p))} ${unidadDe(x.p)}` }
+        : {}),
+      precioSugerido: { monto: x.sugerido.toFixed(4), moneda: v.moneda },
+      precioUnitario: { monto: x.precio.toFixed(4), moneda: v.moneda },
+      subtotal: enMonedas(x.subtotalUsd),
+      costoUnitarioHoy: enMonedas(x.costo),
+    }));
+  const vistaCotizacion = (c: Record<string, unknown>, base: Partial<Registro>) => {
+    const v = calcularCotizacion(c);
+    const dias = Number(c.validezDias ?? 15);
+    return {
+      ...base,
+      tipo: c.tipo,
+      fecha: HOY,
+      validezDias: dias,
+      vence: vence(dias),
+      diasParaVencer: dias,
+      porVencer: dias <= 3,
+      moneda: v.moneda,
+      cliente: v.clienteVista,
+      descripcion: c.descripcion,
+      tasas: tasasCompra(),
+      lineas: v.lineas.map((x) => ({
+        productoId: x.p.id,
+        codigo: x.p.codigo,
+        descripcion: x.p.nombre,
+        unidad: unidadDe(x.p),
+        cantidad: cantidadTexto(x.cantidad),
+        precioSugerido: { monto: x.sugerido.toFixed(4), moneda: v.moneda },
+        precioUnitario: { monto: x.precio.toFixed(4), moneda: v.moneda },
+        subtotal: { monto: (x.precio * x.cantidad).toFixed(4), moneda: v.moneda },
+        costoUnitarioUsd: usd(x.costo),
+      })),
+      resumen: v.resumen,
+      total: { monto: desdeUsd(v.totalUsd, v.moneda).toFixed(4), moneda: v.moneda },
+      utilidad: usd(v.totalUsd - v.costoUsd),
+      porcentajeUtilidad: v.resumen.porcentajeUtilidad,
+      ...(c.descuentoTipo ? { descuentoTipo: c.descuentoTipo, descuentoValor: c.descuentoValor } : {}),
+      monedasComprobante: c.monedasComprobante ?? [],
+      solicitud: c,
+    };
+  };
+  /** Al guardar una venta o instalación con `cotizacionId`, la cotización queda Convertida (RF-95). */
+  const convertir = (c: Record<string, unknown>, documento: Documento & { tipo: string }) => {
+    const cot = estado.cotizaciones.find((r) => r.id === c.cotizacionId);
+    if (!cot) return {};
+    Object.assign(cot, { estado: "CONVERTIDA", documentoGenerado: { ...documento, fecha: HOY } });
+    return { cotizacion: { id: cot.id, consecutivo: cot.consecutivo } };
+  };
+  /** Al anular el documento generado, la cotización vuelve a Aprobada (RF-74). */
+  const revertir = (documento: Registro) => {
+    const origen = documento.cotizacion as { id?: number } | undefined;
+    const cot = estado.cotizaciones.find((r) => r.id === origen?.id);
+    if (cot) {
+      cot.estado = "APROBADA";
+      delete cot.documentoGenerado;
+    }
   };
 
   await page.route(`${API}/**`, async (route) => {
@@ -751,6 +830,7 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
           registradaEn: new Date().toISOString(),
           version: 0,
         };
+        Object.assign(nueva, convertir(c, documento));
         estado.ventas.push(nueva);
         estado.claves.set(clave, nueva);
         return json(route, 201, nueva);
@@ -790,6 +870,7 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
             }
           }
         }
+        revertir(v);
         Object.assign(v, {
           estado: "ANULADA",
           anulacion: { motivo: cuerpo().motivo, usuario: USUARIO.nombre, fecha: new Date().toISOString() },
@@ -879,6 +960,7 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
           registradaEn: new Date().toISOString(),
           version: 0,
         };
+        Object.assign(nueva, convertir(c, documento));
         estado.instalaciones.push(nueva);
         estado.claves.set(clave, nueva);
         return json(route, 201, nueva);
@@ -901,6 +983,32 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
             })),
           ),
         });
+      case "POST /instalaciones/{id}/anular": {
+        const i = estado.instalaciones.find((r) => ruta.includes(`/${String(r.id)}/`));
+        if (!i) return problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+        const documento = { tipo: "INSTALACION", id: i.id, consecutivo: String(i.consecutivo) };
+        for (const l of i.lineas as {
+          productoId: number;
+          cantidad: string;
+          seriales: { numero: string }[];
+        }[]) {
+          const p = estado.productos.find((r) => r.id === l.productoId);
+          if (p) moverStock(p, documento, Number(l.cantidad));
+          for (const { numero } of l.seriales) {
+            const s = estado.seriales.find((r) => r.productoId === l.productoId && r.numero === numero);
+            if (s) {
+              s.estado = "EN_BODEGA";
+              delete s.documentoSalida;
+            }
+          }
+        }
+        revertir(i);
+        Object.assign(i, {
+          estado: "ANULADA",
+          anulacion: { motivo: cuerpo().motivo, usuario: USUARIO.nombre, fecha: new Date().toISOString() },
+        });
+        return json(route, 200, i);
+      }
       case "POST /instalaciones/{id}/fotos": {
         const i = estado.instalaciones.find((r) => ruta.includes(`/${String(r.id)}/`));
         if (!i) return problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
@@ -986,6 +1094,184 @@ export async function simularApi(page: Page, opciones: { bolivarDeHoy?: boolean 
           url: `${API}/comprobantes/e2e`,
           whatsappUrl: "https://wa.me/573001234567?text=Comprobante",
           venceEn: new Date().toISOString(),
+        });
+      case "POST /cotizaciones/vista-previa": {
+        const c = cuerpo();
+        const v = calcularCotizacion(c);
+        const dias = Number(c.validezDias ?? 15);
+        return json(route, 200, {
+          tipo: c.tipo,
+          fecha: HOY,
+          vence: vence(dias),
+          validezDias: dias,
+          moneda: v.moneda,
+          cliente: v.clienteVista,
+          tasas: tasasCompra(),
+          avisos: [],
+          lineas: lineasPrevia(v),
+          resumen: v.resumen,
+        });
+      }
+      case "POST /cotizaciones": {
+        const clave = (await peticion.headerValue("idempotency-key")) ?? "";
+        const repetida = estado.claves.get(clave);
+        if (repetida) return json(route, 201, repetida);
+        const id = estado.id++;
+        const nueva: Registro = {
+          ...vistaCotizacion(cuerpo(), {}),
+          id,
+          consecutivo: `COT-${String(estado.cotizaciones.length + 1).padStart(4, "0")}`,
+          numero: estado.cotizaciones.length + 1,
+          numeroVersion: 1,
+          estado: "BORRADOR",
+          versionesAnteriores: [],
+          registradaPor: USUARIO.nombre,
+          registradaEn: new Date().toISOString(),
+          version: 0,
+        };
+        estado.cotizaciones.push(nueva);
+        estado.claves.set(clave, nueva);
+        return json(route, 201, nueva);
+      }
+      case "GET /cotizaciones":
+        return json(
+          route,
+          200,
+          pagina(
+            [...estado.cotizaciones]
+              .reverse()
+              .filter((r) => !url.searchParams.get("estado") || r.estado === url.searchParams.get("estado"))
+              .map((r) => ({
+                ...r,
+                cliente: (r.cliente as { nombre?: string } | undefined)?.nombre,
+                documentoGenerado: (r.documentoGenerado as { consecutivo?: string } | undefined)?.consecutivo,
+              })),
+          ),
+        );
+      case "GET /cotizaciones/{id}": {
+        const r = porId(estado.cotizaciones);
+        return r ? json(route, 200, r) : problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+      }
+      case "PUT /cotizaciones/{id}": {
+        const r = porId(estado.cotizaciones);
+        if (!r) return problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+        const c = cuerpo();
+        const enEvaluacion = r.estado === "EN_EVALUACION";
+        const numeroVersion = Number(r.numeroVersion) + (enEvaluacion ? 1 : 0);
+        const anteriores = (r.versionesAnteriores as unknown[] | undefined) ?? [];
+        Object.assign(r, vistaCotizacion(c, {}), {
+          numeroVersion,
+          consecutivo: `COT-${String(r.numero).padStart(4, "0")}${numeroVersion > 1 ? ` v${String(numeroVersion)}` : ""}`,
+          versionesAnteriores: enEvaluacion
+            ? [
+                ...anteriores,
+                {
+                  numeroVersion: numeroVersion - 1,
+                  fecha: HOY,
+                  reemplazadaEn: new Date().toISOString(),
+                  reemplazadaPor: USUARIO.nombre,
+                  total: r.total,
+                  lineas: r.lineas,
+                },
+              ]
+            : anteriores,
+          version: Number(r.version) + 1,
+        });
+        return json(route, 200, r);
+      }
+      case "POST /cotizaciones/{id}/enlace":
+      case "POST /cotizaciones/{id}/enviar":
+      case "POST /cotizaciones/{id}/aprobar":
+      case "POST /cotizaciones/{id}/rechazar": {
+        const r = estado.cotizaciones.find((x) => ruta.includes(`/${String(x.id)}/`));
+        if (!r) return problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+        const accion = ruta.split("/").pop();
+        const abierta = r.estado === "BORRADOR" || r.estado === "EN_EVALUACION";
+        const permitida =
+          accion === "rechazar" ? abierta || r.estado === "APROBADA" : accion === "enlace" || abierta;
+        if (!permitida) {
+          return problema(route, 422, "TRANSICION_NO_PERMITIDA", "La cotización no admite esa acción.");
+        }
+        const ahora = new Date().toISOString();
+        if ((accion === "enlace" || accion === "enviar") && r.estado === "BORRADOR") {
+          Object.assign(r, { estado: "EN_EVALUACION", enviadaEn: ahora });
+        }
+        if (accion === "aprobar") Object.assign(r, { estado: "APROBADA", aprobadaEn: ahora });
+        if (accion === "rechazar")
+          Object.assign(r, { estado: "RECHAZADA", rechazo: { ...cuerpo(), fecha: ahora } });
+        if (accion === "enlace") {
+          return json(route, 200, {
+            estado: r.estado,
+            url: `${API}/comprobantes/e2e`,
+            whatsappUrl: "https://wa.me/573001234567?text=Cotizacion",
+            venceEn: ahora,
+          });
+        }
+        return json(route, 200, r);
+      }
+      case "POST /cotizaciones/{id}/duplicar": {
+        const r = estado.cotizaciones.find((x) => ruta.includes(`/${String(x.id)}/`));
+        if (!r) return problema(route, 404, "RECURSO_NO_ENCONTRADO", "No existe.");
+        const id = estado.id++;
+        const numero = estado.cotizaciones.length + 1;
+        const copia: Registro = {
+          ...vistaCotizacion(r.solicitud as Record<string, unknown>, {}),
+          id,
+          numero,
+          consecutivo: `COT-${String(numero).padStart(4, "0")}`,
+          numeroVersion: 1,
+          estado: "BORRADOR",
+          versionesAnteriores: [],
+          registradaPor: USUARIO.nombre,
+          registradaEn: new Date().toISOString(),
+          version: 0,
+        };
+        estado.cotizaciones.push(copia);
+        return json(route, 201, copia);
+      }
+      case "GET /cotizaciones/{id}/seguimiento":
+        return json(route, 200, {
+          mensaje: "Hola, ¿pudiste revisar la cotización?",
+          whatsappUrl: "https://wa.me/573001234567?text=Seguimiento",
+        });
+      case "GET /cotizaciones/{id}/conversion": {
+        const r = estado.cotizaciones.find((x) => ruta.includes(`/${String(x.id)}/`));
+        if (r?.estado !== "APROBADA") {
+          return problema(route, 422, "COTIZACION_NO_CONVERTIBLE", "La cotización no está aprobada.");
+        }
+        const c = r.solicitud as Record<string, unknown>;
+        const v = calcularCotizacion(c);
+        return json(route, 200, {
+          cotizacionId: r.id,
+          consecutivo: r.consecutivo,
+          tipo: r.tipo,
+          clienteId: c.clienteId,
+          cliente: v.clienteVista.nombre,
+          direccion: "Calle 10 # 5-20",
+          descripcion: c.descripcion,
+          moneda: v.moneda,
+          manoDeObra: c.manoDeObra ?? "0",
+          lineas: v.lineas.map((x) => ({
+            productoId: x.p.id,
+            nombre: x.p.nombre,
+            codigo: x.p.codigo,
+            abreviatura: unidadDe(x.p),
+            controlaSerial: x.p.controlaSerial,
+            cantidad: cantidadTexto(x.cantidad),
+            precioUnitario: x.precio.toFixed(4),
+            disponible: cantidadTexto(stockDe(x.p)),
+          })),
+          monedasComprobante: c.monedasComprobante ?? [],
+          avisos: [],
+          puedeGuardar: v.lineas.every((x) => x.cantidad <= stockDe(x.p)),
+        });
+      }
+      case "GET /cotizaciones/{id}/comprobante":
+        return route.fulfill({
+          status: 200,
+          contentType: "application/pdf",
+          headers: { ...CORS, "Content-Disposition": 'attachment; filename="COT-0001.pdf"' },
+          body: "%PDF-1.4 e2e",
         });
       case "GET /carga-inicial":
         return json(route, 200, estado.cargas);

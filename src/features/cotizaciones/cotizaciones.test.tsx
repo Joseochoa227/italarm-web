@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import { HttpResponse } from "msw";
 
-import { cliente, cotizacion, pagina, producto, vistaPreviaCotizacion } from "@/test/datos";
+import { cliente, cotizacion, pagina, producto, sinCampos, vistaPreviaCotizacion } from "@/test/datos";
 import { renderizarApp } from "@/test/renderizar";
 import { http, problema, servidor } from "@/test/servidor";
 
@@ -266,6 +266,54 @@ describe("Detalle de la cotización (RF-87 a RF-92)", () => {
     await waitFor(() => {
       expect(ventana.location.href).toBe("https://wa.me/573001234567?text=Hola");
     });
+  });
+});
+
+describe("Detalle: otros estados y datos", () => {
+  it("una de venta vencida en pesos, con descuento en porcentaje y observaciones; solo se duplica", async () => {
+    servirCotizacion(
+      sinCampos(
+        cotizacion({
+          tipo: "VENTA",
+          estado: "VENCIDA",
+          moneda: "COP",
+          vencidaEl: "2026-10-22",
+          descuentoTipo: "PORCENTAJE",
+          descuentoValor: "10.0000",
+          observaciones: "Precios sujetos a cambio",
+          resumen: {
+            subtotal: { cop: { monto: "400000.0000", moneda: "COP" } },
+            descuento: {
+              usd: { monto: "10.0000", moneda: "USD" },
+              cop: { monto: "40000.0000", moneda: "COP" },
+            },
+            total: { cop: { monto: "360000.0000", moneda: "COP" } },
+          },
+          tasas: {},
+          cliente: { nombre: "Cliente sin ficha" },
+        }),
+        "porcentajeUtilidad",
+      ),
+    );
+    renderizarApp({ ruta: "/cotizaciones/90" });
+
+    expect(await screen.findByText("Vencida el 22/10/2026")).toBeVisible();
+    const resumen = sinNbsp(screen.getByRole("region", { name: "Resumen" }).textContent);
+    expect(resumen).toContain("Descuento (10 %)$ 40.000");
+    expect(resumen).toContain("Total de contado$ 360.000");
+    expect(resumen).not.toContain("Mano de obra");
+    expect(resumen).toContain("Observaciones: Precios sujetos a cambio");
+    expect(screen.queryByRole("link", { name: "Cliente sin ficha" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Rechazar" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Seguimiento por WhatsApp" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Duplicar" })).toBeVisible();
+  });
+
+  it("una rechazada sin motivo lo indica en el historial", async () => {
+    servirCotizacion(cotizacion({ estado: "RECHAZADA", rechazo: { fecha: "2026-10-07T14:00:00Z" } }));
+    renderizarApp({ ruta: "/cotizaciones/90" });
+
+    expect(await screen.findByText(/^Rechazada el .* · —$/)).toBeVisible();
   });
 });
 

@@ -32,6 +32,7 @@ import {
   cobroDeConversion,
   type Conversion,
   leerCotizacionId,
+  salvoConversion,
   useConversion,
 } from "@/features/cotizaciones/conversion";
 import { TEXTOS_COTIZACIONES } from "@/features/cotizaciones/textos";
@@ -177,7 +178,7 @@ function FormularioInstalacion({
             ? valores
             : { ...valores, cotizacionId: conversion.cotizacionId },
       });
-      await clienteConsultas.invalidateQueries();
+      await clienteConsultas.invalidateQueries(salvoConversion);
       if (data) alGuardar(data, fotos);
     } catch (e) {
       const error = comoErrorApi(e);
