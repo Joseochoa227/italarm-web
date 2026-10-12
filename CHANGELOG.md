@@ -4,6 +4,17 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [Sin publicar]
 
+### Fase 5 — Cotizaciones
+
+#### Agregado
+
+- **Nueva cotización** de instalación o de venta de material: cliente, descripción del trabajo, validez de 8, 15 o 30 días con su vencimiento, ítems con precio editable y costo interno a la tasa de hoy y a la de la última compra (CP-09), mano de obra, descuento y resumen del backend. Cotizar no aparta material: la falta de stock es solo un aviso (CP-26). Queda en Borrador.
+- **Vista previa del PDF en vivo** en el computador (W-12): réplica en pantalla con el mismo orden y textos del PDF del backend, sin costos ni utilidad.
+- **Cotizaciones:** listado con filtros por estado, tipo, cliente, fechas y «Por vencer»; días para vencer y resaltado de las que vencen en 3 días o menos (RF-91); «Ver cotizaciones» desde Nueva cotización (W-11).
+- **Detalle** con historial de estados, versiones anteriores y las acciones según el estado: Enviar por WhatsApp, Descargar PDF (la marca enviada, P-50), Editar (en evaluación crea la versión 2), Cliente aprobó, Rechazar con motivo, Duplicar y Seguimiento por WhatsApp. Si otra persona la cambió de estado, avisa y recarga.
+- **Convertir** una cotización aprobada: la venta o la instalación se abre con el cliente (fijo), los ítems, los precios cotizados, la mano de obra y los avisos del backend; se eligen los seriales y se guarda con la cotización (CP-22). Sin stock no deja guardar (CP-23). La venta o la instalación enlaza su cotización y, al anularla, avisa que vuelve a Aprobada (CP-24).
+- Las cotizaciones del cliente en su detalle (P-36).
+
 ### Fase 4 — Instalaciones, fotos y garantías
 
 #### Agregado

@@ -360,6 +360,8 @@ export function FormularioCotizacion({
                   : null)
               }
               descripcion={entrada.descripcion}
+              observaciones={entrada.observaciones}
+              descuento={{ tipo: entrada.descuentoTipo, valor: entrada.descuentoValor }}
               previa={datos}
               moneda={moneda}
               monedasComprobante={entrada.monedasComprobante}

@@ -87,7 +87,7 @@ test("cotizar, aprobar, convertir en instalación y volver a Aprobada al anularl
   await cotizar(page);
   const pdf = page.getByRole("region", { name: "Vista previa del PDF" });
   if (informacion.project.name === "computador") {
-    await expect(pdf).toContainText("COTIZACIÓN");
+    await expect(pdf).toContainText("Cotización de instalación");
     await expect(pdf).toContainText("Ana Gómez");
     await expect(pdf).toContainText("Dos cámaras en la entrada");
     await expect(pdf).not.toContainText("Costo");

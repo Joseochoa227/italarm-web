@@ -192,7 +192,7 @@ export function Component() {
       />
       <div className="flex flex-wrap items-center gap-3">
         <EstadoCotizacion estado={c.estado} />
-        {c.porVencer && c.diasParaVencer !== undefined && (
+        {c.porVencer && typeof c.diasParaVencer === "number" && (
           <strong className="text-sm text-acento-700">
             {D.porVencer(TEXTOS_COTIZACIONES.listado.dias(c.diasParaVencer))}
           </strong>

@@ -77,12 +77,12 @@ describe("Nueva cotización (RF-80 a RF-86)", () => {
 
     const pdf = screen.getByRole("region", { name: "Vista previa del PDF" });
     const textoPdf = sinNbsp(pdf.textContent);
-    expect(textoPdf).toContain("COTIZACIÓN");
+    expect(textoPdf).toContain("Cotización de instalaciónCOT-····");
     expect(textoPdf).toContain("Ferretería El Tornillo");
     expect(textoPdf).toContain("Instalación de 4 cámaras");
     expect(textoPdf).toContain("Cámara domo 2MP4 und");
-    expect(textoPdf).toContain("Mano de obraUS$ 40,00");
-    expect(textoPdf).toContain("TotalUS$ 142,00");
+    expect(textoPdf).toContain("Mano de obra · instalación y configuración1US$ 40,00");
+    expect(textoPdf).toContain("Total de contadoUS$ 142,00");
     expect(textoPdf).toContain("Válida hasta: 21/10/2026");
     expect(textoPdf).not.toContain("Costo");
     expect(textoPdf).not.toContain("Utilidad");

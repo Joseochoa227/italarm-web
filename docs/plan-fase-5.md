@@ -1,6 +1,6 @@
 # Plan de la Fase 5 — Cotizaciones (italarm-web)
 
-> Estado: **aprobado por ITALARM el 09/10/2026** con las propuestas de W-11 y W-12.
+> Estado: **aprobado por ITALARM el 09/10/2026** con las propuestas de W-11 y W-12. **Implementado el 12/10/2026.** Falta la CI en GitHub y el despliegue (F6-02).
 > Base: `docs/requerimientos.md` (3.11, 12.7 y casos CP-09, CP-21 a CP-24 y CP-26), `italarm-api/docs/preguntas.md` (P-46 a P-55), `italarm-api/docs/guia-frontend.md` (§9 y §17), el prototipo `docs/Italarm v2.html` (pantalla Cotización) y el contrato `contrato/openapi.json` (`dev` @ `26aa62c`).
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado; no se necesitan endpoints nuevos.
 
@@ -33,7 +33,7 @@ Entregable:
 `/cotizaciones/nueva` (también con `?clienteId=`, desde el detalle del cliente), con los bloques del prototipo:
 
 - **Tipo**: **Instalación** o **Venta de material** (control segmentado). Cambia lo que se muestra: la mano de obra y la dirección solo en las de instalación.
-- **01 · Cliente**: el selector de las fases 3 y 4 (que también crea clientes); dirección y descripción del trabajo en las de instalación.
+- **01 · Cliente**: el selector de las fases 3 y 4 (que también crea clientes); descripción del trabajo en las de instalación. _(La cotización no guarda dirección: `SolicitudCotizacion` no la tiene; la instalación la toma del cliente al convertirla.)_
 - **Validez**: **8**, **15** o **30 días** (por defecto, el de Configuración), con la fecha en que vence según el backend. La fecha de la cotización es siempre hoy (P-49).
 - **02 · Ítems**: la línea de material del módulo `comercial`, sin seriales (se eligen al convertir):
   - precio sugerido, que se puede cambiar;
@@ -155,10 +155,10 @@ Todos existen en el contrato.
 ## 7. Definición de terminado (12.1)
 
 - [ ] Pull Request con la CI en verde.
-- [ ] Pruebas de la sección 6 escritas y pasando, incluidos CP-09, CP-21 a CP-24, CP-26 y las transiciones no permitidas.
-- [ ] Cliente generado desde el contrato vigente.
+- [x] Pruebas de la sección 6 escritas y pasando, incluidos CP-09, CP-21 a CP-24, CP-26 y las transiciones no permitidas: 282 de componentes (cobertura 92,2 % de líneas y 75,3 % de ramas) y 16 escenarios extremo a extremo, cada uno en celular y computador. Además, el recorrido se probó contra el backend real de `dev` en local: CP-09 ($ 81.900 a la TRM de hoy y $ 78.000 a la de compra), CP-26, versión 2, PDF y WhatsApp, aprobar, CP-22 y CP-23 (4 cámaras cotizadas con 3 en bodega), CP-24, transición no permitida, rechazo, duplicado, seguimiento, conversión en venta y CP-21 (la tarea diaria venció una cotización enviada hace 16 días). La réplica del PDF se comparó con el PDF real.
+- [x] Cliente generado desde el contrato vigente (`dev` @ `26aa62c`).
 - [ ] Desplegado en pruebas. _(Pasa a la Fase 6: F6-02.)_
-- [ ] `CHANGELOG.md` actualizado y lista para ITALARM:
+- [x] `CHANGELOG.md` actualizado y lista para ITALARM:
   1. Crear una cotización de instalación con cámaras, cable y mano de obra; revisar la vista previa del PDF en el computador.
   2. Enviarla por WhatsApp desde el celular y comprobar que queda En evaluación.
   3. Editarla y ver la versión 2 con la anterior guardada.

@@ -57,7 +57,7 @@ function FilaCotizacion({ c }: { c: components["schemas"]["CotizacionResumenVist
           {c.totalUsd && c.moneda !== "USD" && (
             <span className="text-xs text-neutro-700">{formatearDineroDe(c.totalUsd)}</span>
           )}
-          {c.diasParaVencer !== undefined && (
+          {typeof c.diasParaVencer === "number" && (
             <span
               className={cx("text-xs", c.porVencer ? "font-semibold text-acento-700" : "text-neutro-700")}
             >

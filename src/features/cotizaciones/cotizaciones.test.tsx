@@ -48,7 +48,8 @@ describe("Listado de cotizaciones (RF-89 a RF-91)", () => {
               porVencer: false,
             }),
             // CP-21: la tarea diaria del backend la venció al día 16.
-            fila({ id: 92, consecutivo: "COT-0003", estado: "VENCIDA", tipo: "VENTA" }),
+            // El backend manda null en los días de las que ya no están abiertas.
+            fila({ id: 92, consecutivo: "COT-0003", estado: "VENCIDA", tipo: "VENTA", diasParaVencer: null }),
             fila({ id: 93, consecutivo: "COT-0004", estado: "CONVERTIDA", documentoGenerado: "I-0007" }),
           ]),
         );
@@ -66,6 +67,7 @@ describe("Listado de cotizaciones (RF-89 a RF-91)", () => {
     expect(borrador).not.toHaveClass("bg-acento/7");
     expect(vencida).toHaveTextContent("Vencida");
     expect(vencida).toHaveTextContent("Venta de material");
+    expect(vencida).not.toHaveTextContent(/Vence|null/);
     expect(convertida).toHaveTextContent("Convertida en I-0007");
     expect(within(porVencer!).getByRole("link")).toHaveAttribute("href", "/cotizaciones/90");
 
