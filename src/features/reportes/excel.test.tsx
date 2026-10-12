@@ -1,6 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import { HttpResponse } from "msw";
 
+import { hoyBogota } from "@/lib/fechas";
 import { pagina, productoDetalle, proveedor } from "@/test/datos";
 import { renderizarApp } from "@/test/renderizar";
 import { http, servidor } from "@/test/servidor";
@@ -136,7 +137,7 @@ describe("Botón Excel en los listados (RF-144, RNF-06, P-62)", () => {
     expect(recibido.consulta?.get("proveedorId")).toBe("30");
   });
 
-  it("kárdex: exporta el del producto; sin nombre del backend usa uno propio", async () => {
+  it("kárdex: exporta el del producto; sin el nombre del backend usa uno propio con la fecha", async () => {
     servidor.use(
       http.get("/api/v1/inventario/productos/{id}", ({ response }) => response(200).json(productoDetalle())),
       http.get("/api/v1/inventario/productos/{id}/kardex", ({ response }) => response(200).json(pagina([]))),
@@ -151,7 +152,7 @@ describe("Botón Excel en los listados (RF-144, RNF-06, P-62)", () => {
 
     await usuario.click(await screen.findByRole("button", { name: "Excel" }));
     await waitFor(() => {
-      expect(nombres).toEqual(["kardex-CAM-D2.xlsx"]);
+      expect(nombres).toEqual([`kardex-CAM-D2-${hoyBogota()}.xlsx`]);
     });
   });
 });

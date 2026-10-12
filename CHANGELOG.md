@@ -4,6 +4,33 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
 ## [Sin publicar]
 
+### Fase 6 — Inicio, reportes, Excel y validación en local
+
+#### Agregado
+
+- **Inicio** completo con una sola petición:
+  - aviso de tasas antes que todo, con Registrar tasa (RF-07);
+  - indicadores del mes en USD con sus equivalentes y lo cobrado en cada moneda (RF-08, P-57);
+  - accesos rápidos;
+  - stock bajo con barra de nivel, garantías y cotizaciones por vencer;
+  - últimos movimientos que abren su detalle (RF-09 a RF-13).
+- **Indicador de productos bajo el mínimo** junto a Inventario, en el menú y en la barra del celular (RF-02, W-13).
+- **Reportes** con período por semana, mes, año o rango (flechas, en la URL) y tres pestañas:
+  - **Resumen:** indicadores, gráfico de ventas e instalaciones con su tabla, más vendidos e instalados, compras por proveedor, cotizaciones por estado y stock bajo;
+  - **Utilidad por documento:** con filtro y orden;
+  - **Seriales:** por estado y producto (RF-135 a RF-143).
+- **Botón Excel** (RF-144):
+  - en inventario, kárdex, compras, ventas, instalaciones, cotizaciones, garantías y cada pestaña de Reportes;
+  - usa los mismos filtros de la pantalla;
+  - si el archivo pasa de 20.000 filas, avisa (P-62).
+- **Ver compras** en Registrar compra (F6-01, W-14).
+- **`docs/guia-local.md`:** cómo instalar y correr todo en Windows, probar desde el celular por Wi-Fi y la lista de verificación de la Fase 6.
+
+#### Cambiado
+
+- Revisión de accesibilidad con axe (WCAG 2.1 AA) en las 15 pantallas principales: se corrigió el contraste de la vista previa del PDF y de los documentos anulados.
+- Se quitó la página «Esta sección llega en la Fase N».
+
 ### Fase 5 — Cotizaciones
 
 #### Agregado

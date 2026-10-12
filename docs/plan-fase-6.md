@@ -1,6 +1,6 @@
 # Plan de la Fase 6 — Inicio, reportes, Excel y validación en local (italarm-web)
 
-> Estado: **aprobado por ITALARM el 12/10/2026** con las propuestas de W-13 a W-16.
+> Estado: **aprobado por ITALARM el 12/10/2026** con las propuestas de W-13 a W-16. **Implementado el 12/10/2026**; pendiente de la validación de ITALARM en local.
 > Base: `docs/requerimientos.md` (3.1, 3.2, 3.16, RNF-04, RNF-06, RNF-08 y 12.8), `italarm-api/docs/preguntas.md` (P-56 a P-63), `italarm-api/docs/guia-frontend.md` (§18 a §20), `italarm-api/docs/plan-fase-6.md` (sección 9, lista de verificación), el prototipo `docs/Italarm v2.html` (Inicio y Reportes) y el contrato de `dev` @ `4a4ba37`.
 > Alcance: solo **italarm-web**. El backend de esta fase ya está terminado en `dev`: Inicio, reportes y Excel (14 rutas nuevas, sin cambios en las existentes).
 
@@ -202,10 +202,15 @@ Todos están en el contrato de `dev`.
 
 ## 7. Definición de terminado y lista para ITALARM
 
-- [ ] Pruebas de la sección 6 escritas y pasando; cobertura de al menos 80 % de líneas.
-- [ ] Cliente generado desde el contrato vigente (`dev` @ `4a4ba37` o posterior).
-- [ ] `docs/guia-local.md` probada siguiendo los pasos desde cero.
-- [ ] `CHANGELOG.md` y `CLAUDE.md` actualizados.
+- [x] Pruebas de la sección 6 escritas y pasando: 305 de componentes (cobertura 92,5 % de líneas) y 20 escenarios extremo a extremo en celular y computador, incluida la revisión de accesibilidad con axe en 15 pantallas.
+- [x] Contra el backend real de `dev` @ `4a4ba37`:
+  - con los datos de volumen (3 años: 6.000 ventas, 1.500 instalaciones, 20.000 seriales) y una conexión 4G simulada, Inicio, Reportes (mes y año), Utilidad por documento y Ventas cargan en unos 1,5 s (RNF-08 pide menos de 3 s);
+  - el Excel de utilidad del año baja en 2,1 s y el de ventas trae los montos como números;
+  - la carga inicial de la app pesa unos 182 kB comprimidos.
+- [x] Cliente generado desde el contrato vigente (`dev` @ `4a4ba37`).
+- [ ] `docs/guia-local.md` probada siguiendo los pasos desde cero. _(Los mismos pasos se probaron en Linux; en Windows la confirma ITALARM al seguirla.)_
+- [x] `CHANGELOG.md` y `CLAUDE.md` actualizados.
+- **Hallazgo para el backend:** la API no expone `Content-Disposition` por CORS (solo `X-Correlation-Id`), así que el navegador no puede leer el nombre de los archivos (Excel, PDF y plantilla). El frontend usa un nombre de respaldo con la fecha, igual al del backend. El arreglo es agregar `Content-Disposition` a `setExposedHeaders` en `ConfiguracionSeguridad`; queda anotado para la Fase 7.
 - [ ] Todo en `dev` de los dos repositorios.
 - [ ] **Validación de ITALARM en local.** Con ella se escribe el plan de la Fase 7.
 

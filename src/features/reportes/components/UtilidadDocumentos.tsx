@@ -70,7 +70,7 @@ export function UtilidadDocumentos({ periodo }: { periodo: ReturnType<typeof use
             <Total titulo={U.utilidad} valor={datos.utilidadUsd} />
             {datos.porcentajeUtilidad && (
               <div>
-                <dt className="text-xs text-neutro-700">%</dt>
+                <dt className="text-xs text-neutro-700">{U.margenTitulo}</dt>
                 <dd className="m-0 font-titulo text-xl font-semibold">
                   {U.margen(formatearDecimal(datos.porcentajeUtilidad))}
                 </dd>

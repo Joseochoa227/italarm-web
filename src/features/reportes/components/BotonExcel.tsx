@@ -5,6 +5,7 @@ import { Boton } from "@/components/ui/Boton";
 import { useAvisar } from "@/components/ui/contextoAvisos";
 import { guardarArchivo, nombreDeArchivo } from "@/lib/descargas";
 import { mensajeDeError } from "@/lib/errores";
+import { hoyBogota } from "@/lib/fechas";
 
 import { TEXTOS_REPORTES } from "../textos";
 
@@ -21,7 +22,10 @@ export function BotonExcel({
 }: {
   /** `api.GET(".../excel", { params, parseAs: "blob" })`. */
   obtener: () => Promise<{ data?: unknown; response: Response }>;
-  /** Nombre si el backend no lo envía. */
+  /**
+   * Nombre si el navegador no puede leer el del backend (la API todavía no expone
+   * Content-Disposition por CORS): se le agrega la fecha de hoy, como hace el backend.
+   */
   nombre: string;
 }) {
   const avisar = useAvisar();
@@ -35,7 +39,10 @@ export function BotonExcel({
         data instanceof Blob
           ? data
           : new Blob([], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      guardarArchivo(archivo, nombreDeArchivo(response.headers.get("Content-Disposition"), `${nombre}.xlsx`));
+      guardarArchivo(
+        archivo,
+        nombreDeArchivo(response.headers.get("Content-Disposition"), `${nombre}-${hoyBogota()}.xlsx`),
+      );
     } catch (e) {
       avisar({ titulo: mensajeDeError(e), tono: "error" });
     } finally {

@@ -69,6 +69,7 @@ export const TEXTOS_REPORTES = {
     costo: "Costo",
     utilidad: "Utilidad",
     margen: (p: string) => `${p} %`,
+    margenTitulo: "Margen",
     lista: "Utilidad por documento",
     vacio: "No hay ventas ni instalaciones en este período.",
   },
