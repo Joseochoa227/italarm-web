@@ -6,6 +6,7 @@ import { cx } from "@/lib/clases";
 const VARIANTES = {
   primario: "bg-acento-700 border-acento-700 text-fondo hover:bg-acento-800 hover:text-fondo",
   secundario: "border-divisor text-tinta hover:bg-tinta/7 hover:text-tinta",
+  fantasma: "border-transparent text-acento-700 hover:bg-acento/10 hover:text-acento-700",
 } as const;
 
 /** Enlace con forma de botón (navega a otra pantalla), con el mismo aspecto que Boton. */

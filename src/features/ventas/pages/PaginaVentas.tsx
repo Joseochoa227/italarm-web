@@ -1,7 +1,7 @@
 import { Plus, ShieldCheck, ShoppingCart, X } from "lucide-react";
 import { Link } from "react-router";
 
-import { $api } from "@/api/cliente";
+import { $api, api } from "@/api/cliente";
 import type { components } from "@/api/esquema";
 import { errorDeConsultas } from "@/api/problema";
 import { Boton } from "@/components/ui/Boton";
@@ -20,6 +20,7 @@ import { TEXTOS_GARANTIAS } from "@/features/garantias/textos";
 import { SelectorProducto } from "@/features/inventario/components/SelectorProducto";
 import { useFiltrosUrl } from "@/lib/filtrosUrl";
 import { formatearDineroDe, formatearFecha } from "@/lib/formato";
+import { BotonExcel } from "@/features/reportes/components/BotonExcel";
 
 import { TEXTOS_VENTAS } from "../textos";
 
@@ -44,7 +45,7 @@ function FilaVenta({ v }: { v: components["schemas"]["VentaResumenVista"] }) {
           {v.productos && <span className="text-xs text-neutro-700">{v.productos}</span>}
         </div>
         <div className="flex min-w-[140px] flex-col text-right">
-          <span className={anulada ? "font-medium text-neutro-600 line-through" : "font-medium"}>
+          <span className={anulada ? "font-medium text-neutro-700 line-through" : "font-medium"}>
             {v.total ? formatearDineroDe(v.total) : "—"}
           </span>
           {v.totalUsd && v.moneda !== "USD" && (
@@ -69,18 +70,16 @@ export function Component() {
   const desde = filtros.leer("desde");
   const hasta = filtros.leer("hasta");
   const incluirAnuladas = filtros.leer("anuladas") !== "no";
+  // Los mismos filtros de la pantalla, sin paginar, para el botón Excel (RF-144).
+  const filtrosExcel = {
+    incluirAnuladas,
+    ...(cliente ? { clienteId: Number(cliente) } : {}),
+    ...(producto ? { productoId: Number(producto) } : {}),
+    ...(desde ? { desde } : {}),
+    ...(hasta ? { hasta } : {}),
+  };
   const consulta = $api.useQuery("get", "/api/v1/ventas", {
-    params: {
-      query: {
-        page: filtros.paginaApi,
-        size: 20,
-        incluirAnuladas,
-        ...(cliente ? { clienteId: Number(cliente) } : {}),
-        ...(producto ? { productoId: Number(producto) } : {}),
-        ...(desde ? { desde } : {}),
-        ...(hasta ? { hasta } : {}),
-      },
-    },
+    params: { query: { page: filtros.paginaApi, size: 20, ...filtrosExcel } },
   });
   const error = errorDeConsultas(consulta);
   const datos = consulta.data;
@@ -92,6 +91,12 @@ export function Component() {
         titulo={TEXTOS_VENTAS.titulo}
         acciones={
           <>
+            <BotonExcel
+              nombre="ventas"
+              obtener={() =>
+                api.GET("/api/v1/ventas/excel", { params: { query: filtrosExcel }, parseAs: "blob" })
+              }
+            />
             <EnlaceBoton a="/garantias?tipo=VENTA" icono={<ShieldCheck aria-hidden size={16} />}>
               {TEXTOS_GARANTIAS.titulo}
             </EnlaceBoton>

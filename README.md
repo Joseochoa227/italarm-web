@@ -9,6 +9,8 @@ Aplicación web de ITALARM: inventario, compras, ventas, instalaciones y cotizac
 
 ## Ejecutar en local
 
+Para instalar y probar todo el sistema en Windows (base de datos, API y aplicación, también desde el celular), sigue **`docs/guia-local.md`**.
+
 ```bash
 npm install
 npm run dev                  # http://localhost:5173
@@ -39,6 +41,7 @@ Para las pruebas extremo a extremo con un Chromium ya instalado: `PLAYWRIGHT_CHR
 
 - `docs/requerimientos.md`: requerimientos del sistema. Las decisiones de ITALARM están en `italarm-api/docs/preguntas.md` y prevalecen.
 - `docs/plan-fase-N.md`: plan de cada fase.
+- `docs/guia-local.md`: guía para correr todo en local y lista de verificación.
 - `italarm-api/docs/guia-frontend.md`: cómo usar la API (sesión, errores, dinero, paginación…).
 - `CLAUDE.md`: convenciones y decisiones técnicas.
 - `CHANGELOG.md`: cambios por fase.

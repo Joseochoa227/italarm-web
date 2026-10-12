@@ -1,7 +1,7 @@
 import { Plus, ShieldCheck, Wrench } from "lucide-react";
 import { Link } from "react-router";
 
-import { $api } from "@/api/cliente";
+import { $api, api } from "@/api/cliente";
 import type { components } from "@/api/esquema";
 import { errorDeConsultas } from "@/api/problema";
 import { Campo } from "@/components/ui/Campo";
@@ -18,6 +18,7 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { FiltroCliente } from "@/features/comercial/components/SelectorCliente";
 import { useFiltrosUrl } from "@/lib/filtrosUrl";
 import { formatearDineroDe, formatearFecha } from "@/lib/formato";
+import { BotonExcel } from "@/features/reportes/components/BotonExcel";
 
 import { TEXTOS_INSTALACIONES } from "../textos";
 
@@ -59,7 +60,7 @@ function FilaInstalacion({ i }: { i: components["schemas"]["InstalacionResumenVi
           </span>
         </div>
         <div className="flex min-w-[140px] flex-col text-right">
-          <span className={anulada ? "font-medium text-neutro-600 line-through" : "font-medium"}>
+          <span className={anulada ? "font-medium text-neutro-700 line-through" : "font-medium"}>
             {i.total ? formatearDineroDe(i.total) : "—"}
           </span>
           {i.totalUsd && i.moneda !== "USD" && (
@@ -86,19 +87,17 @@ export function Component() {
   const incluirAnuladas = filtros.leer("anuladas") !== "no";
   const tecnicos = $api.useQuery("get", "/api/v1/usuarios/tecnicos");
   const estadoGarantia = ESTADOS.find((e) => e === garantia);
+  // Los mismos filtros de la pantalla, sin paginar, para el botón Excel (RF-144).
+  const filtrosExcel = {
+    incluirAnuladas,
+    ...(cliente ? { clienteId: Number(cliente) } : {}),
+    ...(tecnico ? { tecnicoId: Number(tecnico) } : {}),
+    ...(estadoGarantia ? { estadoGarantia } : {}),
+    ...(desde ? { desde } : {}),
+    ...(hasta ? { hasta } : {}),
+  };
   const consulta = $api.useQuery("get", "/api/v1/instalaciones", {
-    params: {
-      query: {
-        page: filtros.paginaApi,
-        size: 20,
-        incluirAnuladas,
-        ...(cliente ? { clienteId: Number(cliente) } : {}),
-        ...(tecnico ? { tecnicoId: Number(tecnico) } : {}),
-        ...(estadoGarantia ? { estadoGarantia } : {}),
-        ...(desde ? { desde } : {}),
-        ...(hasta ? { hasta } : {}),
-      },
-    },
+    params: { query: { page: filtros.paginaApi, size: 20, ...filtrosExcel } },
   });
   const error = errorDeConsultas(consulta);
   const datos = consulta.data;
@@ -110,6 +109,12 @@ export function Component() {
         titulo={T.titulo}
         acciones={
           <>
+            <BotonExcel
+              nombre="instalaciones"
+              obtener={() =>
+                api.GET("/api/v1/instalaciones/excel", { params: { query: filtrosExcel }, parseAs: "blob" })
+              }
+            />
             <EnlaceBoton a="/garantias" icono={<ShieldCheck aria-hidden size={16} />}>
               {L.garantias}
             </EnlaceBoton>

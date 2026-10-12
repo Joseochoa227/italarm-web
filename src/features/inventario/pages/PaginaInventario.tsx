@@ -1,7 +1,7 @@
 import { ClipboardList, FileSpreadsheet, Package, Plus, Truck } from "lucide-react";
 import { Link } from "react-router";
 
-import { $api } from "@/api/cliente";
+import { $api, api } from "@/api/cliente";
 import type { components } from "@/api/esquema";
 import { errorDeConsultas } from "@/api/problema";
 import { Alerta } from "@/components/ui/Alerta";
@@ -18,6 +18,7 @@ import { Segmentado } from "@/components/ui/Segmentado";
 import { cx } from "@/lib/clases";
 import { useFiltrosUrl } from "@/lib/filtrosUrl";
 import { formatearCantidad, formatearDineroDe, formatearEnMonedas } from "@/lib/formato";
+import { BotonExcel } from "@/features/reportes/components/BotonExcel";
 
 import { TEXTOS_PRODUCTOS } from "../textos";
 import { TEXTOS_INVENTARIO } from "../textosInventario";
@@ -89,16 +90,14 @@ export function Component() {
   const activo = ACTIVO[estado];
 
   const categorias = $api.useQuery("get", "/api/v1/categorias");
+  // Los mismos filtros de la pantalla, sin paginar, para el botón Excel (RF-144).
+  const filtrosExcel = {
+    ...(buscar ? { buscar } : {}),
+    ...(categoria ? { categoriaId: Number(categoria) } : {}),
+    ...(activo === undefined ? {} : { activo }),
+  };
   const consulta = $api.useQuery("get", "/api/v1/inventario", {
-    params: {
-      query: {
-        page: filtros.paginaApi,
-        size: 20,
-        ...(buscar ? { buscar } : {}),
-        ...(categoria ? { categoriaId: Number(categoria) } : {}),
-        ...(activo === undefined ? {} : { activo }),
-      },
-    },
+    params: { query: { page: filtros.paginaApi, size: 20, ...filtrosExcel } },
   });
   const error = errorDeConsultas(consulta);
   const datos = consulta.data;
@@ -116,6 +115,12 @@ export function Component() {
         }
         acciones={
           <>
+            <BotonExcel
+              nombre="inventario"
+              obtener={() =>
+                api.GET("/api/v1/inventario/excel", { params: { query: filtrosExcel }, parseAs: "blob" })
+              }
+            />
             <EnlaceBoton a="/inventario/ajustes" icono={<ClipboardList aria-hidden size={16} />}>
               {L.ajustes}
             </EnlaceBoton>

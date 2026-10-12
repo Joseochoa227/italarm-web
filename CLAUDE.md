@@ -31,7 +31,7 @@ Antes de cada commit, Husky corre ESLint y Prettier sobre los archivos cambiados
 src/
 ├── app/            arranque, rutas (todas diferidas), proveedores, layout, menú y textos de navegación
 ├── api/            esquema.ts (GENERADO, no se edita), cliente.ts, problema.ts y token.ts
-├── components/     PaginaPendiente y ui/ (sistema de diseño)
+├── components/     ui/ (sistema de diseño)
 ├── features/<f>/   components/, hooks/, pages/, schemas/, textos.ts y sus pruebas
 │                   (comercial/: cliente, material, cobro, seriales que salen, comprobante,
 │                   confirmación y anulación, comunes a ventas, instalaciones y cotizaciones)
@@ -73,6 +73,7 @@ Las páginas exportan `Component`, porque React Router las carga con `lazy`.
   - la API se simula con `http` de `@/test/servidor`, tipado con el contrato;
   - `renderizarApp({ ruta, conToken, escritorio })` monta la app completa;
   - datos de prueba en `src/test/datos.ts`; `problema(status, codigo, detalle)` arma los errores;
+  - los `findBy` esperan hasta 3 s (`src/test/configuracion.ts`), porque las páginas se cargan diferidas;
   - en MSW, una ruta con `{id}` también coincide con rutas fijas del mismo nivel (`/tasas/{id}` con `/tasas/vigentes`): el manejador debe devolver `undefined` si no le corresponde.
 
 ## Decisiones técnicas
@@ -100,11 +101,18 @@ Las páginas exportan `Component`, porque React Router las carga con `lazy`.
 | Vista previa del PDF de la cotización como réplica en pantalla                         | W-12: el PDF real solo existe para una cotización guardada. `VistaPreviaPdf` sigue el orden y los textos de `ComprobantesCotizacion` del backend; si el PDF cambia, se ajusta a mano.                                                                               |
 | Conversión con `?cotizacionId=` en Nueva venta / Nueva instalación                     | RF-93: `GET /cotizaciones/{id}/conversion` precarga el formulario (cliente fijo, precios cotizados) y se guarda con `cotizacionId`. Al guardar se invalida todo menos la conversión (`salvoConversion`), que ya convertida respondería `COTIZACION_NO_CONVERTIBLE`. |
 | Acciones de la cotización según el estado; el backend decide                           | `TRANSICION_NO_PERMITIDA` → aviso y recarga. Descargar el PDF de un Borrador o En evaluación llama a `/enviar` (P-50).                                                                                                                                              |
+| Gráficos con HTML y CSS, sin librería                                                  | BF-12: no suma peso a la carga. Las proporciones se calculan con `proporcion()` (BigInt, `lib/decimal.ts`), sin pasar el dinero por `number`; cada gráfico tiene su tabla o texto accesible.                                                                        |
+| Excel con los filtros de la pantalla (`filtrosExcel`) y `BotonExcel`                   | RF-144: la misma consulta del listado sin `page`/`size`. Como la API no expone `Content-Disposition` por CORS, el nombre de respaldo lleva la fecha de hoy, igual que el del backend.                                                                               |
+| Indicador de stock bajo con `GET /inicio` (`useTotalStockBajo`)                        | W-13: la misma cifra del bloque de Inicio. El menú pide Inicio en todas las pantallas: en las pruebas, el manejador por defecto responde `inicioVacio()`.                                                                                                           |
+| Revisión de accesibilidad con axe en las e2e (`e2e/fase6.spec.ts`)                     | BF-11: falla con cualquier violación grave o crítica de WCAG 2.1 AA en las pantallas principales.                                                                                                                                                                   |
 | Errores de negocio sin campo (compras) en un aviso general                             | El backend no indica la línea; los que sí corresponden a un campo se mapean por `codigo` (`COMPRA_FECHA_FUTURA` → fecha, `STOCK_INSUFICIENTE` → cantidad…).                                                                                                         |
 
-## Pendientes para la Fase 6
+## Pendientes para la Fase 7 (salida a producción)
 
-Ver `docs/plan-fase-0.md`, sección 10: acceso al listado de Compras en el celular (F6-01; Cotizaciones ya tiene «Ver cotizaciones», W-11), despliegue a pruebas (F6-02), ajustes del contrato (F6-03), logo (F6-04), CI en GitHub (F6-05) e indicador de bajo mínimo en el menú (F6-06).
+- Despliegue, HTTPS, CSP definitiva y cabeceras del hosting (F6-02, P-04).
+- Ajustes del contrato D-01 y D-02 (F6-03).
+- Logo de ITALARM para los íconos (F6-04, W-15: cuando lo entregue).
+- La API debe exponer `Content-Disposition` por CORS (`Access-Control-Expose-Headers`) para que los archivos usen el nombre del backend.
 
 ## Dependencias abiertas con el backend
 

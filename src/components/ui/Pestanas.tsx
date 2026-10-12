@@ -11,11 +11,14 @@ export function Pestanas<T extends string>({
   activa,
   opciones,
   ruta,
+  conservar = "",
 }: {
   etiqueta: string;
   activa: T;
   opciones: readonly { valor: T; etiqueta: string }[];
   ruta: string;
+  /** Otros parámetros de la URL que se conservan al cambiar de pestaña (por ejemplo, el período). */
+  conservar?: string;
 }) {
   return (
     <nav aria-label={etiqueta} className="flex gap-1 overflow-x-auto border-b border-divisor">
@@ -24,7 +27,7 @@ export function Pestanas<T extends string>({
         return (
           <Link
             key={o.valor}
-            to={`${ruta}?pestana=${o.valor}`}
+            to={`${ruta}?${conservar ? `${conservar}&` : ""}pestana=${o.valor}`}
             replace
             aria-current={actual ? "page" : undefined}
             className={cx(

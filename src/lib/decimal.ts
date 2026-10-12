@@ -91,3 +91,22 @@ export function compararDecimales(a: string, b: string): -1 | 0 | 1 {
   const diferencia = aEscala(a, escala) - aEscala(b, escala);
   return diferencia < 0n ? -1 : diferencia > 0n ? 1 : 0;
 }
+
+/**
+ * Qué porcentaje es `valor` de `maximo` (0 a 100, con un decimal), para dibujar barras sin pasar el
+ * dinero por number. Con máximo 0 o negativo, 0.
+ */
+export function proporcion(valor: string, maximo: string): number {
+  const escala = escalaDe(valor, maximo);
+  const max = aEscala(maximo, escala);
+  if (max <= 0n) return 0;
+  const v = aEscala(valor, escala);
+  const milesimas = (v * 1000n) / max;
+  const acotado = milesimas < 0n ? 0n : milesimas > 1000n ? 1000n : milesimas;
+  return Number(acotado) / 10;
+}
+
+/** El mayor de varios textos decimales ("0" si no hay ninguno). */
+export function maximoDecimal(valores: readonly string[]): string {
+  return valores.reduce((max, v) => (compararDecimales(v, max) > 0 ? v : max), "0");
+}

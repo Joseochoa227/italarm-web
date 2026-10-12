@@ -2,7 +2,9 @@ import {
   compararDecimales,
   decimalAEdicion,
   leerDecimal,
+  maximoDecimal,
   MENSAJES_DECIMAL,
+  proporcion,
   restarDecimales,
   sumarDecimales,
 } from "./decimal";
@@ -69,5 +71,20 @@ describe("aritmética decimal sin number", () => {
     expect(compararDecimales("10", "9.99")).toBe(1);
     expect(compararDecimales("2.50", "2.5")).toBe(0);
     expect(compararDecimales("-1", "0")).toBe(-1);
+  });
+});
+
+describe("proporcion y maximoDecimal (barras de los reportes)", () => {
+  it("da el porcentaje con un decimal, acotado entre 0 y 100", () => {
+    expect(proporcion("25.5", "102")).toBe(25);
+    expect(proporcion("1", "3")).toBe(33.3);
+    expect(proporcion("150", "100")).toBe(100);
+    expect(proporcion("-5", "100")).toBe(0);
+    expect(proporcion("5", "0")).toBe(0);
+  });
+
+  it("encuentra el mayor sin pasar por number", () => {
+    expect(maximoDecimal(["10.50", "9.9999", "10.5001"])).toBe("10.5001");
+    expect(maximoDecimal([])).toBe("0");
   });
 });

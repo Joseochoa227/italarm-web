@@ -9,6 +9,7 @@ import { cx } from "@/lib/clases";
 import { inicial } from "@/lib/texto";
 
 import { BotonBuscarSerial } from "./BotonBuscarSerial";
+import { IndicadorStockBajo } from "./IndicadorStockBajo";
 import { MenuUsuario } from "./MenuUsuario";
 import {
   BARRA_INFERIOR_DERECHA,
@@ -48,7 +49,7 @@ function Pestana({ ruta, etiqueta, icono: Icono }: OpcionNavegacion) {
       end={ruta === "/"}
       className={({ isActive }) =>
         cx(
-          "flex min-h-[56px] flex-col items-center justify-center gap-0.5 rounded-md text-[11px] no-underline",
+          "relative flex min-h-[56px] flex-col items-center justify-center gap-0.5 rounded-md text-[11px] no-underline",
           isActive
             ? "font-semibold text-acento-700 hover:text-acento-700"
             : "text-neutro-700 hover:text-tinta",
@@ -57,6 +58,7 @@ function Pestana({ ruta, etiqueta, icono: Icono }: OpcionNavegacion) {
     >
       <Icono aria-hidden size={22} />
       <span>{etiqueta}</span>
+      {ruta === "/inventario" && <IndicadorStockBajo flotante />}
     </NavLink>
   );
 }

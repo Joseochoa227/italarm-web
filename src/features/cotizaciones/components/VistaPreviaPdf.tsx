@@ -101,8 +101,8 @@ export function VistaPreviaPdf({
             {empresa?.logoUrl && <img src={empresa.logoUrl} alt="" className="h-12 w-auto object-contain" />}
             <div>
               <div className="text-[15px] font-semibold">{empresa?.empresaNombre}</div>
-              {empresa?.empresaLema && <div className="text-neutro-600">{empresa.empresaLema}</div>}
-              <div className="text-neutro-600">
+              {empresa?.empresaLema && <div className="text-neutro-700">{empresa.empresaLema}</div>}
+              <div className="text-neutro-700">
                 {[
                   empresa?.empresaNit && `NIT ${empresa.empresaNit}`,
                   empresa?.empresaCiudad,
@@ -132,11 +132,11 @@ export function VistaPreviaPdf({
           </div>
         )}
         {lineas.length === 0 && !manoDeObra ? (
-          <p className="m-0 text-neutro-500">{P.sinItems}</p>
+          <p className="m-0 text-neutro-700">{P.sinItems}</p>
         ) : (
           <table className="w-full border-collapse">
             <thead>
-              <tr className="border-b border-neutro-300 text-left text-[10px] tracking-[0.08em] text-neutro-500 uppercase">
+              <tr className="border-b border-neutro-300 text-left text-[10px] tracking-[0.08em] text-neutro-700 uppercase">
                 <th className="py-1 font-normal">{P.columnas.descripcion}</th>
                 <th className="py-1 text-right font-normal">{P.columnas.cantidad}</th>
                 <th className="py-1 text-right font-normal">{P.columnas.precio}</th>
@@ -181,7 +181,7 @@ export function VistaPreviaPdf({
           )}
           <Total titulo={P.total} valor={en(resumen?.total)} fuerte />
           {equivalentes(previa, moneda, monedasComprobante).map((t) => (
-            <div key={t} className="text-right text-neutro-600">
+            <div key={t} className="text-right text-neutro-700">
               {t}
             </div>
           ))}
@@ -189,7 +189,7 @@ export function VistaPreviaPdf({
         {textoObservaciones.length > 0 && (
           <p className="m-0 whitespace-pre-line">{P.observaciones(textoObservaciones.join("\n"))}</p>
         )}
-        <footer className="flex flex-col gap-1 border-t border-neutro-300 pt-2 text-[10px] text-neutro-600">
+        <footer className="flex flex-col gap-1 border-t border-neutro-300 pt-2 text-[10px] text-neutro-700">
           {previa?.vence && previa.validezDias !== undefined && (
             <span>{P.validez(previa.validezDias, formatearFecha(previa.vence))}</span>
           )}

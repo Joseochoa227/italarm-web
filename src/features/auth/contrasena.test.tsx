@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 
 import { renderizarApp } from "@/test/renderizar";
 import { http, problema, servidor } from "@/test/servidor";
@@ -41,7 +41,10 @@ describe("Cambiar contraseña (RU-07)", () => {
       contrasenaNueva: "Nueva.Clave9",
       confirmacion: "Nueva.Clave9",
     });
-    expect(router.state.location.pathname).toBe("/");
+    // Inicio se carga diferido: la ruta cambia cuando termina de cargar.
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe("/");
+    });
   });
 
   it.each([

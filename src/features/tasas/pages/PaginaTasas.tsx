@@ -83,7 +83,7 @@ interface Fila {
 }
 
 function CeldaTasa({ tasa, par, abrir }: { tasa: Tasa | undefined; par: Par; abrir: (m: ModoTasa) => void }) {
-  if (!tasa?.valor) return <span className="text-neutro-500">—</span>;
+  if (!tasa?.valor) return <span className="text-neutro-700">—</span>;
   return (
     <span className="flex flex-wrap items-center gap-x-2">
       <strong>{formatearDecimal(tasa.valor)}</strong>

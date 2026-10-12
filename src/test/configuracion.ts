@@ -1,9 +1,12 @@
 import "@testing-library/jest-dom/vitest";
 
-import { cleanup } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
 
 import { pantalla } from "./pantalla";
 import { servidor } from "./servidor";
+
+// Las páginas se cargan diferidas: con la máquina ocupada, la primera puede tardar más de 1 s.
+configure({ asyncUtilTimeout: 3000 });
 
 beforeAll(() => {
   servidor.listen({ onUnhandledRequest: "error" });

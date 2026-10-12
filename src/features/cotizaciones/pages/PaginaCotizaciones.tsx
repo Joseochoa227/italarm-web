@@ -1,7 +1,7 @@
 import { FileText, Plus } from "lucide-react";
 import { Link } from "react-router";
 
-import { $api } from "@/api/cliente";
+import { $api, api } from "@/api/cliente";
 import type { components } from "@/api/esquema";
 import { errorDeConsultas } from "@/api/problema";
 import { Campo } from "@/components/ui/Campo";
@@ -17,6 +17,7 @@ import { FiltroCliente } from "@/features/comercial/components/SelectorCliente";
 import { cx } from "@/lib/clases";
 import { useFiltrosUrl } from "@/lib/filtrosUrl";
 import { formatearDineroDe, formatearFecha } from "@/lib/formato";
+import { BotonExcel } from "@/features/reportes/components/BotonExcel";
 
 import { EstadoCotizacion } from "../components/EstadoCotizacion";
 import { TEXTOS_COTIZACIONES } from "../textos";
@@ -83,19 +84,17 @@ export function Component() {
   const desde = filtros.leer("desde");
   const hasta = filtros.leer("hasta");
   const porVencer = filtros.leer("porVencer") === "si";
+  // Los mismos filtros de la pantalla, sin paginar, para el botón Excel (RF-144).
+  const filtrosExcel = {
+    ...((ESTADOS as readonly string[]).includes(estado) ? { estado: estado as Estado } : {}),
+    ...((TIPOS as readonly string[]).includes(tipo) ? { tipo: tipo as Tipo } : {}),
+    ...(cliente ? { clienteId: Number(cliente) } : {}),
+    ...(desde ? { desde } : {}),
+    ...(hasta ? { hasta } : {}),
+    ...(porVencer ? { porVencer: true } : {}),
+  };
   const consulta = $api.useQuery("get", "/api/v1/cotizaciones", {
-    params: {
-      query: {
-        page: filtros.paginaApi,
-        size: 20,
-        ...((ESTADOS as readonly string[]).includes(estado) ? { estado: estado as Estado } : {}),
-        ...((TIPOS as readonly string[]).includes(tipo) ? { tipo: tipo as Tipo } : {}),
-        ...(cliente ? { clienteId: Number(cliente) } : {}),
-        ...(desde ? { desde } : {}),
-        ...(hasta ? { hasta } : {}),
-        ...(porVencer ? { porVencer: true } : {}),
-      },
-    },
+    params: { query: { page: filtros.paginaApi, size: 20, ...filtrosExcel } },
   });
   const error = errorDeConsultas(consulta);
   const cotizaciones = consulta.data?.contenido ?? [];
@@ -105,9 +104,17 @@ export function Component() {
       <EncabezadoPagina
         titulo={TEXTOS_COTIZACIONES.titulo}
         acciones={
-          <EnlaceBoton a="/cotizaciones/nueva" variante="primario" icono={<Plus aria-hidden size={16} />}>
-            {L.nueva}
-          </EnlaceBoton>
+          <>
+            <BotonExcel
+              nombre="cotizaciones"
+              obtener={() =>
+                api.GET("/api/v1/cotizaciones/excel", { params: { query: filtrosExcel }, parseAs: "blob" })
+              }
+            />
+            <EnlaceBoton a="/cotizaciones/nueva" variante="primario" icono={<Plus aria-hidden size={16} />}>
+              {L.nueva}
+            </EnlaceBoton>
+          </>
         }
       />
       <div className="flex flex-wrap items-end gap-3">

@@ -1,7 +1,7 @@
 import { Paperclip, Plus, ShoppingCart, X } from "lucide-react";
 import { Link } from "react-router";
 
-import { $api } from "@/api/cliente";
+import { $api, api } from "@/api/cliente";
 import type { components } from "@/api/esquema";
 import { errorDeConsultas } from "@/api/problema";
 import { Boton } from "@/components/ui/Boton";
@@ -18,6 +18,7 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { SelectorProducto } from "@/features/inventario/components/SelectorProducto";
 import { useFiltrosUrl } from "@/lib/filtrosUrl";
 import { formatearDineroDe, formatearFecha } from "@/lib/formato";
+import { BotonExcel } from "@/features/reportes/components/BotonExcel";
 
 import { textoTasas } from "../formato";
 import { TEXTOS_COMPRAS } from "../textos";
@@ -50,7 +51,7 @@ function FilaCompra({ c }: { c: Resumen }) {
           {c.productos && <span className="text-xs text-neutro-700">{c.productos}</span>}
         </div>
         <div className="flex min-w-[140px] flex-col text-right">
-          <span className={anulada ? "font-medium text-neutro-600 line-through" : "font-medium"}>
+          <span className={anulada ? "font-medium text-neutro-700 line-through" : "font-medium"}>
             {c.total ? formatearDineroDe(c.total) : "—"}
           </span>
           {c.totalUsd && c.moneda !== "USD" && (
@@ -87,18 +88,16 @@ export function ListaCompras() {
   const incluirAnuladas = filtros.leer("anuladas") !== "no";
 
   const proveedores = $api.useQuery("get", "/api/v1/proveedores", { params: { query: { size: 100 } } });
+  // Los mismos filtros de la pantalla, sin paginar, para el botón Excel (RF-144).
+  const filtrosExcel = {
+    incluirAnuladas,
+    ...(proveedor ? { proveedorId: Number(proveedor) } : {}),
+    ...(producto ? { productoId: Number(producto) } : {}),
+    ...(desde ? { desde } : {}),
+    ...(hasta ? { hasta } : {}),
+  };
   const consulta = $api.useQuery("get", "/api/v1/compras", {
-    params: {
-      query: {
-        page: filtros.paginaApi,
-        size: 20,
-        incluirAnuladas,
-        ...(proveedor ? { proveedorId: Number(proveedor) } : {}),
-        ...(producto ? { productoId: Number(producto) } : {}),
-        ...(desde ? { desde } : {}),
-        ...(hasta ? { hasta } : {}),
-      },
-    },
+    params: { query: { page: filtros.paginaApi, size: 20, ...filtrosExcel } },
   });
   const error = errorDeConsultas(consulta);
   const datos = consulta.data;
@@ -137,6 +136,12 @@ export function ListaCompras() {
             filtros.cambiar({ hasta: e.target.value });
           }}
           className="w-[160px]"
+        />
+        <BotonExcel
+          nombre="compras"
+          obtener={() =>
+            api.GET("/api/v1/compras/excel", { params: { query: filtrosExcel }, parseAs: "blob" })
+          }
         />
         <EnlaceBoton a="/compras/nueva" variante="primario" icono={<Plus aria-hidden size={16} />}>
           {L.nueva}

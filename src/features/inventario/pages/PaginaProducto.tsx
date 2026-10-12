@@ -2,7 +2,7 @@ import { Pencil, SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import { useParams } from "react-router";
 
-import { $api } from "@/api/cliente";
+import { $api, api } from "@/api/cliente";
 import { errorDeConsultas } from "@/api/problema";
 import { Alerta } from "@/components/ui/Alerta";
 import { CargandoLista } from "@/components/ui/CargandoLista";
@@ -13,6 +13,7 @@ import { Etiqueta } from "@/components/ui/Etiqueta";
 import { Paginacion } from "@/components/ui/Paginacion";
 import { Celda, Tabla } from "@/components/ui/Tabla";
 import { Tarjeta } from "@/components/ui/Tarjeta";
+import { BotonExcel } from "@/features/reportes/components/BotonExcel";
 import {
   formatearCantidad,
   formatearDecimal,
@@ -132,14 +133,25 @@ export function Component() {
       {p.controlaSerial && <SerialesProducto productoId={id} resumen={p.seriales} />}
 
       <section aria-labelledby="titulo-kardex" className="flex flex-col gap-2">
-        <h2 id="titulo-kardex" className="m-0 text-[22px]">
-          {D.kardex}
-          {kardex.data?.totalElementos !== undefined && (
-            <span className="ml-2 font-texto text-sm font-normal text-neutro-700">
-              · {kardex.data.totalElementos}
-            </span>
-          )}
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 id="titulo-kardex" className="m-0 text-[22px]">
+            {D.kardex}
+            {kardex.data?.totalElementos !== undefined && (
+              <span className="ml-2 font-texto text-sm font-normal text-neutro-700">
+                · {kardex.data.totalElementos}
+              </span>
+            )}
+          </h2>
+          <BotonExcel
+            nombre={`kardex-${p.codigo ?? String(id)}`}
+            obtener={() =>
+              api.GET("/api/v1/inventario/productos/{id}/kardex/excel", {
+                params: { path: { id } },
+                parseAs: "blob",
+              })
+            }
+          />
+        </div>
         {errorKardex ? (
           <EstadoError error={errorKardex} alReintentar={() => void kardex.refetch()} />
         ) : kardex.isPending ? (

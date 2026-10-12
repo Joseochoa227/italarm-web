@@ -50,6 +50,7 @@ export const TEXTOS_COMPRAS = {
   nueva: {
     titulo: "Nueva compra",
     volver: "Compras",
+    verCompras: "Ver compras",
     encabezado: (fecha: string, usuario: string) => `${fecha} · ${usuario}`,
     consecutivo: "El consecutivo se asigna al guardar.",
     seccionProveedor: "Proveedor y factura",

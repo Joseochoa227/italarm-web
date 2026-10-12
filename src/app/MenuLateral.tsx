@@ -7,6 +7,7 @@ import { cx } from "@/lib/clases";
 import { inicial } from "@/lib/texto";
 
 import { BotonBuscarSerial } from "./BotonBuscarSerial";
+import { IndicadorStockBajo } from "./IndicadorStockBajo";
 import { MenuUsuario } from "./MenuUsuario";
 import { MENU_LATERAL, TEXTOS_NAVEGACION } from "./navegacion";
 
@@ -39,6 +40,7 @@ export function MenuLateral() {
           >
             <Icono aria-hidden size={18} />
             <span className="flex-1">{etiqueta}</span>
+            {ruta === "/inventario" && <IndicadorStockBajo />}
           </NavLink>
         ))}
       </nav>
