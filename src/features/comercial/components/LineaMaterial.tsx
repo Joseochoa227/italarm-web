@@ -50,7 +50,8 @@ function CostoLinea({ previa }: { previa: Previa }) {
 /**
  * Una línea de material de una venta, instalación o cotización (RF-99, RF-108): precio sugerido
  * editable, disponibilidad, costo, cantidad o seriales que salen, subtotal y avisos, tal como los
- * da la vista previa del backend.
+ * da la vista previa del backend. Sin `seriales` (cotización) todas llevan cantidad y la falta de
+ * stock es solo un aviso, porque cotizar no aparta material (RF-86).
  */
 export function LineaMaterial({
   linea,
@@ -59,6 +60,7 @@ export function LineaMaterial({
   registroCantidad,
   registroPrecio,
   seriales,
+  nota,
   errores,
   alQuitar,
 }: {
@@ -67,7 +69,9 @@ export function LineaMaterial({
   moneda: Moneda;
   registroCantidad: UseFormRegisterReturn;
   registroPrecio: UseFormRegisterReturn;
-  seriales: { valor: string[]; alCambiar: (seriales: string[]) => void };
+  seriales?: { valor: string[]; alCambiar: (seriales: string[]) => void };
+  /** Texto bajo el nombre (por ejemplo, lo cotizado al convertir). */
+  nota?: string | undefined;
   errores:
     { cantidad?: string | undefined; precio?: string | undefined; seriales?: string | undefined } | undefined;
   alQuitar: () => void;
@@ -75,6 +79,7 @@ export function LineaMaterial({
   const subtotal = separarMonedas(previa?.subtotal, moneda);
   const sugerido = previa?.precioSugerido;
   const unidad = linea.abreviatura;
+  const conSeriales = linea.controlaSerial && seriales !== undefined;
 
   return (
     <li className="flex flex-col gap-2.5 border-t border-tinta/8 py-4">
@@ -92,12 +97,13 @@ export function LineaMaterial({
               .filter(Boolean)
               .join(" · ")}
           </div>
+          {nota && <div className="text-xs text-acento-700">{nota}</div>}
         </div>
-        {!linea.controlaSerial && (
+        {!conSeriales && (
           <Campo
             etiqueta={N.etiquetaCantidad}
             aria-label={N.cantidad(linea.nombre)}
-            inputMode={linea.admiteDecimales ? "decimal" : "numeric"}
+            inputMode={linea.admiteDecimales && !linea.controlaSerial ? "decimal" : "numeric"}
             autoComplete="off"
             ayuda={unidad}
             error={errores?.cantidad}
@@ -124,7 +130,7 @@ export function LineaMaterial({
           <X aria-hidden size={18} />
         </Boton>
       </div>
-      {linea.controlaSerial && (
+      {conSeriales && (
         <SerialesQueSalen
           productoId={linea.productoId}
           producto={linea.nombre}
@@ -133,11 +139,16 @@ export function LineaMaterial({
           error={errores?.seriales}
         />
       )}
-      {previa?.avisoStock && (
-        <Alerta tono="peligro" rol="alert">
-          {previa.avisoStock}
-        </Alerta>
-      )}
+      {previa?.avisoStock &&
+        (seriales ? (
+          <Alerta tono="peligro" rol="alert">
+            {previa.avisoStock}
+          </Alerta>
+        ) : (
+          <Alerta tono="aviso" rol="status">
+            {previa.avisoStock}
+          </Alerta>
+        ))}
       {previa?.avisoPrecio && (
         <Alerta tono="aviso" rol="status">
           {previa.avisoPrecio}

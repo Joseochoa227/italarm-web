@@ -420,3 +420,157 @@ export function instalacion(cambios: Partial<S["InstalacionVista"]> = {}): S["In
     ...cambios,
   };
 }
+
+export function cotizacion(cambios: Partial<S["CotizacionVista"]> = {}): S["CotizacionVista"] {
+  return {
+    id: 90,
+    consecutivo: "COT-0001",
+    numeroVersion: 1,
+    tipo: "INSTALACION",
+    estado: "BORRADOR",
+    fecha: HOY,
+    validezDias: 15,
+    vence: "2026-10-21",
+    diasParaVencer: 15,
+    porVencer: false,
+    moneda: "USD",
+    cliente: {
+      id: 20,
+      tipo: "INSTALADOR",
+      nombre: "Ferretería El Tornillo",
+      documento: "NIT 900111222-3",
+      telefono: "+573001234567",
+      direccion: "Calle 10 # 5-20",
+      ciudad: "Cúcuta",
+    },
+    descripcion: "Instalación de 4 cámaras",
+    tasas: { trm: "4200", fechaTrm: HOY, tasaVes: "50", fechaTasaVes: HOY },
+    lineas: [
+      {
+        productoId: 10,
+        codigo: "CAM-D2",
+        descripcion: "Cámara domo 2MP",
+        unidad: "und",
+        cantidad: "4",
+        precioSugerido: usd("25.5000"),
+        precioUnitario: usd("25.5000"),
+        subtotal: usd("102.0000"),
+        costoUnitarioUsd: usd("19.5000"),
+      },
+    ],
+    resumen: {
+      material: { usd: usd("102.0000") },
+      manoDeObra: { usd: usd("40.0000") },
+      subtotal: { usd: usd("142.0000") },
+      descuento: { usd: usd("0.0000") },
+      total: { usd: usd("142.0000"), cop: cop("596400.0000") },
+      costo: { usd: usd("78.0000") },
+      utilidad: { usd: usd("64.0000") },
+      porcentajeUtilidad: "45.07",
+    },
+    total: usd("142.0000"),
+    utilidad: usd("64.0000"),
+    porcentajeUtilidad: "45.07",
+    monedasComprobante: [],
+    versionesAnteriores: [],
+    registradaPor: "Jose Ochoa",
+    registradaEn: "2026-10-06T15:00:00Z",
+    version: 0,
+    ...cambios,
+  };
+}
+
+/** Vista previa de una cotización: precios, costo de US$ 19,50 a TRM 4.200 y 4.000 (CP-09) y resumen. */
+export function vistaPreviaCotizacion(
+  cuerpo: {
+    tipo: "VENTA" | "INSTALACION";
+    moneda: "USD" | "COP" | "VES";
+    lineas?: { productoId: number; cantidad: string; precioUnitario?: string }[];
+  },
+  cambios: Partial<S["VistaPreviaCotizacionVista"]> = {},
+): S["VistaPreviaCotizacionVista"] {
+  return {
+    tipo: cuerpo.tipo,
+    fecha: HOY,
+    vence: "2026-10-21",
+    validezDias: 15,
+    moneda: cuerpo.moneda,
+    cliente: {
+      id: 20,
+      tipo: "INSTALADOR",
+      nombre: "Ferretería El Tornillo",
+      documento: "NIT 900111222-3",
+      telefono: "+573001234567",
+      precioAplicado: "Se le aplicará el precio instalador",
+    },
+    tasas: { trm: "4200", fechaTrm: HOY, tasaVes: "50", fechaTasaVes: HOY },
+    avisos: [],
+    lineas: (cuerpo.lineas ?? []).map((l) => ({
+      productoId: l.productoId,
+      nombre: l.productoId === 10 ? "Cámara domo 2MP" : "Cable UTP",
+      abreviatura: l.productoId === 10 ? "und" : "m",
+      cantidad: l.cantidad,
+      disponible: "3",
+      precioSugerido: { monto: "25.5000", moneda: cuerpo.moneda },
+      precioUnitario: { monto: l.precioUnitario ?? "25.5000", moneda: cuerpo.moneda },
+      subtotal: { usd: usd("102.0000"), cop: cop("428400.0000") },
+      costoUnitarioHoy: { usd: usd("19.5000"), cop: cop("81900.0000") },
+      costoUnitarioUltimaCompra: { usd: usd("19.5000"), cop: cop("78000.0000") },
+      ultimaCompra: { consecutivo: "C-0001", fecha: "2026-10-01", trm: "4000" },
+    })),
+    resumen: {
+      material: { usd: usd("102.0000") },
+      manoDeObra: { usd: usd(cuerpo.tipo === "INSTALACION" ? "40.0000" : "0.0000") },
+      subtotal: { usd: usd("142.0000") },
+      descuento: { usd: usd("0.0000") },
+      total: { usd: usd("142.0000"), cop: cop("596400.0000") },
+      costo: { usd: usd("78.0000") },
+      utilidad: { usd: usd("64.0000") },
+      porcentajeUtilidad: "45.07",
+    },
+    ...cambios,
+  };
+}
+
+/** Lo que devuelve GET /cotizaciones/{id}/conversion para la cotización aprobada de 4 cámaras y 120 m de cable. */
+export function conversion(
+  cambios: Partial<S["ConversionCotizacionVista"]> = {},
+): S["ConversionCotizacionVista"] {
+  return {
+    cotizacionId: 90,
+    consecutivo: "COT-0001",
+    tipo: "INSTALACION",
+    clienteId: 20,
+    cliente: "Ferretería El Tornillo",
+    direccion: "Carrera 5 # 1-10",
+    descripcion: "Instalación de 4 cámaras",
+    moneda: "USD",
+    manoDeObra: "40.0000",
+    lineas: [
+      {
+        productoId: 10,
+        nombre: "Cámara domo 2MP",
+        codigo: "CAM-D2",
+        abreviatura: "und",
+        controlaSerial: true,
+        cantidad: "4",
+        precioUnitario: "24.0000",
+        disponible: "4",
+      },
+      {
+        productoId: 11,
+        nombre: "Cable UTP",
+        codigo: "CAB-UTP",
+        abreviatura: "m",
+        controlaSerial: false,
+        cantidad: "120",
+        precioUnitario: "0.8000",
+        disponible: "300",
+      },
+    ],
+    monedasComprobante: ["COP"],
+    avisos: [],
+    puedeGuardar: true,
+    ...cambios,
+  };
+}

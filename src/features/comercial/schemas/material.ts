@@ -60,10 +60,38 @@ export function lineaParaEnviar(
   return { productoId: linea.productoId, cantidad, ...conPrecio };
 }
 
+/**
+ * Línea de una cotización (guía §17): siempre con cantidad, también en los productos con serial,
+ * porque los seriales se eligen al convertirla.
+ */
+export function lineaCotizada(
+  linea: EntradaLineaMaterial,
+):
+  | { productoId: number; cantidad: string; precioUnitario?: string }
+  | { campo: "cantidad" | "precio"; error: string } {
+  const precio = leerPrecio(linea.precio);
+  if (typeof precio === "object") return { campo: "precio", error: precio.error };
+  const cantidad = leerCantidad(linea.cantidad, linea.admiteDecimales && !linea.controlaSerial);
+  if (typeof cantidad !== "string") return { campo: "cantidad", error: cantidad.error };
+  return {
+    productoId: linea.productoId,
+    cantidad,
+    ...(precio === undefined ? {} : { precioUnitario: precio }),
+  };
+}
+
 /** Líneas completas para la vista previa (las incompletas se omiten hasta que se llenen). */
 export function lineasParaVistaPrevia(lineas: readonly EntradaLineaMaterial[]) {
   return lineas.flatMap((l) => {
     const r = lineaParaEnviar(l);
+    return "error" in r ? [] : [r];
+  });
+}
+
+/** Líneas completas de una cotización para su vista previa. */
+export function lineasCotizadas(lineas: readonly EntradaLineaMaterial[]) {
+  return lineas.flatMap((l) => {
+    const r = lineaCotizada(l);
     return "error" in r ? [] : [r];
   });
 }
@@ -81,35 +109,48 @@ export function leerDescuento(
   return { descuentoTipo: tipo, descuentoValor: r.valor };
 }
 
-export const esquemaLineaMaterial = z
-  .object({
-    productoId: z.number(),
-    nombre: z.string(),
-    codigo: z.string(),
-    abreviatura: z.string(),
-    admiteDecimales: z.boolean(),
-    controlaSerial: z.boolean(),
-    cantidad: z.string(),
-    precio: z.string(),
-    seriales: z.array(z.string()),
-  })
-  .transform((linea, ctx) => {
-    const r = lineaParaEnviar(linea);
-    if ("error" in r) {
-      ctx.addIssue({ code: "custom", message: r.error, path: [r.campo] });
-      return z.NEVER;
-    }
-    return r;
-  });
+const objetoLinea = z.object({
+  productoId: z.number(),
+  nombre: z.string(),
+  codigo: z.string(),
+  abreviatura: z.string(),
+  admiteDecimales: z.boolean(),
+  controlaSerial: z.boolean(),
+  cantidad: z.string(),
+  precio: z.string(),
+  seriales: z.array(z.string()),
+});
 
-/** Línea nueva al elegir un producto en el selector. */
-export function lineaDeProducto(p: {
-  id?: number;
-  nombre?: string;
-  codigo?: string;
-  controlaSerial?: boolean;
-  unidadMedida?: { abreviatura?: string; admiteDecimales?: boolean };
-}): EntradaLineaMaterial | null {
+/** Línea de una cotización: cantidad y precio, sin seriales. */
+export const esquemaLineaCotizada = objetoLinea.transform((linea, ctx) => {
+  const r = lineaCotizada(linea);
+  if ("error" in r) {
+    ctx.addIssue({ code: "custom", message: r.error, path: [r.campo] });
+    return z.NEVER;
+  }
+  return r;
+});
+
+export const esquemaLineaMaterial = objetoLinea.transform((linea, ctx) => {
+  const r = lineaParaEnviar(linea);
+  if ("error" in r) {
+    ctx.addIssue({ code: "custom", message: r.error, path: [r.campo] });
+    return z.NEVER;
+  }
+  return r;
+});
+
+/** Línea nueva al elegir un producto en el selector; en una cotización, todas con cantidad 1. */
+export function lineaDeProducto(
+  p: {
+    id?: number;
+    nombre?: string;
+    codigo?: string;
+    controlaSerial?: boolean;
+    unidadMedida?: { abreviatura?: string; admiteDecimales?: boolean };
+  },
+  cotizada = false,
+): EntradaLineaMaterial | null {
   if (p.id === undefined) return null;
   return {
     productoId: p.id,
@@ -118,7 +159,7 @@ export function lineaDeProducto(p: {
     abreviatura: p.unidadMedida?.abreviatura ?? "",
     admiteDecimales: p.unidadMedida?.admiteDecimales ?? false,
     controlaSerial: p.controlaSerial ?? false,
-    cantidad: p.controlaSerial ? "" : "1",
+    cantidad: p.controlaSerial && !cotizada ? "" : "1",
     precio: "",
     seriales: [],
   };

@@ -25,7 +25,18 @@ import { type Cliente, SelectorCliente } from "@/features/comercial/components/S
 import { lineaDeProducto, MONEDAS } from "@/features/comercial/schemas/material";
 import { TEXTOS_COMERCIAL } from "@/features/comercial/textos";
 import { useConfiguracion } from "@/features/configuracion/hooks/configuracion";
+import { AvisoConversion } from "@/features/cotizaciones/components/AvisoConversion";
+import { ConversionNoDisponible } from "@/features/cotizaciones/components/ConversionNoDisponible";
+import {
+  cantidadCotizada,
+  cobroDeConversion,
+  type Conversion,
+  leerCotizacionId,
+  useConversion,
+} from "@/features/cotizaciones/conversion";
+import { TEXTOS_COTIZACIONES } from "@/features/cotizaciones/textos";
 import { SelectorProducto } from "@/features/inventario/components/SelectorProducto";
+import { decimalAEdicion } from "@/lib/decimal";
 import { aplicarErroresDeCampo, mensajeDeError } from "@/lib/errores";
 import { hoyBogota } from "@/lib/fechas";
 import { formatearDecimal, formatearFecha } from "@/lib/formato";
@@ -76,10 +87,13 @@ function Seccion({ numero, titulo, children }: { numero: string; titulo: string;
 function FormularioInstalacion({
   clienteInicial,
   configuracion,
+  conversion,
   alGuardar,
 }: {
   clienteInicial: Cliente | null;
   configuracion: components["schemas"]["ConfiguracionVista"] | undefined;
+  /** Instalación desde una cotización aprobada (RF-93): llega con lo cotizado y el cliente no cambia. */
+  conversion?: Conversion | undefined;
   alGuardar: (instalacion: Instalacion, fotos: FotosLocales) => void;
 }) {
   const hoy = hoyBogota();
@@ -120,6 +134,14 @@ function FormularioInstalacion({
       descuentoValor: "",
       monedasComprobante: [],
       observaciones: "",
+      ...(conversion
+        ? {
+            ...cobroDeConversion(conversion),
+            direccion: conversion.direccion ?? clienteInicial?.direccion ?? "",
+            descripcion: conversion.descripcion ?? "",
+            manoDeObra: decimalAEdicion(conversion.manoDeObra),
+          }
+        : {}),
     },
   });
   const { fields, append, remove } = useFieldArray({ control, name: "lineas" });
@@ -150,7 +172,10 @@ function FormularioInstalacion({
     try {
       const { data } = await api.POST("/api/v1/instalaciones", {
         params: { header: { "Idempotency-Key": clave } },
-        body: valores,
+        body:
+          conversion?.cotizacionId === undefined
+            ? valores
+            : { ...valores, cotizacionId: conversion.cotizacionId },
       });
       await clienteConsultas.invalidateQueries();
       if (data) alGuardar(data, fotos);
@@ -202,11 +227,13 @@ function FormularioInstalacion({
           </EnlaceBoton>
         }
       />
+      {conversion && <AvisoConversion conversion={conversion} />}
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[2_1_460px] flex-col gap-6">
           <Seccion numero="01" titulo={N.seccionCliente}>
             <SelectorCliente
               cliente={cliente}
+              fijo={conversion !== undefined}
               error={errors.clienteId?.message}
               alElegir={(c) => {
                 // La dirección se propone desde el cliente, salvo que ya se haya escrito otra.
@@ -276,6 +303,13 @@ function FormularioInstalacion({
                     linea={entrada.lineas[i] ?? f}
                     previa={datos?.lineas?.find((l) => l.productoId === f.productoId)}
                     moneda={moneda}
+                    nota={
+                      f.controlaSerial && cantidadCotizada(conversion, f.productoId)
+                        ? TEXTOS_COTIZACIONES.conversion.cotizada(
+                            cantidadCotizada(conversion, f.productoId) ?? "",
+                          )
+                        : undefined
+                    }
                     registroCantidad={register(`lineas.${i}.cantidad`)}
                     registroPrecio={register(`lineas.${i}.precio`)}
                     seriales={{
@@ -456,7 +490,9 @@ function FormularioInstalacion({
 /** Nueva instalación (RF-107 a RF-120). Con `?clienteId=` llega con el cliente elegido. */
 export function Component() {
   const [parametros] = useSearchParams();
-  const clienteId = Number(parametros.get("clienteId") ?? "");
+  const cotizacionId = leerCotizacionId(parametros);
+  const conversion = useConversion(cotizacionId);
+  const clienteId = Number(conversion.data?.clienteId ?? parametros.get("clienteId") ?? "");
   const conCliente = Number.isInteger(clienteId) && clienteId > 0;
   const cliente = $api.useQuery(
     "get",
@@ -498,6 +534,19 @@ export function Component() {
       />
     );
   }
+  if (cotizacionId !== null && intento === 0) {
+    if (conversion.isPending) return <CargandoLista filas={4} />;
+    const errorConversion = errorDeConsultas(conversion);
+    if (errorConversion || conversion.data?.tipo !== "INSTALACION") {
+      return (
+        <ConversionNoDisponible
+          cotizacionId={cotizacionId}
+          error={errorConversion}
+          tipo={conversion.data?.tipo}
+        />
+      );
+    }
+  }
   const error = errorDeConsultas(configuracion);
   if (error) return <EstadoError error={error} alReintentar={() => void configuracion.refetch()} />;
   // Se espera al cliente de la URL y a la Configuración para montar el formulario con sus valores.
@@ -507,6 +556,7 @@ export function Component() {
       key={intento}
       clienteInicial={intento === 0 ? (cliente.data ?? null) : null}
       configuracion={configuracion.data}
+      conversion={intento === 0 ? conversion.data : undefined}
       alGuardar={(instalacion, fotos) => {
         setGuardada(instalacion);
         if (instalacion.id !== undefined) void subirFotos(instalacion.id, fotos);

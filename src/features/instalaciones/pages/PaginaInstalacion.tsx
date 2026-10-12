@@ -17,6 +17,7 @@ import { Celda, Tabla } from "@/components/ui/Tabla";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { AccionesComprobante } from "@/features/comercial/components/AccionesComprobante";
 import { AnularDocumento } from "@/features/comercial/components/AnularDocumento";
+import { TEXTOS_COTIZACIONES } from "@/features/cotizaciones/textos";
 import { TEXTOS_COMERCIAL } from "@/features/comercial/textos";
 import { ListaReclamos, RegistrarReclamo } from "@/features/garantias/components/Reclamos";
 import { TEXTOS_GARANTIAS } from "@/features/garantias/textos";
@@ -134,7 +135,9 @@ export function Component() {
                 textos={{
                   anular: D.anular,
                   titulo: D.anularTitulo(consecutivo),
-                  texto: D.anularTexto,
+                  texto: v.cotizacion?.consecutivo
+                    ? `${D.anularTexto} ${TEXTOS_COTIZACIONES.conversion.anularVuelve(v.cotizacion.consecutivo)}`
+                    : D.anularTexto,
                   motivo: D.motivo,
                   motivoRequerido: D.motivoRequerido,
                 }}
@@ -188,7 +191,15 @@ export function Component() {
               .filter(Boolean)
               .join(" · ")}
           </Dato>
-          {v.cotizacion?.consecutivo && <Dato titulo={D.cotizacion}>{v.cotizacion.consecutivo}</Dato>}
+          {v.cotizacion?.consecutivo && (
+            <Dato titulo={D.cotizacion}>
+              {v.cotizacion.id === undefined ? (
+                v.cotizacion.consecutivo
+              ) : (
+                <Link to={`/cotizaciones/${String(v.cotizacion.id)}`}>{v.cotizacion.consecutivo}</Link>
+              )}
+            </Dato>
+          )}
           <div className="escritorio:col-span-3">
             <Dato titulo={D.descripcion}>{v.descripcion}</Dato>
           </div>

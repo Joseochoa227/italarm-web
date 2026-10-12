@@ -30,11 +30,18 @@ export function AccionesComprobante({
   consecutivo,
   obtenerPdf,
   obtenerEnlace,
+  alEnviar,
+  textos,
   bloque = false,
 }: {
   consecutivo: string;
   obtenerPdf: () => Promise<PdfComprobante>;
-  obtenerEnlace: () => Promise<components["schemas"]["EnlaceComprobanteVista"] | undefined>;
+  obtenerEnlace: () => Promise<
+    Pick<components["schemas"]["EnlaceComprobanteVista"], "whatsappUrl"> | undefined
+  >;
+  /** Después de compartir el PDF o de descargarlo (las cotizaciones quedan enviadas, P-50). */
+  alEnviar?: () => Promise<unknown>;
+  textos?: { whatsapp: string; compartirTitulo: (consecutivo: string) => string };
   bloque?: boolean;
 }) {
   const avisar = useAvisar();
@@ -66,6 +73,7 @@ export function AccionesComprobante({
     try {
       const { blob, nombre } = await pedirPdf();
       guardarArchivo(blob, nombre);
+      await alEnviar?.();
     } catch (e) {
       pdf.current = null;
       avisar({ titulo: mensajeDeError(e), tono: "error" });
@@ -99,7 +107,11 @@ export function AccionesComprobante({
         const { blob, nombre } = await pedirPdf();
         const archivo = new File([blob], nombre, { type: "application/pdf" });
         if (puedeCompartir(archivo)) {
-          await navigator.share({ files: [archivo], title: T.compartirTitulo(consecutivo) });
+          await navigator.share({
+            files: [archivo],
+            title: (textos?.compartirTitulo ?? T.compartirTitulo)(consecutivo),
+          });
+          await alEnviar?.();
           return;
         }
       }
@@ -123,7 +135,7 @@ export function AccionesComprobante({
         onClick={() => void enviar()}
       >
         <Send aria-hidden size={16} />
-        {bloque ? T.whatsappLargo : T.whatsapp}
+        {textos?.whatsapp ?? (bloque ? T.whatsappLargo : T.whatsapp)}
       </Boton>
       <Boton bloque={bloque} ocupado={ocupado === "pdf"} onClick={() => void descargar()}>
         <Download aria-hidden size={16} />

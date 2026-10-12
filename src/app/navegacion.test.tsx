@@ -26,11 +26,11 @@ describe("Navegación en computador (RF-01)", () => {
   it("lleva a cada sección, que muestra en qué fase llega", async () => {
     const { usuario, router } = renderizarApp();
 
-    await usuario.click(await screen.findByRole("link", { name: "Cotizaciones" }));
+    await usuario.click(await screen.findByRole("link", { name: "Reportes" }));
 
-    expect(await screen.findByRole("heading", { name: "Cotizaciones" })).toBeInTheDocument();
-    expect(screen.getByText("Esta sección llega en la Fase 5")).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe("/cotizaciones");
+    expect(await screen.findByRole("heading", { name: "Reportes" })).toBeInTheDocument();
+    expect(screen.getByText("Esta sección llega en la Fase 6")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/reportes");
   });
 
   it("el menú del usuario tiene Configuración, Usuarios, Cambiar contraseña y Cerrar sesión (W-01)", async () => {
@@ -105,14 +105,13 @@ describe("Navegación en celular (RF-03, RF-04)", () => {
 });
 
 describe("Secciones pendientes (entregable de la Fase 0: menú vacío)", () => {
-  it.each([
-    ["/cotizaciones", "Cotizaciones", 5],
-    ["/cotizaciones/nueva", "Nueva cotización", 5],
-    ["/reportes", "Reportes", 6],
-  ])("%s muestra «%s» y la fase en que llega", async (ruta, titulo, fase) => {
-    renderizarApp({ ruta });
+  it.each([["/reportes", "Reportes", 6]])(
+    "%s muestra «%s» y la fase en que llega",
+    async (ruta, titulo, fase) => {
+      renderizarApp({ ruta });
 
-    expect(await screen.findByRole("heading", { level: 1, name: titulo })).toBeInTheDocument();
-    expect(screen.getByText(`Esta sección llega en la Fase ${fase}`)).toBeInTheDocument();
-  });
+      expect(await screen.findByRole("heading", { level: 1, name: titulo })).toBeInTheDocument();
+      expect(screen.getByText(`Esta sección llega en la Fase ${fase}`)).toBeInTheDocument();
+    },
+  );
 });

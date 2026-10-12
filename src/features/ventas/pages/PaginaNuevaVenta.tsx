@@ -20,6 +20,15 @@ import { LineaMaterial } from "@/features/comercial/components/LineaMaterial";
 import { ResumenCobro } from "@/features/comercial/components/ResumenCobro";
 import { lineaDeProducto, MONEDAS } from "@/features/comercial/schemas/material";
 import { TEXTOS_COMERCIAL } from "@/features/comercial/textos";
+import { AvisoConversion } from "@/features/cotizaciones/components/AvisoConversion";
+import {
+  cantidadCotizada,
+  cobroDeConversion,
+  type Conversion,
+  leerCotizacionId,
+  useConversion,
+} from "@/features/cotizaciones/conversion";
+import { ConversionNoDisponible } from "@/features/cotizaciones/components/ConversionNoDisponible";
 import { SelectorProducto } from "@/features/inventario/components/SelectorProducto";
 import { aplicarErroresDeCampo, mensajeDeError } from "@/lib/errores";
 import { hoyBogota } from "@/lib/fechas";
@@ -30,6 +39,7 @@ import { ConfirmacionVenta } from "../components/ConfirmacionVenta";
 import { useVistaPreviaVenta } from "../hooks/vistaPrevia";
 import { type DatosVenta, type EntradaVenta, esquemaVenta } from "../schemas/venta";
 import { TEXTOS_VENTAS } from "../textos";
+import { TEXTOS_COTIZACIONES } from "@/features/cotizaciones/textos";
 
 const N = TEXTOS_VENTAS.nueva;
 const OPCIONES_MONEDA = MONEDAS.map((m) => ({ valor: m, etiqueta: m }));
@@ -75,9 +85,12 @@ function TasasDelDia() {
 
 function FormularioVenta({
   clienteInicial,
+  conversion,
   alGuardar,
 }: {
   clienteInicial: Cliente | null;
+  /** Venta desde una cotización aprobada (RF-93): llega con lo cotizado y el cliente no cambia. */
+  conversion?: Conversion | undefined;
   alGuardar: (venta: components["schemas"]["VentaVista"]) => void;
 }) {
   const hoy = hoyBogota();
@@ -99,7 +112,9 @@ function FormularioVenta({
     formState: { errors },
   } = useForm<EntradaVenta, unknown, DatosVenta>({
     resolver: zodResolver(esquemaVenta),
-    defaultValues: { ...VACIA, clienteId: clienteInicial?.id ?? null },
+    defaultValues: conversion
+      ? { ...VACIA, ...cobroDeConversion(conversion) }
+      : { ...VACIA, clienteId: clienteInicial?.id ?? null },
   });
   const { fields, append, remove } = useFieldArray({ control, name: "lineas" });
   const entrada = useWatch({ control }) as EntradaVenta;
@@ -115,7 +130,10 @@ function FormularioVenta({
     try {
       const { data } = await api.POST("/api/v1/ventas", {
         params: { header: { "Idempotency-Key": clave } },
-        body: valores,
+        body:
+          conversion?.cotizacionId === undefined
+            ? valores
+            : { ...valores, cotizacionId: conversion.cotizacionId },
       });
       await clienteConsultas.invalidateQueries();
       if (data) alGuardar(data);
@@ -149,11 +167,13 @@ function FormularioVenta({
           </EnlaceBoton>
         }
       />
+      {conversion && <AvisoConversion conversion={conversion} />}
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[2_1_460px] flex-col gap-6">
           <Seccion numero="01" titulo={N.seccionCliente}>
             <SelectorCliente
               cliente={cliente}
+              fijo={conversion !== undefined}
               error={errors.clienteId?.message}
               alElegir={(c) => {
                 setCliente(c);
@@ -223,6 +243,13 @@ function FormularioVenta({
                     linea={entrada.lineas[i] ?? f}
                     previa={datos?.lineas?.find((l) => l.productoId === f.productoId)}
                     moneda={moneda}
+                    nota={
+                      f.controlaSerial && cantidadCotizada(conversion, f.productoId)
+                        ? TEXTOS_COTIZACIONES.conversion.cotizada(
+                            cantidadCotizada(conversion, f.productoId) ?? "",
+                          )
+                        : undefined
+                    }
                     registroCantidad={register(`lineas.${i}.cantidad`)}
                     registroPrecio={register(`lineas.${i}.precio`)}
                     seriales={{
@@ -307,7 +334,9 @@ function FormularioVenta({
 /** Nueva venta (RF-97 a RF-104). Con `?clienteId=` llega con el cliente elegido. */
 export function Component() {
   const [parametros] = useSearchParams();
-  const clienteId = Number(parametros.get("clienteId") ?? "");
+  const cotizacionId = leerCotizacionId(parametros);
+  const conversion = useConversion(cotizacionId);
+  const clienteId = Number(conversion.data?.clienteId ?? parametros.get("clienteId") ?? "");
   const conCliente = Number.isInteger(clienteId) && clienteId > 0;
   const cliente = $api.useQuery(
     "get",
@@ -332,13 +361,28 @@ export function Component() {
       />
     );
   }
+  if (cotizacionId !== null && intento === 0) {
+    if (conversion.isPending) return null;
+    const errorConversion = errorDeConsultas(conversion);
+    if (errorConversion || conversion.data?.tipo !== "VENTA") {
+      return (
+        <ConversionNoDisponible
+          cotizacionId={cotizacionId}
+          error={errorConversion}
+          tipo={conversion.data?.tipo}
+        />
+      );
+    }
+  }
   // Se espera al cliente de la URL para montar el formulario con él (defaultValues).
   if (conCliente && cliente.isPending) return null;
+  const desdeCotizacion = intento === 0 ? conversion.data : undefined;
   return (
     <FormularioVenta
       // Otra venta: formulario vacío y una clave de idempotencia nueva.
       key={intento}
       clienteInicial={intento === 0 ? (cliente.data ?? null) : null}
+      conversion={desdeCotizacion}
       alGuardar={setGuardada}
     />
   );

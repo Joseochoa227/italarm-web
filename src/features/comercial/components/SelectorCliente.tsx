@@ -134,16 +134,19 @@ export function DialogoClientes({
 
 /**
  * Cliente de un documento (RF-98): se busca o se crea sin salir del formulario (RF-79), y se muestra
- * su tipo y el precio que se le aplicará (RF-78).
+ * su tipo y el precio que se le aplicará (RF-78). `fijo`: no se cambia (conversión de una
+ * cotización, P-54).
  */
 export function SelectorCliente({
   cliente,
   alElegir,
   error,
+  fijo = false,
 }: {
   cliente: Cliente | null;
   alElegir: (cliente: Cliente) => void;
   error?: string | undefined;
+  fijo?: boolean;
 }) {
   const [abierto, setAbierto] = useState(false);
   const elegir = (c: Cliente) => {
@@ -162,14 +165,16 @@ export function SelectorCliente({
             <div className="text-xs text-neutro-700">{cliente.precioAplicadoDescripcion}</div>
           </div>
           {cliente.tipo && <Etiqueta tono="acento">{TEXTOS_CLIENTES.tipos[cliente.tipo]}</Etiqueta>}
-          <Boton
-            variante="fantasma"
-            onClick={() => {
-              setAbierto(true);
-            }}
-          >
-            {T.cambiar}
-          </Boton>
+          {!fijo && (
+            <Boton
+              variante="fantasma"
+              onClick={() => {
+                setAbierto(true);
+              }}
+            >
+              {T.cambiar}
+            </Boton>
+          )}
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-2">

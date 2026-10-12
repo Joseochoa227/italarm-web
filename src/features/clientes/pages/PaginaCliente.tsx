@@ -2,6 +2,7 @@ import { FileText, MessageCircle, Pencil, ShoppingCart, Wrench, ShieldCheck } fr
 import type { ReactNode } from "react";
 import { Link, useParams } from "react-router";
 
+import { CotizacionesCliente } from "@/features/cotizaciones/components/CotizacionesCliente";
 import { TEXTOS_GARANTIAS } from "@/features/garantias/textos";
 import { EnlaceDocumento } from "@/features/inventario/components/EnlaceDocumento";
 
@@ -178,6 +179,7 @@ export function Component() {
           </ul>
         )}
       </section>
+      <CotizacionesCliente clienteId={id} nombre={c.nombre ?? ""} />
     </>
   );
 }
